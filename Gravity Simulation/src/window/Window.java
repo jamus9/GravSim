@@ -66,14 +66,16 @@ public class Window extends Application {
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Namen");
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vektoren");
 
-	// launches the JavaFX application
+	/**
+	 * launches the javafx application
+	 */
 	public static void main(String[] args) {
 		Simulation.run();
 		Application.launch(args);
 	}
 
 	/**
-	 * main window for the simulation
+	 * Starts the window for the simulation.
 	 */
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Gravity Simulation");
@@ -89,25 +91,23 @@ public class Window extends Application {
 		// seconds label
 		Label seconds = new Label();
 		seconds.relocate(0, 40);
-		infoGroup.getChildren().add(seconds);
-		// seconds.setVisible(false);
 
 		// steps per second label
 		Label sps = new Label();
 		sps.relocate(3, 25);
-		infoGroup.getChildren().add(sps);
-		// sps.setVisible(false);
 
 		// info label
 		info.relocate(3, 70);
-		infoGroup.getChildren().add(info);
+		infoGroup.getChildren().addAll(info, seconds, sps);
 
 		// menu bar
 		MenuBar menuBar = new MenuBar();
 		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
 		root.getChildren().add(menuBar);
 
-		// simulation menu
+		/**
+		 * simulation menu
+		 */
 		Menu simulation = new Menu("Simulation");
 
 		MenuItem restart = new MenuItem("Neustart");
@@ -121,21 +121,21 @@ public class Window extends Application {
 
 		simulation.getItems().addAll(restart, resetView, exit);
 
-		// options menu
-		Menu options = new Menu("Einstellungen");
+		/**
+		 * settings menu
+		 */
+		Menu settings = new Menu("Einstellungen");
 
-		orbitsCMI.setSelected(true);
 		orbitsCMI.setOnAction(actionEvent -> changeOrbitVisibility());
-		labelsCMI.setSelected(true);
 		labelsCMI.setOnAction(actionEvent -> changeLabelVisibility());
-		infoCMI.setSelected(true);
 		infoCMI.setOnAction(ActionEvent -> changeInfoVisibility());
-		vectorsCMI.setSelected(false);
 		vectorsCMI.setOnAction(actionEvent -> changeVectorVisibility());
 
-		options.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI);
+		settings.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI);
 
-		// load different constellations in the menu
+		/**
+		 * constellation loading menu
+		 */
 		Menu load = new Menu("Lade");
 
 		MenuItem solarSystemItem = new MenuItem(StartConditions.solarSystem.getName());
@@ -158,8 +158,8 @@ public class Window extends Application {
 
 		load.getItems().addAll(solarSystemItem, earthMoonItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem);
 
-		// add menus to the menu bar
-		menuBar.getMenus().addAll(simulation, load, options);
+		// add all menus to the menu bar
+		menuBar.getMenus().addAll(simulation, load, settings);
 
 		/**
 		 * starts the simulation and initialize all values to default
@@ -194,7 +194,6 @@ public class Window extends Application {
 				// draw orbits
 				if (!Simulation.pause && orbits) {
 					orbitGroup.getChildren().clear();
-
 					for (Planet planet : Simulation.planets)
 						for (Line line : planet.getOrbitLineList())
 							orbitGroup.getChildren().add(line);
@@ -212,6 +211,7 @@ public class Window extends Application {
 				}
 			}
 		});
+		
 		Timeline timeline = new Timeline(drawObjects);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
@@ -261,26 +261,30 @@ public class Window extends Application {
 			}
 		});
 
-		// zoom in and out with the mouse wheel
+		/**
+		 * Zoom with the mouse wheel.
+		 */
 		scene.setOnScroll(new EventHandler<ScrollEvent>() {
 			public void handle(ScrollEvent event) {
-				double zoomFactor = 1.05;
 
 				// zoom in
-				if (event.getDeltaY() > 0) {
-					zoom *= zoomFactor;
-					translateOrbits();
-				}
+				if (event.getDeltaY() > 0)
+					zoom *= 1.05;
+
 				// zoom out
-				if (event.getDeltaY() < 0) {
-					zoom /= zoomFactor;
-					translateOrbits();
-				}
+				if (event.getDeltaY() < 0)
+					zoom /= 1.05;
+
+				translateOrbits();
+
 				event.consume();
 			}
 		});
 
-		// save mouse position and check if a planet was selected
+		/**
+		 * Select planets with primary mouse button and reset view with
+		 * secondary mouse button. Saves click position.
+		 */
 		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
 				mouseX = event.getX();
@@ -296,17 +300,23 @@ public class Window extends Application {
 			}
 		});
 
-		// if the mouse is dragged translate the screen
+		/**
+		 * Translates the view if the mouse is dragged.
+		 */
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
+
 				tempdx = (event.getX() - mouseX) / zoom;
 				tempdy = (event.getY() - mouseY) / zoom;
+
 				translateOrbits();
 			}
 		});
 
-		// if the mouse is released the current position is saved in dx/y and
-		// tempdx/y is reset
+		/**
+		 * When the mouse is released the current position is saved in dx dy and
+		 * tempdx tempdy is reset
+		 */
 		scene.setOnMouseReleased(MouseEvent -> {
 			dx += tempdx;
 			dy += tempdy;
@@ -322,8 +332,6 @@ public class Window extends Application {
 	 *            the constellation of the simulation
 	 */
 	private void restart(Constellation constellation) {
-
-		// reset all variables to default values
 		zoom = 1;
 		dx = dy = 0;
 		tempdx = tempdy = 0;
@@ -397,8 +405,8 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Checks if a planet is clicked. Automatically deselects the
-	 * previously selected planet
+	 * Checks if a planet is clicked. Automatically deselects the previously
+	 * selected planet
 	 * 
 	 * If a planet is clicked, highlight it and set the variables to follow it.
 	 */
@@ -420,6 +428,7 @@ public class Window extends Application {
 
 	/**
 	 * Selects a planet and updates the info label
+	 * 
 	 * @param i
 	 */
 	public void selectPlanet(int i) {
