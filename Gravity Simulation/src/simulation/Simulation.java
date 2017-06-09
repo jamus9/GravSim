@@ -13,6 +13,8 @@ import utils.Vec2D;
 /**
  * Simulates the movement of the planets and handles the current planets and
  * constellation.
+ * 
+ * @author Jan Muskalla
  */
 public class Simulation {
 

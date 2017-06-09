@@ -4,6 +4,9 @@ import simulation.Planet;
 
 /**
  * Implements a Constellation with an array of planets, a scale, time and name.
+ * 
+ * @author Jan Muskalla
+ * 
  */
 public class Constellation {
 

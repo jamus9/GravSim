@@ -13,6 +13,9 @@ import window.Window;
  * Implements a planet with position and velocity vector, radius, mass and a
  * name. Each planet has a circle, velocity line and label that are drawn in the
  * main window.
+ * 
+ * @author Jan Muskalla
+ * 
  */
 public class Planet {
 

@@ -2,6 +2,9 @@ package utils;
 
 /**
  * A 2D vector with x and y coordinates
+ * 
+ * @author Jan Muskalla
+ *
  */
 public class Vec2D {
 

@@ -6,6 +6,9 @@ import simulation.Simulation;
 
 /**
  * A class that creates start conditions (constellations) for the simulation.
+ * 
+ * @author Jan Muskalla
+ * 
  */
 public class StartConditions {
 
