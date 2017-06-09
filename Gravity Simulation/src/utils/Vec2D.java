@@ -18,8 +18,6 @@ public class Vec2D {
 	public Vec2D() {
 		this(0, 0);
 	}
-
-	// Getter
 	
 	public double x() {
 		return x;
@@ -29,8 +27,6 @@ public class Vec2D {
 		return y;
 	}
 
-	// Operations
-	
 	public Vec2D add(Vec2D v) {
 		return new Vec2D(x + v.x, y + v.y);
 	}
@@ -52,10 +48,11 @@ public class Vec2D {
 	}
 
 	public boolean isEqual(Vec2D vec) {
-		if (vec.x() == this.x && vec.y() == this.y)
-			return true;
-		else
-			return false;
+		return (vec.x() == x && vec.y() == y);
+	}
+
+	@Override
+	public Vec2D clone() {
+		return new Vec2D(x, y);
 	}
 }
-

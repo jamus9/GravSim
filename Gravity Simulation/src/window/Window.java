@@ -32,6 +32,10 @@ import utils.Vec2D;
 /**
  * The main window of the application that handles all drawn objects.
  * 
+ * default values in restart()
+ * 
+ * info and orbittranslate only when needed
+ * 
  * @author Jan Muskalla
  *
  */
@@ -85,7 +89,7 @@ public class Window extends Application {
 	 */
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Gravity Simulation");
-		primaryStage.setMaximized(true);
+		// primaryStage.setMaximized(true);
 
 		// main group
 		Group root = new Group();
@@ -206,9 +210,11 @@ public class Window extends Application {
 				}
 
 				// update counter
-				sps.setText("Steps/Sec: " + (Simulation.SPScounter * 60));
-				Simulation.SPScounter = 0;
-				seconds.setText(Simulation.pastTime());
+				if (!Simulation.pause) {
+					sps.setText("Steps/Sec: " + (Simulation.SPScounter * 60));
+					Simulation.SPScounter = 0;
+					seconds.setText(Simulation.pastTime());
+				}
 
 				// return to the center after a reset of the window
 				if (stopResetTimeline && zoom == 1 && dx == 0 && dy == 0) {
@@ -345,10 +351,13 @@ public class Window extends Application {
 
 		orbits = true;
 		orbitsCMI.setSelected(orbits);
+
 		labels = true;
 		labelsCMI.setSelected(labels);
+
 		vectors = false;
 		vectorsCMI.setSelected(vectors);
+
 		infoGroup.setVisible(true);
 		infoCMI.setSelected(true);
 
@@ -491,6 +500,16 @@ public class Window extends Application {
 	}
 
 	/**
+	 * Updates the check menu items in the menu "settings".
+	 */
+	private void updateCMIs() {
+		orbitsCMI.setSelected(orbits);
+		labelsCMI.setSelected(labels);
+		vectorsCMI.setSelected(vectors);
+		infoCMI.setSelected(infoGroup.isVisible());
+	}
+
+	/**
 	 * Changes the visibility of the orbit for all planets and updates the check
 	 * menu item.
 	 * 
@@ -507,7 +526,7 @@ public class Window extends Application {
 		} else {
 			orbits = true;
 			for (Planet p : Simulation.planets)
-				p.setOldPos();
+				p.savePosition();
 		}
 		updateCMIs();
 	}
@@ -541,16 +560,6 @@ public class Window extends Application {
 	private void changeInfoVisibility() {
 		infoGroup.setVisible(!infoGroup.isVisible());
 		updateCMIs();
-	}
-
-	/**
-	 * Updates the check menu items in the menu "settings".
-	 */
-	public void updateCMIs() {
-		orbitsCMI.setSelected(orbits);
-		labelsCMI.setSelected(labels);
-		vectorsCMI.setSelected(vectors);
-		infoCMI.setSelected(infoGroup.isVisible());
 	}
 
 }

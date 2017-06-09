@@ -6,13 +6,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import utils.Vec2D;
-import utils.Vec4D;
 import window.Window;
 
 /**
- * Implements a planet with position and velocity vector, radius, mass and a
- * name. Each planet has a circle, velocity line and label that are drawn in the
- * main window.
+ * Implements a planet with position and velocity, radius, mass and a name. Each
+ * planet has a circle, velocity line and label that are drawn in the main
+ * window. The orbitLineList contains the orbit that gets drawn and the list
+ * orbitPoints saves the real coordinates of the orbit for later transformation.
  * 
  * @author Jan Muskalla
  * 
@@ -21,12 +21,9 @@ public class Planet {
 
 	private Vec2D pos;
 	private Vec2D vel;
-	private Vec2D oldPos;
 
 	private double radius;
 	private double mass;
-
-	private String name;
 
 	private Circle circle;
 	private Line velocityLine;
@@ -36,16 +33,32 @@ public class Planet {
 	private LinkedList<Line> orbitLineList;
 
 	// the coordinates of the orbit
-	private LinkedList<Vec4D> orbitPoints;
+	private LinkedList<Vec2D> orbitPoints;
 
-	// x y x y mass radius color name
+	/**
+	 * Creates a new Planet with position, velocity, mass, radius, color and
+	 * name.
+	 * 
+	 * @param xp
+	 *            position x
+	 * @param yp
+	 *            position y
+	 * @param xv
+	 *            velocity x
+	 * @param yv
+	 *            velocity y
+	 * @param mass
+	 * @param radius
+	 * @param color
+	 * @param name
+	 */
 	public Planet(double xp, double yp, double xv, double yv, double mass, double radius, Color color, String name) {
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		this.mass = mass;
 		this.radius = radius;
-		this.name = name;
-		initializeObjects(color, this.name);
+		// this.name = name;
+		initializeObjects(color, name);
 	}
 
 	// position and velocity = (0,0)
@@ -65,58 +78,21 @@ public class Planet {
 	 * @param name
 	 */
 	private void initializeObjects(Color color, String name) {
-		Vec2D tp = transform(pos);
-
-		circle = new Circle(tp.x(), tp.y(), Simulation.scale * radius, color);
+		circle = new Circle();
+		circle.setFill(color);
 		circle.setStroke(Color.BLACK);
 
-		velocityLine = new Line(0, 0, 0, 0);
+		velocityLine = new Line();
 		velocityLine.setStroke(Color.RED);
 		velocityLine.setVisible(false);
 
 		label = new Label(name);
-		label.relocate(tp.x() + radius + 10, tp.y());
 
 		orbitLineList = new LinkedList<Line>();
-		orbitPoints = new LinkedList<Vec4D>();
+		orbitPoints = new LinkedList<Vec2D>();
 
-		setOldPos();
+		savePosition();
 	}
-
-	/**
-	 * Sets the next orbit line in coordinates of the planet and saves the real
-	 * position.
-	 */
-	private void setNextOrbitLine() {
-		Vec2D tp = transform(pos);
-		Vec2D top = transform(oldPos);
-
-		if (tp.sub(top).norm() > 4) {
-
-			if (orbitLineList.size() > 300) {
-				orbitLineList.removeFirst();
-				orbitPoints.removeFirst();
-			}
-
-			Line line = new Line(tp.x(), tp.y(), top.x(), top.y());
-			line.setStroke(Color.RED);
-
-			orbitLineList.addLast(line);
-			
-			orbitPoints.addLast(new Vec4D(oldPos.x(), oldPos.y(), pos.x(), pos.y()));
-
-			setOldPos();
-
-			// FadeTransition ft = new FadeTransition(new Duration(30000),
-			// newLine);
-			// ft.setFromValue(1.0);
-			// ft.setToValue(0.0);
-			// ft.play();
-		}
-	}
-
-	// typical asteroid?
-	private static final double DENSITY = 2000; // kg/m^3
 
 	/**
 	 * Returns the mass of a 3D planet with a given radius and a default
@@ -127,10 +103,18 @@ public class Planet {
 	 * @return the mass of the planet
 	 */
 	private static double standardMass(double radius) {
-		return (4.0 / 3.0) * Math.PI * Math.pow(radius, 3) * DENSITY;
+		// typical asteroid? in kg/m^3
+		double density = 2000;
+		return (4.0 / 3.0) * Math.PI * Math.pow(radius, 3) * density;
 	}
 
-	// transforms a vector from planet coordinates to screen coordinates
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param v
+	 *            the vector to transform
+	 * @return the transformed vector
+	 */
 	private static Vec2D transform(Vec2D v) {
 		double x = Window.zoom * (Simulation.scale * v.x() + Window.dx + Window.tempdx) + Window.winX / 2.0;
 		double y = Window.zoom * (Simulation.scale * -v.y() + Window.dy + Window.tempdy) + Window.winY / 2.0;
@@ -139,40 +123,61 @@ public class Planet {
 
 	/**
 	 * Updates the position and radius of the circle, the vector line, the label
-	 * and the orbit of this planet
+	 * and the orbit of this planet.
 	 */
 	public void updateObjects() {
-		Vec2D tpos = transform(pos);
+		Vec2D tp = transform(pos);
 
-		circle.setCenterX(tpos.x());
-		circle.setCenterY(tpos.y());
+		// update circle
+		circle.setCenterX(tp.x());
+		circle.setCenterY(tp.y());
 		circle.setRadius(Simulation.scale * Window.zoom * radius);
 
+		// update vectors
 		if (Window.vectors) {
-			velocityLine.setStartX(tpos.x());
-			velocityLine.setStartY(tpos.y());
-			velocityLine.setEndX(vel.x() + tpos.x());
-			velocityLine.setEndY(-vel.y() + tpos.y());
+			double scaleFactor = Simulation.scale * Window.zoom * 100000.0;
+			velocityLine.setStartX(tp.x());
+			velocityLine.setStartY(tp.y());
+			velocityLine.setEndX(vel.x() * scaleFactor + tp.x());
+			velocityLine.setEndY(-vel.y() * scaleFactor + tp.y());
 		}
 
-		if (Window.labels)
-			label.relocate(tpos.x() + Simulation.scale * Window.zoom * radius + 5, tpos.y());
+		// update labels
+		if (Window.labels) {
+			double offset = Simulation.scale * Window.zoom * radius + 5;
+			label.relocate(tp.x() + offset, tp.y());
+		}
 
-		if (Window.orbits)
-			setNextOrbitLine();
+		// update orbits
+		if (Window.orbits) {
+			Vec2D tplast = transform(orbitPoints.getLast());
+
+			if (tp.sub(tplast).norm() > 4) {
+
+				if (orbitLineList.size() > 300) {
+					orbitLineList.removeFirst();
+					orbitPoints.removeFirst();
+				}
+
+				Line line = new Line(tplast.x(), tplast.y(), tp.x(), tp.y());
+				line.setStroke(Color.RED);
+				orbitLineList.add(line);
+
+				savePosition();
+			}
+		}
 	}
 
-	// translates all Lines in orbitLineList
+	/**
+	 * Translate all Lines in orbitLineList with help of orbitPoints.
+	 */
 	public void translateOrbit() {
 		Vec2D newStart, newEnd;
-		Vec4D point;
 		Line line;
 
 		for (int i = 0; i < orbitLineList.size(); i++) {
-			point = orbitPoints.get(i);
-
-			newStart = transform(new Vec2D(point.x1(), point.x2()));
-			newEnd = transform(new Vec2D(point.x3(), point.x4()));
+			newStart = transform(orbitPoints.get(i));
+			newEnd = transform(orbitPoints.get(i + 1));
 
 			line = orbitLineList.get(i);
 
@@ -183,24 +188,40 @@ public class Planet {
 		}
 	}
 
-	// deletes the orbit
+	/**
+	 * Deletes all orbit data.
+	 */
 	public void deleteOrbit() {
 		orbitLineList.clear();
 		orbitPoints.clear();
 	}
 
-	// return a copy of this planet
+	/**
+	 * Return a copy of this planet.
+	 */
 	@Override
 	public Planet clone() {
-		return new Planet(pos.x(), pos.y(), vel.x(), vel.y(), mass, radius, (Color) circle.getFill(), name);
+		return new Planet(pos.x(), pos.y(), vel.x(), vel.y(), mass, radius, (Color) circle.getFill(), getName());
 	}
 
-	// if the planet is selected turn the border white
+	/**
+	 * If the planet is selected turn the border white or turn it black again.
+	 * 
+	 * @param selected
+	 *            true if selected, false if not
+	 */
 	public void select(boolean selected) {
 		if (selected)
 			circle.setStroke(Color.WHITE);
 		else
 			circle.setStroke(Color.BLACK);
+	}
+
+	/**
+	 * saves the current position in the list orbitPoints
+	 */
+	public void savePosition() {
+		orbitPoints.add(pos.clone());
 	}
 
 	public void setPos(Vec2D pos) {
@@ -219,10 +240,6 @@ public class Planet {
 		vel = new Vec2D(x, y);
 	}
 
-	public void setOldPos() {
-		this.oldPos = this.pos;
-	}
-
 	public void setVelocityLineVisibility(boolean b) {
 		velocityLine.setVisible(b);
 	}
@@ -233,10 +250,6 @@ public class Planet {
 
 	public Vec2D getPos() {
 		return pos;
-	}
-
-	public Vec2D getOldPos() {
-		return oldPos;
 	}
 
 	public Vec2D getVel() {
@@ -264,7 +277,7 @@ public class Planet {
 	}
 
 	public String getName() {
-		return name;
+		return label.getText();
 	}
 
 	public LinkedList<Line> getOrbitLineList() {
