@@ -1,5 +1,8 @@
 package utils;
 
+/**
+ * A 2D vector with x and y coordinates
+ */
 public class Vec2D {
 
 	private double x, y;

@@ -29,6 +29,12 @@ import simulation.Planet;
 import simulation.Simulation;
 import utils.Vec2D;
 
+/**
+ * The main window of the application that handles all drawn objects.
+ * 
+ * @author Jan Muskalla
+ *
+ */
 public class Window extends Application {
 
 	// window size in pixel
@@ -211,7 +217,7 @@ public class Window extends Application {
 				}
 			}
 		});
-		
+
 		Timeline timeline = new Timeline(drawObjects);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();

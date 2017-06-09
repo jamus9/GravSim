@@ -9,6 +9,11 @@ import utils.Vec2D;
 import utils.Vec4D;
 import window.Window;
 
+/**
+ * Implements a planet with position and velocity vector, radius, mass and a
+ * name. Each planet has a circle, velocity line and label that are drawn in the
+ * main window.
+ */
 public class Planet {
 
 	private Vec2D pos;
@@ -40,7 +45,7 @@ public class Planet {
 		initializeObjects(color, this.name);
 	}
 
-	// position and velocity = 0,0
+	// position and velocity = (0,0)
 	public Planet(double mass, double radius, Color color, String name) {
 		this(0, 0, 0, 0, mass, radius, color, name);
 	}
@@ -49,10 +54,6 @@ public class Planet {
 	public Planet(double xp, double yp, double xv, double yv, double radius) {
 		this(xp, yp, xv, yv, standardMass(radius), radius, Color.BLACK, "");
 	}
-
-	/**
-	 * Private methods --------------------------------------------------
-	 */
 
 	/**
 	 * Initializes the circle, vector, label and orbit.
@@ -80,7 +81,8 @@ public class Planet {
 	}
 
 	/**
-	 * Sets the next orbit line in coordinates of the planet and saves the real position.
+	 * Sets the next orbit line in coordinates of the planet and saves the real
+	 * position.
 	 */
 	private void setNextOrbitLine() {
 		Vec2D tp = transform(pos);
@@ -97,6 +99,7 @@ public class Planet {
 			line.setStroke(Color.RED);
 
 			orbitLineList.addLast(line);
+			
 			orbitPoints.addLast(new Vec4D(oldPos.x(), oldPos.y(), pos.x(), pos.y()));
 
 			setOldPos();
@@ -113,7 +116,8 @@ public class Planet {
 	private static final double DENSITY = 2000; // kg/m^3
 
 	/**
-	 * Returns the mass of a 3D planet with a given radius and a default density.
+	 * Returns the mass of a 3D planet with a given radius and a default
+	 * density.
 	 * 
 	 * @param radius
 	 *            the radius of the planet
@@ -129,10 +133,6 @@ public class Planet {
 		double y = Window.zoom * (Simulation.scale * -v.y() + Window.dy + Window.tempdy) + Window.winY / 2.0;
 		return new Vec2D(x, y);
 	}
-
-	/**
-	 * Public methods --------------------------------------------------
-	 */
 
 	/**
 	 * Updates the position and radius of the circle, the vector line, the label
@@ -200,8 +200,6 @@ public class Planet {
 			circle.setStroke(Color.BLACK);
 	}
 
-	// setter
-
 	public void setPos(Vec2D pos) {
 		this.pos = pos;
 	}
@@ -229,8 +227,6 @@ public class Planet {
 	public void setLabelVisibility(boolean b) {
 		label.setVisible(b);
 	}
-
-	// getter
 
 	public Vec2D getPos() {
 		return pos;

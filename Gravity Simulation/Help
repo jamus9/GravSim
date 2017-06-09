@@ -1,19 +1,18 @@
-
 Controls:
 
-R = restart
+restart				R
 
-P or Space = pause
-. = accelerate time
-, = decelerate time
-- = reset time
+pause				P or Space
+accelerate time		.
+decelerate time		,
+reset time			-
 
-V = vectors
-O = orbits
-L = labels
-I = information
+vectors				V
+orbits				O
+labels				L
+information			I
 
-left mouse button = select planet
-right mouse button = reset view
-mouse scroll = zoom
-mouse drag = drag view
+select planet		left mouse
+reset view			right mouse
+drag view			mouse drag
+zoom				mouse scroll

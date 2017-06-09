@@ -2,6 +2,9 @@ package constellations;
 
 import simulation.Planet;
 
+/**
+ * Implements a Constellation with an array of planets, a scale, time and name.
+ */
 public class Constellation {
 
 	private Planet[] planetArray;

@@ -10,6 +10,10 @@ import javafx.event.EventHandler;
 import javafx.util.Duration;
 import utils.Vec2D;
 
+/**
+ * Simulates the movement of the planets and handles the current planets and
+ * constellation.
+ */
 public class Simulation {
 
 	public static final double GRAV_CONST = 6.67408e-11;

@@ -4,6 +4,9 @@ import javafx.scene.paint.Color;
 import simulation.Planet;
 import simulation.Simulation;
 
+/**
+ * A class that creates start conditions (constellations) for the simulation.
+ */
 public class StartConditions {
 
 	private static final double sunMass = 1.9884e30, sunRad = 696342e3,
