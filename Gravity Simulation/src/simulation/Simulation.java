@@ -138,11 +138,13 @@ public class Simulation {
 	}
 
 	/**
-	 * collides two planets and creates a new array with the new planet and
-	 * without the collided planets
+	 * Collides two planets and creates a new array without the smaller collided planet.
+	 * The bigger collided planet gets changed after the collision.
 	 * 
 	 * @param i
+	 * the index of the collided planet 1
 	 * @param j
+	 * the index of the collided planet 2
 	 */
 	private static void collide(int i, int j) {
 		pause = true;
@@ -205,7 +207,7 @@ public class Simulation {
 	}
 
 	/**
-	 * calculates the new radius of a planet after a collision
+	 * Calculates the new radius of a planet after a collision with the masses of both collided planets and the density of the bigger one.
 	 * 
 	 * @param bigMass
 	 * @param bigRadius
@@ -217,13 +219,13 @@ public class Simulation {
 	}
 
 	/**
-	 * calculates the new velocity of a planet after a collision
+	 * Calculates the new velocity of a planet after a collision with momentum conservation
 	 * 
 	 * @param mass1
 	 * @param vel1
 	 * @param mass2
 	 * @param vel2
-	 * @return
+	 * @return the new velocity
 	 */
 	private static Vec2D getNewVel(double mass1, Vec2D vel1, double mass2, Vec2D vel2) {
 		double x = (mass1 * vel1.x() + mass2 * vel2.x()) / (mass1 + mass2);
