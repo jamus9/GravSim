@@ -3,6 +3,7 @@ package constellations;
 import javafx.scene.paint.Color;
 import simulation.Planet;
 import simulation.Simulation;
+import window.Window;
 
 /**
  * A class that creates start conditions (constellations) for the simulation.
@@ -132,7 +133,7 @@ public class StartConditions {
 		deimos.setVel(0, -orbVel(marsMass, deimosDistance));
 
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
-		
+
 		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
 	}
 
@@ -185,21 +186,21 @@ public class StartConditions {
 
 		return new Constellation("Sonne - Erde", new Planet[] { sun.clone(), earth.clone() }, 4e-7, 0.05);
 	}
-	
+
 	// Earth in low orbit around the sun
 	public static final Constellation collision = getCollision();
 
 	private static Constellation getCollision() {
 		double distance = mars.getRadius() * 100;
 		double vel = 1000;
-		
+
 		mars.setPos(0, -distance);
 		mars.setVel(0, vel);
-		
+
 		Planet mars2 = mars.clone();
-		
+
 		mars2.setPos(distance, -distance);
-		mars2.setVel(0, vel/2);
+		mars2.setVel(0, vel / 2);
 
 		earth.setPos(-distance, 0);
 		earth.setVel(vel, 0);
@@ -217,28 +218,33 @@ public class StartConditions {
 		return Math.sqrt(Simulation.GRAV_CONST * otherMass / distance);
 	}
 
-	// // Random Planets
-	// public static Planet[] random = random(30);
-	//
-	// public static Planet[] random(int n) {
-	// Planet[] p = new Planet[n];
-	//
-	// for (int i = 0; i < n; i++)
-	// p[i] = new Planet(
-	// plusMinus()*Math.random()*500,
-	// plusMinus()*Math.random()*350,
-	// plusMinus()*Math.random()*30,
-	// plusMinus()*Math.random()*30,
-	// Math.random()*5);
-	//
-	// return p;
-	// }
-	//
-	// // returns randomly 1 or -1
-	// public static int plusMinus() {
-	// if (Math.random() < 0.5)
-	// return -1;
-	// else
-	// return 1;
-	// }
+	// Random Planets
+	public static final Constellation random = getRandom(30, 1);
+	
+	public static Constellation getRandom(int number, double scale) {
+		return new Constellation("Random", random(number, scale), scale, 2);
+	}
+
+	public static Planet[] random(int number, double scale) {
+		
+		Planet[] planets = new Planet[number];
+
+		for (int i = 0; i < number; i++)
+			planets[i] = new Planet(
+					plusMinus() * Math.random() * Window.winX / 3.0 * scale, 
+					plusMinus() * Math.random() * Window.winY / 3.0 *scale,
+					plusMinus() * Math.random() *0.001* scale, 
+					plusMinus() * Math.random() *0.001* scale, 
+					2.5);
+
+		return planets;
+	}
+
+	// returns randomly 1 or -1
+	public static int plusMinus() {
+		if (Math.random() < 0.5)
+			return -1;
+		else
+			return 1;
+	}
 }

@@ -28,7 +28,7 @@ public class Simulation {
 	public static boolean pause = true;
 
 	// the current constellation with start conditions
-	public static Constellation constellation = StartConditions.collision;
+	public static Constellation constellation = StartConditions.solarSystem;
 	public static double scale; // scale of the simulation
 	public static double time; // time step per simulation
 
