@@ -2,18 +2,18 @@
 A JavaFX application that simulates the movement of planets in two dimensions in realistic scale.
 
 Controls:
-
+Control | Key
 ------------ | -------------
 Restart | R
 Pause | P or Space
-* Accelerate time: .
-* Decelerate time: ,
-* Reset time: -
+Accelerate time | .
+Decelerate time | ,
+Reset time | -
 
-Vectors: V
-Orbits: O
-Labels: L
-Information: I
+Vectors | V
+Orbits | O
+Labels | L
+Information | I
 
 Select planet: left mouse button
 Reset view: right mouse button
