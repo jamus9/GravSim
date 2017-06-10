@@ -171,7 +171,7 @@ public class Planet {
 		if (Window.orbits) {
 			Vec2D tplast = transform(orbitPoints.getLast());
 
-			if (tp.sub(tplast).norm() > 4) {
+			if (tp.sub(tplast).norm() > 3) {
 
 				if (orbitLineList.size() > 300) {
 					orbitLineList.removeFirst();

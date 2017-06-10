@@ -141,16 +141,16 @@ public class Simulation {
 	 * Collides two planets and creates a new array without the smaller collided
 	 * planet. The bigger collided planet gets changed after the collision.
 	 * 
-	 * @param i
+	 * @param index1
 	 *            the index of the collided planet 1
-	 * @param j
+	 * @param index2
 	 *            the index of the collided planet 2
 	 */
-	private static void collide(int i, int j) {
+	private static void collide(int index1, int index2) {
 		pause = true;
 
-		Planet p1 = planets[i];
-		Planet p2 = planets[j];
+		Planet p1 = planets[index1];
+		Planet p2 = planets[index2];
 		Planet bigP, smallP;
 
 		// get bigger planet
@@ -164,48 +164,49 @@ public class Simulation {
 
 		// vel, mass and radius of the new planet
 		bigP.setVel(getNewVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
-		bigP.setMass(bigP.getMass() + smallP.getMass());
 		bigP.setRadius(getNewRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
+		bigP.setMass(bigP.getMass() + smallP.getMass());
 
 		// the new planets array
 		Planet[] newPlanets = new Planet[planets.length - 1];
 
 		// copy all planets in the new planets array except the smaller one
-		int h = 0;
-		for (int k = 0; k < newPlanets.length; k++) {
-			if (smallP.equals(planets[h]))
-				h++;
+		int j = 0;
+		for (int i = 0; i < newPlanets.length; i++) {
+			if (smallP.equals(planets[j]))
+				j++;
 
-			newPlanets[k] = planets[h];
-			h++;
+			newPlanets[i] = planets[j];
+			j++;
 		}
 
 		// check selected planet
-		int id = -1;
-		Boolean select = false;
+		int planetID = -1;
+		Boolean planetSelected = false;
 		if (Window.selectedPlanet != -1) {
-			select = true;
+			planetSelected = true;
 			if (planets[Window.selectedPlanet].equals(smallP)) {
-				id = bigP.getID();
+				planetID = bigP.getID();
 			} else
-				id = planets[Window.selectedPlanet].getID();
+				planetID = planets[Window.selectedPlanet].getID();
 			window.deselectPlanet();
 		}
 
 		// copy the new planets in the simulation planets array
 		planets = newPlanets;
-
-		window.updatePlanets();
+		
 
 		// select big planet if one of the colliding planets was selected
-		if (select) {
-			for (int l = 0; l < planets.length; l++) {
-				if (planets[l].getID() == id) {
-					window.selectPlanet(l);
+		if (planetSelected) {
+			for (int i = 0; i < planets.length; i++) {
+				if (planets[i].getID() == planetID) {
+					window.selectPlanet(i);
 					break;
 				}
 			}
 		}
+		
+		window.updatePlanets();
 
 		pause = false;
 	}

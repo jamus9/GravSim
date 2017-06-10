@@ -90,11 +90,11 @@ public class Window extends Application {
 	public void start(Stage primaryStage) {
 		Simulation.window = this;
 		primaryStage.setTitle("Gravity Simulation");
-		// primaryStage.setMaximized(true);
+		primaryStage.setMaximized(true);
 
 		// main group
 		Group root = new Group();
-		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
+		Scene scene = new Scene(root, winX, winY, Color.WHITE);
 
 		// add sub groups
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
@@ -111,7 +111,9 @@ public class Window extends Application {
 		info.relocate(3, 70);
 		infoGroup.getChildren().addAll(info, seconds, sps);
 
-		// menu bar
+		/**
+		 * menu bar
+		 */
 		MenuBar menuBar = new MenuBar();
 		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
 		root.getChildren().add(menuBar);
@@ -168,9 +170,20 @@ public class Window extends Application {
 		symItem.setOnAction(actionEvent -> restart(StartConditions.symmetrical));
 
 		load.getItems().addAll(solarSystemItem, earthMoonItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem);
-
-		// add all menus to the menu bar
-		menuBar.getMenus().addAll(simulation, load, settings);
+		
+		/**
+		 * time controls (does not work)
+		 */
+		Menu timeSlower = new Menu("<<");
+		timeSlower.setOnAction(actionEvent -> setTimeStep(Simulation.time * 0.5));
+		
+		Menu timeFaster = new Menu(">>");
+		timeFaster.setOnAction(actionEvent -> setTimeStep(Simulation.time * 2));
+		
+		/**
+		 * add all menus to the menu bar
+		 */
+		menuBar.getMenus().addAll(simulation, load, settings, timeSlower, timeFaster);
 
 		/**
 		 * starts the simulation and initialize all values to default
