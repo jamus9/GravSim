@@ -3,7 +3,7 @@ A JavaFX application that simulates the movement of planets in two dimensions in
 
 Controls:
 
-Control | Key
+Controls | Key
 ------- | ---
 Restart | R
 Pause | P or Space
