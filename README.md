@@ -14,7 +14,7 @@ Vectors | V
 Orbits | O
 Labels | L
 Information | I
-Select planet | left mouse button
-Reset view | right mouse button
-Drag view | mouse drag
-Zoom | mouse scroll
+Select planet | Left mouse button
+Reset view | Right mouse button
+Drag view | Mouse drag
+Zoom | Mouse scroll
