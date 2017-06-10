@@ -18,7 +18,7 @@ import window.Window;
  * 
  */
 public class Planet {
-	public static int ID = 1;
+	public static int globalID = 1;
 	
 	private int id;
 	private Vec2D pos;
@@ -61,7 +61,7 @@ public class Planet {
 		this.radius = radius;
 		// this.name = name;
 		initializeObjects(color, name);
-		id = ID++;
+		id = globalID++;
 	}
 
 	/**

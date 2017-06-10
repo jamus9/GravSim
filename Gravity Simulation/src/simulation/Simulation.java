@@ -138,17 +138,17 @@ public class Simulation {
 	}
 
 	/**
-	 * Collides two planets and creates a new array without the smaller collided planet.
-	 * The bigger collided planet gets changed after the collision.
+	 * Collides two planets and creates a new array without the smaller collided
+	 * planet. The bigger collided planet gets changed after the collision.
 	 * 
 	 * @param i
-	 * the index of the collided planet 1
+	 *            the index of the collided planet 1
 	 * @param j
-	 * the index of the collided planet 2
+	 *            the index of the collided planet 2
 	 */
 	private static void collide(int i, int j) {
 		pause = true;
-		
+
 		Planet p1 = planets[i];
 		Planet p2 = planets[j];
 		Planet bigP, smallP;
@@ -181,12 +181,14 @@ public class Simulation {
 		}
 
 		// check selected planet
-		String name = "";
+		int id = -1;
+		Boolean select = false;
 		if (Window.selectedPlanet != -1) {
+			select = true;
 			if (planets[Window.selectedPlanet].equals(smallP)) {
-				name = bigP.getName();
+				id = bigP.getID();
 			} else
-				name = planets[Window.selectedPlanet].getName();
+				id = planets[Window.selectedPlanet].getID();
 			window.deselectPlanet();
 		}
 
@@ -196,10 +198,12 @@ public class Simulation {
 		window.updatePlanets();
 
 		// select big planet if one of the colliding planets was selected
-		for (int l = 0; l < planets.length; l++) {
-			if (planets[l].getName().equals(name)) {
-				window.selectPlanet(l);
-				break;
+		if (select) {
+			for (int l = 0; l < planets.length; l++) {
+				if (planets[l].getID() == id) {
+					window.selectPlanet(l);
+					break;
+				}
 			}
 		}
 
@@ -207,7 +211,8 @@ public class Simulation {
 	}
 
 	/**
-	 * Calculates the new radius of a planet after a collision with the masses of both collided planets and the density of the bigger one.
+	 * Calculates the new radius of a planet after a collision with the masses
+	 * of both collided planets and the density of the bigger one.
 	 * 
 	 * @param bigMass
 	 * @param bigRadius
@@ -219,7 +224,8 @@ public class Simulation {
 	}
 
 	/**
-	 * Calculates the new velocity of a planet after a collision with momentum conservation
+	 * Calculates the new velocity of a planet after a collision with momentum
+	 * conservation
 	 * 
 	 * @param mass1
 	 * @param vel1
