@@ -2,6 +2,7 @@
 A JavaFX application that simulates the movement of planets in two dimensions in realistic scale.
 
 Controls:
+
 Control | Key
 ------- | ---
 Restart | R
