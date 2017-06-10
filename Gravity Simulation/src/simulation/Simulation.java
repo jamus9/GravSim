@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
 import utils.Vec2D;
+import window.Window;
 
 /**
  * Simulates the movement of the planets and handles the current planets and
@@ -18,6 +19,8 @@ import utils.Vec2D;
  */
 public class Simulation {
 
+	public static Window window;
+
 	public static final double GRAV_CONST = 6.67408e-11;
 	public static final double SPS = 8000; // simulations per second
 	public static int SPScounter = 0; // counts the simulations per second
@@ -25,7 +28,7 @@ public class Simulation {
 	public static boolean pause = true;
 
 	// the current constellation with start conditions
-	public static Constellation constellation = StartConditions.solarSystem;
+	public static Constellation constellation = StartConditions.collision;
 	public static double scale; // scale of the simulation
 	public static double time; // time step per simulation
 
@@ -62,8 +65,10 @@ public class Simulation {
 	public static void run() {
 		KeyFrame timeStep = new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-				if (!pause)
+				if (!pause) {
 					movePlanets();
+					checkForCollisions();
+				}
 			}
 		});
 		Timeline tl1 = new Timeline(timeStep);
@@ -114,6 +119,116 @@ public class Simulation {
 			// r0 + v0 * t + 1/2 * a0 * t^2
 			planets[i].setPos(pos0.add(vel0.mult(t)).add(acc0.mult(t * t * 0.5)));
 		}
+	}
+
+	/**
+	 * checks all planets for collisions
+	 */
+	private static void checkForCollisions() {
+		Planet p1, p2;
+		for (int i = 0; i < planets.length - 1; i++) {
+			for (int j = i + 1; j < planets.length; j++) {
+				p1 = planets[i];
+				p2 = planets[j];
+				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius()) {
+					collide(i, j);
+				}
+			}
+		}
+	}
+
+	/**
+	 * collides two planets and creates a new array with the new planet and
+	 * without the collided planets
+	 * 
+	 * @param i
+	 * @param j
+	 */
+	private static void collide(int i, int j) {
+		pause = true;
+		
+		Planet p1 = planets[i];
+		Planet p2 = planets[j];
+		Planet bigP, smallP;
+
+		// get bigger planet
+		if (p1.getMass() >= p2.getMass()) {
+			bigP = p1;
+			smallP = p2;
+		} else {
+			bigP = p2;
+			smallP = p1;
+		}
+
+		// vel, mass and radius of the new planet
+		bigP.setVel(getNewVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
+		bigP.setMass(bigP.getMass() + smallP.getMass());
+		bigP.setRadius(getNewRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
+
+		// the new planets array
+		Planet[] newPlanets = new Planet[planets.length - 1];
+
+		// copy all planets in the new planets array except the smaller one
+		int h = 0;
+		for (int k = 0; k < newPlanets.length; k++) {
+			if (smallP.equals(planets[h]))
+				h++;
+
+			newPlanets[k] = planets[h];
+			h++;
+		}
+
+		// check selected planet
+		String name = "";
+		if (Window.selectedPlanet != -1) {
+			if (planets[Window.selectedPlanet].equals(smallP)) {
+				name = bigP.getName();
+			} else
+				name = planets[Window.selectedPlanet].getName();
+			window.deselectPlanet();
+		}
+
+		// copy the new planets in the simulation planets array
+		planets = newPlanets;
+
+		window.updatePlanets();
+
+		// select big planet if one of the colliding planets was selected
+		for (int l = 0; l < planets.length; l++) {
+			if (planets[l].getName().equals(name)) {
+				window.selectPlanet(l);
+				break;
+			}
+		}
+
+		pause = false;
+	}
+
+	/**
+	 * calculates the new radius of a planet after a collision
+	 * 
+	 * @param bigMass
+	 * @param bigRadius
+	 * @param smallMass
+	 * @return the new radius
+	 */
+	private static double getNewRadius(double bigMass, double bigRadius, double smallMass) {
+		return Math.pow((16 * Math.pow(bigRadius, 3) * (bigMass + smallMass)) / (9 * bigMass), 1.0 / 3.0);
+	}
+
+	/**
+	 * calculates the new velocity of a planet after a collision
+	 * 
+	 * @param mass1
+	 * @param vel1
+	 * @param mass2
+	 * @param vel2
+	 * @return
+	 */
+	private static Vec2D getNewVel(double mass1, Vec2D vel1, double mass2, Vec2D vel2) {
+		double x = (mass1 * vel1.x() + mass2 * vel2.x()) / (mass1 + mass2);
+		double y = (mass1 * vel1.y() + mass2 * vel2.y()) / (mass1 + mass2);
+		return new Vec2D(x, y);
 	}
 
 	/**

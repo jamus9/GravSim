@@ -18,7 +18,9 @@ import window.Window;
  * 
  */
 public class Planet {
-
+	public static int ID = 1;
+	
+	private int id;
 	private Vec2D pos;
 	private Vec2D vel;
 
@@ -59,14 +61,31 @@ public class Planet {
 		this.radius = radius;
 		// this.name = name;
 		initializeObjects(color, name);
+		id = ID++;
 	}
 
-	// position and velocity = (0,0)
+	/**
+	 * Creates a new Planet with mass, radius, color and name.
+	 * 
+	 * @param mass
+	 * @param radius
+	 * @param color
+	 * @param name
+	 */
 	public Planet(double mass, double radius, Color color, String name) {
 		this(0, 0, 0, 0, mass, radius, color, name);
 	}
 
 	// no name, black, standard mass
+	/**
+	 * Creates a new Planet with position, velocity and radius.
+	 * 
+	 * @param xp
+	 * @param yp
+	 * @param xv
+	 * @param yv
+	 * @param radius
+	 */
 	public Planet(double xp, double yp, double xv, double yv, double radius) {
 		this(xp, yp, xv, yv, standardMass(radius), radius, Color.BLACK, "");
 	}
@@ -247,6 +266,14 @@ public class Planet {
 	public void setLabelVisibility(boolean b) {
 		label.setVisible(b);
 	}
+	
+	public void setMass(double mass) {
+		this.mass = mass;
+	}
+	
+	public void setRadius(double radius) {
+		this.radius = radius;
+	}
 
 	public Vec2D getPos() {
 		return pos;
@@ -279,9 +306,17 @@ public class Planet {
 	public String getName() {
 		return label.getText();
 	}
+	
+	public int getID() {
+		return id;
+	}
 
 	public LinkedList<Line> getOrbitLineList() {
 		return orbitLineList;
+	}
+	
+	public boolean equals(Planet p) {
+		return getID() == p.getID();
 	}
 
 }

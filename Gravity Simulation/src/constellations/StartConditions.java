@@ -185,6 +185,27 @@ public class StartConditions {
 
 		return new Constellation("Sonne - Erde", new Planet[] { sun.clone(), earth.clone() }, 4e-7, 0.05);
 	}
+	
+	// Earth in low orbit around the sun
+	public static final Constellation collision = getCollision();
+
+	private static Constellation getCollision() {
+		double distance = mars.getRadius() * 100;
+		double vel = 1000;
+		
+		mars.setPos(0, -distance);
+		mars.setVel(0, vel);
+		
+		Planet mars2 = mars.clone();
+		
+		mars2.setPos(distance, -distance);
+		mars2.setVel(0, vel/2);
+
+		earth.setPos(-distance, 0);
+		earth.setVel(vel, 0);
+
+		return new Constellation("Kollision", new Planet[] { mars.clone(), mars2, earth.clone() }, 8e-7, 5);
+	}
 
 	// momentum compensation
 	private static double momComp(double ownMass, double otherMass, double otherSpeed) {

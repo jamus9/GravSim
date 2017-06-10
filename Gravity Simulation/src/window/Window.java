@@ -88,6 +88,7 @@ public class Window extends Application {
 	 * Starts the window for the simulation.
 	 */
 	public void start(Stage primaryStage) {
+		Simulation.window = this;
 		primaryStage.setTitle("Gravity Simulation");
 		// primaryStage.setMaximized(true);
 
@@ -361,10 +362,10 @@ public class Window extends Application {
 		infoGroup.setVisible(true);
 		infoCMI.setSelected(true);
 
-		// delete all circles, orbits and vectors
-		planetGroup.getChildren().clear();
-
 		Simulation.loadConstellation(constellation);
+		
+		// delete all circles, vectors and labels
+		planetGroup.getChildren().clear();
 
 		// add everything again
 		for (Planet p : Simulation.planets)
@@ -560,6 +561,15 @@ public class Window extends Application {
 	private void changeInfoVisibility() {
 		infoGroup.setVisible(!infoGroup.isVisible());
 		updateCMIs();
+	}
+	
+	/**
+	 * updates all circles, vectors and labels
+	 */
+	public void updatePlanets() {
+		planetGroup.getChildren().clear();
+		for (Planet p : Simulation.planets)
+			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
 	}
 
 }
