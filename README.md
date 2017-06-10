@@ -3,11 +3,11 @@ A JavaFX application that simulates the movement of planets in two dimensions in
 
 Controls:
 
-Restart: R
-Pause: P or Space
-Accelerate time: .
-Decelerate time: ,
-Reset time: -
+*Restart: R
+*Pause: P or Space
+*Accelerate time: .
+*Decelerate time: ,
+*Reset time: -
 
 Vectors: V
 Orbits: O
