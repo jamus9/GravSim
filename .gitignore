@@ -22,10 +22,8 @@
 hs_err_pid*
 
 # eclipse
-**/bin/**
 .metadata/**
 **/.classpath
 **/.settings/**
-*.class
 *.project
 .recommenders/**
