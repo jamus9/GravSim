@@ -1,12 +1,10 @@
 # Gravity Simulation
 A JavaFX application that simulates the movement of planets in two dimensions in realistic scale.
 
-Controls:
-
 Function | Key
 --- | ---
 Restart | R
-Pause | P or Space
+Pause | Space or P
 Accelerate time | .
 Decelerate time | ,
 Reset time | -
