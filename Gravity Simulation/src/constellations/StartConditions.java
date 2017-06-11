@@ -54,10 +54,12 @@ public class StartConditions {
 
 			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun");
 
+	/**
+	 * The Solar System with the sun and the 9 planets
+	 */
 	public static final Constellation solarSystem = getSolarSystem();
 
-	// Solar System
-	private static Constellation getSolarSystem() {
+	public static Constellation getSolarSystem() {
 		double merkurDis = 57.909e9;
 		double venusDis = 108.16e9;
 		double earthDis = 149.6e9;
@@ -100,10 +102,12 @@ public class StartConditions {
 		return new Constellation("Sonnen System", planets, 2e-9, 100);
 	}
 
+	/**
+	 * The Earth-Moon System
+	 */
 	public static final Constellation earthSystem = getEarthSystem();
 
-	// Earth - Moon System
-	private static Constellation getEarthSystem() {
+	public static Constellation getEarthSystem() {
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);
@@ -116,10 +120,12 @@ public class StartConditions {
 		return new Constellation("Erde - Mond System", planets, 0.8e-6, 20);
 	}
 
+	/**
+	 * The Mars system with the two moons Phobos and Deimos
+	 */
 	public static final Constellation marsSystem = getMarsSystem();
 
-	// Mars System
-	private static Constellation getMarsSystem() {
+	public static Constellation getMarsSystem() {
 		double phobosDistance = 9378e3;
 		double deimosDistance = 23459e3;
 
@@ -137,10 +143,12 @@ public class StartConditions {
 		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
 	}
 
+	/**
+	 * A flyby of Jupiter by two asteroids
+	 */
 	public static final Constellation jupiterFlyby = getJupiterFlyby();
 
-	// Jupiter Flyby
-	private static Constellation getJupiterFlyby() {
+	public static Constellation getJupiterFlyby() {
 		Planet ast1 = new Planet(-133708e3 * 17, -133708e3 * 4, 10000, 0, 0, 0, Color.GRAY, "Asteroid");
 		Planet ast2 = new Planet(-133708e3 * 17, -133708e3 * 8, 10000, 0, 0, 0, Color.GRAY, "Asteroid");
 
@@ -150,10 +158,12 @@ public class StartConditions {
 		return new Constellation("Jupiter Flyby", new Planet[] { ast1, ast2, jupiter.clone() }, 3e-7, 3);
 	}
 
+	/**
+	 * 8 planets in a symmetrical constellation
+	 */
 	public static final Constellation symmetrical = getSymmetrical();
 
-	// 8 symmetrical planets
-	private static Constellation getSymmetrical() {
+	public static Constellation getSymmetrical() {
 		int dis = 3000;
 		double vel = 0.0135;
 		int rad = 100;
@@ -172,10 +182,12 @@ public class StartConditions {
 		return new Constellation("Symmetrische Konstellation", planets, 0.05, 10);
 	}
 
-	// Earth in low orbit around the sun
+	/**
+	 * The Earth in a low orbit around the Sun
+	 */
 	public static final Constellation earthSunLow = getEarthSunLow();
 
-	private static Constellation getEarthSunLow() {
+	public static Constellation getEarthSunLow() {
 		double earthDis = sunRad * 1.1;
 
 		sun.setPos(0, 0);
@@ -187,10 +199,12 @@ public class StartConditions {
 		return new Constellation("Sonne - Erde", new Planet[] { sun.clone(), earth.clone() }, 4e-7, 0.05);
 	}
 
-	// Earth in low orbit around the sun
+	/**
+	 * Earth on collision curse with two mars
+	 */
 	public static final Constellation collision = getCollision();
 
-	private static Constellation getCollision() {
+	public static Constellation getCollision() {
 		double distance = mars.getRadius() * 100;
 		double vel = 1000;
 
@@ -208,6 +222,29 @@ public class StartConditions {
 		return new Constellation("Kollision", new Planet[] { mars.clone(), mars2, earth.clone() }, 8e-7, 5);
 	}
 
+	/**
+	 * returns a number of random planets
+	 * 
+	 * @param number
+	 * @return a constellation of random planets
+	 */
+	public static Constellation getRandom(int number) {
+		Planet[] planets = new Planet[number];
+
+		for (int i = 0; i < number; i++) {
+			planets[i] = new Planet(plusMinus() * Math.random() * Window.winX * (3.0 / 8.0),
+					plusMinus() * Math.random() * Window.winY * (3.0 / 8.0), plusMinus() * Math.random() * 0.001,
+					plusMinus() * Math.random() * 0.001, 2.5);
+		}
+		
+		return new Constellation("Random", planets, 1, 2);
+	}
+
+	// returns randomly 1 or -1
+	private static double plusMinus() {
+		return Math.signum(Math.random() - 0.5);
+	}
+
 	// momentum compensation
 	private static double momComp(double ownMass, double otherMass, double otherSpeed) {
 		return -otherMass * otherSpeed / ownMass;
@@ -218,33 +255,4 @@ public class StartConditions {
 		return Math.sqrt(Simulation.GRAV_CONST * otherMass / distance);
 	}
 
-	// Random Planets
-	public static final Constellation random = getRandom(30, 1);
-	
-	public static Constellation getRandom(int number, double scale) {
-		return new Constellation("Random", random(number, scale), scale, 2);
-	}
-
-	public static Planet[] random(int number, double scale) {
-		
-		Planet[] planets = new Planet[number];
-
-		for (int i = 0; i < number; i++)
-			planets[i] = new Planet(
-					plusMinus() * Math.random() * Window.winX / 3.0 * scale, 
-					plusMinus() * Math.random() * Window.winY / 3.0 *scale,
-					plusMinus() * Math.random() *0.001* scale, 
-					plusMinus() * Math.random() *0.001* scale, 
-					2.5);
-
-		return planets;
-	}
-
-	// returns randomly 1 or -1
-	public static int plusMinus() {
-		if (Math.random() < 0.5)
-			return -1;
-		else
-			return 1;
-	}
 }

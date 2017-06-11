@@ -1,7 +1,7 @@
 package utils;
 
 /**
- * A 2D vector with x and y coordinates
+ * A 2D vector with x and y coordinate
  * 
  * @author Jan Muskalla
  *

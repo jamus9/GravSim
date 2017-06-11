@@ -51,10 +51,9 @@ public class Window extends Application {
 
 	// flags for orbits label and vectors
 	public static boolean orbits, labels, vectors;
-
-	// the number of the selected planet
-	// -1 if no planet is selected
-	public static int selectedPlanet;
+	
+	// the selected planet
+	public static Planet selectedPlanet;
 
 	// coordinates for mouse dragging
 	public static double mouseX, mouseY;
@@ -70,7 +69,7 @@ public class Window extends Application {
 	// info label
 	private Label info = new Label();
 
-	// CheckMenuItems in Options Menu
+	// CheckMenuItems in options menu
 	private CheckMenuItem infoCMI = new CheckMenuItem("Information");
 	private CheckMenuItem orbitsCMI = new CheckMenuItem("Orbits");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Namen");
@@ -90,11 +89,11 @@ public class Window extends Application {
 	public void start(Stage primaryStage) {
 		Simulation.window = this;
 		primaryStage.setTitle("Gravity Simulation");
-		primaryStage.setMaximized(true);
+		// primaryStage.setMaximized(true);
 
 		// main group
 		Group root = new Group();
-		Scene scene = new Scene(root, winX, winY, Color.WHITE);
+		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
 
 		// add sub groups
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
@@ -168,22 +167,24 @@ public class Window extends Application {
 
 		MenuItem symItem = new MenuItem(StartConditions.symmetrical.getName());
 		symItem.setOnAction(actionEvent -> restart(StartConditions.symmetrical));
-
-		load.getItems().addAll(solarSystemItem, earthMoonItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem);
 		
+		MenuItem randomItem = new MenuItem("Random");
+		randomItem.setOnAction(actionEvent -> restart(StartConditions.getRandom(40)));
+
+		load.getItems().addAll(solarSystemItem, earthMoonItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem, randomItem);
+
 		/**
 		 * time controls (does not work)
 		 */
 		Menu timeSlower = new Menu("<<");
 		timeSlower.setOnAction(actionEvent -> setTimeStep(Simulation.time * 0.5));
-		
 		Menu timeFaster = new Menu(">>");
 		timeFaster.setOnAction(actionEvent -> setTimeStep(Simulation.time * 2));
-		
+
 		/**
 		 * add all menus to the menu bar
 		 */
-		menuBar.getMenus().addAll(simulation, load, settings, timeSlower, timeFaster);
+		menuBar.getMenus().addAll(simulation, load, settings);
 
 		/**
 		 * starts the simulation and initialize all values to default
@@ -205,9 +206,9 @@ public class Window extends Application {
 				}
 
 				// follow a planet
-				if (selectedPlanet != -1) {
-					dx = Simulation.scale * -Simulation.planets[selectedPlanet].getPos().x();
-					dy = Simulation.scale * Simulation.planets[selectedPlanet].getPos().y();
+				if (selectedPlanet != null) {
+					dx = Simulation.scale * -selectedPlanet.getPos().x();
+					dy = Simulation.scale * selectedPlanet.getPos().y();
 					translateOrbits();
 				}
 
@@ -261,9 +262,11 @@ public class Window extends Application {
 			public void handle(KeyEvent event) {
 				KeyCode key = event.getCode();
 
-				// restart
+				// restart and exit
 				if (key == KeyCode.R)
 					restart(Simulation.constellation);
+				if (key == KeyCode.ESCAPE)
+					Platform.exit();
 
 				// time
 				if (key == KeyCode.PERIOD)
@@ -316,8 +319,10 @@ public class Window extends Application {
 				mouseX = event.getX();
 				mouseY = event.getY();
 
-				if (event.isPrimaryButtonDown())
-					checkForSelectedPlanet();
+				if (event.isPrimaryButtonDown()) {
+					deselectPlanet();
+					checkForSelectedPlanet(mouseX, mouseY);
+				}
 
 				if (event.isSecondaryButtonDown())
 					resetView();
@@ -361,30 +366,25 @@ public class Window extends Application {
 		zoom = 1;
 		dx = dy = 0;
 		tempdx = tempdy = 0;
-		selectedPlanet = -1;
+		selectedPlanet = null;
 
-		orbits = true;
-		orbitsCMI.setSelected(orbits);
+		{
+			orbits = true;
+			orbitsCMI.setSelected(orbits);
 
-		labels = true;
-		labelsCMI.setSelected(labels);
+			labels = true;
+			labelsCMI.setSelected(labels);
 
-		vectors = false;
-		vectorsCMI.setSelected(vectors);
+			vectors = false;
+			vectorsCMI.setSelected(vectors);
 
-		infoGroup.setVisible(true);
-		infoCMI.setSelected(true);
+			infoGroup.setVisible(true);
+			infoCMI.setSelected(true);
+		}
 
 		Simulation.loadConstellation(constellation);
-		
-		// delete all circles, vectors and labels
-		planetGroup.getChildren().clear();
 
-		// add everything again
-		for (Planet p : Simulation.planets)
-			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
-
-		updateInfoLabel();
+		updatePlanets();
 	}
 
 	Timeline resetTimeline;
@@ -439,30 +439,30 @@ public class Window extends Application {
 	 * 
 	 * If a planet is clicked, highlight it and set the variables to follow it.
 	 */
-	private void checkForSelectedPlanet() {
-		deselectPlanet();
+	private void checkForSelectedPlanet(double mouseX, double mouseY) {
 
 		Circle circle;
 		Vec2D mouse, center;
 
-		for (int i = 0; i < Simulation.planets.length; i++) {
-			circle = Simulation.planets[i].getCircle();
+		for (Planet planet : Simulation.planets) {
+			circle = planet.getCircle();
 			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2D(mouseX, mouseY);
 
-			if (mouse.sub(center).norm() < circle.getRadius() + 5)
-				selectPlanet(i);
+			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
+				selectPlanet(planet);
+			}
 		}
 	}
 
 	/**
 	 * Selects a planet and updates the info label
 	 * 
-	 * @param i
+	 * @param planet
 	 */
-	public void selectPlanet(int i) {
-		selectedPlanet = i;
-		Simulation.planets[i].select(true);
+	public void selectPlanet(Planet planet) {
+		selectedPlanet = planet;
+		planet.select(true);
 		updateInfoLabel();
 	}
 
@@ -470,11 +470,47 @@ public class Window extends Application {
 	 * Deselects the selected planet and updates the info label.
 	 */
 	public void deselectPlanet() {
-		if (selectedPlanet != -1) {
-			Simulation.planets[selectedPlanet].select(false);
+		if (selectedPlanet != null) {
+			selectedPlanet.select(false);
 		}
-		selectedPlanet = -1;
+		selectedPlanet = null;
 		updateInfoLabel();
+	}
+
+	/**
+	 * updates all circles, vectors and labels
+	 */
+	public void updatePlanets() {
+		planetGroup.getChildren().clear();
+		for (Planet p : Simulation.planets) {
+			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
+		}
+		updateInfoLabel();
+	}
+
+	/**
+	 * Updates the check menu items in the menu "settings".
+	 */
+	private void updateCMIs() {
+		orbitsCMI.setSelected(orbits);
+		labelsCMI.setSelected(labels);
+		vectorsCMI.setSelected(vectors);
+		infoCMI.setSelected(infoGroup.isVisible());
+	}
+
+	/**
+	 * Updates the displayed information about the system or planet.
+	 */
+	private void updateInfoLabel() {
+		if (selectedPlanet != null) {
+			info.setText(selectedPlanet.getName() + "\nMasse: " + selectedPlanet.getMass() + " kg\nRadius: "
+					+ (int) selectedPlanet.getRadius() / 1000 + " km\nGeschwindigkeit: "
+					+ (int) selectedPlanet.getVel().norm() + " m/s" + "\nZeit: x"
+					+ (int) (Simulation.time * Simulation.SPS));
+		} else {
+			info.setText(Simulation.constellation.getName() + "\nObjekte: " + Simulation.planets.length + "\nZeit: x"
+					+ (int) (Simulation.time * Simulation.SPS));
+		}
 	}
 
 	/**
@@ -496,31 +532,6 @@ public class Window extends Application {
 	private void setTimeStep(double time) {
 		Simulation.time = time;
 		updateInfoLabel();
-	}
-
-	/**
-	 * Updates the displayed information about the system or planet.
-	 */
-	private void updateInfoLabel() {
-		if (selectedPlanet != -1) {
-			Planet p = Simulation.planets[selectedPlanet];
-			info.setText(p.getName() + "\nMasse: " + p.getMass() + " kg\nRadius: " + (int) p.getRadius() / 1000
-					+ " km\nGeschwindigkeit: " + (int) p.getVel().norm() + " m/s" + "\nZeit: x"
-					+ (int) (Simulation.time * Simulation.SPS));
-		} else {
-			info.setText(Simulation.constellation.getName() + "\nObjekte: " + Simulation.planets.length + "\nZeit: x"
-					+ (int) (Simulation.time * Simulation.SPS));
-		}
-	}
-
-	/**
-	 * Updates the check menu items in the menu "settings".
-	 */
-	private void updateCMIs() {
-		orbitsCMI.setSelected(orbits);
-		labelsCMI.setSelected(labels);
-		vectorsCMI.setSelected(vectors);
-		infoCMI.setSelected(infoGroup.isVisible());
 	}
 
 	/**
@@ -574,15 +585,6 @@ public class Window extends Application {
 	private void changeInfoVisibility() {
 		infoGroup.setVisible(!infoGroup.isVisible());
 		updateCMIs();
-	}
-	
-	/**
-	 * updates all circles, vectors and labels
-	 */
-	public void updatePlanets() {
-		planetGroup.getChildren().clear();
-		for (Planet p : Simulation.planets)
-			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
 	}
 
 }

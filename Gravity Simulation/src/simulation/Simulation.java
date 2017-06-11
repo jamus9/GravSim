@@ -28,7 +28,7 @@ public class Simulation {
 	public static boolean pause = true;
 
 	// the current constellation with start conditions
-	public static Constellation constellation = StartConditions.solarSystem;
+	public static Constellation constellation = StartConditions.earthSystem;
 	public static double scale; // scale of the simulation
 	public static double time; // time step per simulation
 
@@ -44,15 +44,12 @@ public class Simulation {
 		pause = true;
 
 		constellation = newConstellation;
-
 		time = constellation.getTime();
 		scale = constellation.getScale();
 
-		// copies the planets of the new constellation in the local array
-		// "planets"
+		// copies the planets of the new constellation in the local array planets
 		planets = new Planet[constellation.numberOfPlanets()];
-
-		for (int i = 0; i < constellation.numberOfPlanets(); i++)
+		for (int i = 0; i < planets.length; i++)
 			planets[i] = constellation.getPlanet(i).clone();
 
 		secondsCounter = 0;
@@ -183,12 +180,12 @@ public class Simulation {
 		// check selected planet
 		int planetID = -1;
 		Boolean planetSelected = false;
-		if (Window.selectedPlanet != -1) {
+		if (Window.selectedPlanet != null) {
 			planetSelected = true;
-			if (planets[Window.selectedPlanet].equals(smallP)) {
+			if (Window.selectedPlanet.equals(smallP)) {
 				planetID = bigP.getID();
 			} else
-				planetID = planets[Window.selectedPlanet].getID();
+				planetID = Window.selectedPlanet.getID();
 			window.deselectPlanet();
 		}
 
@@ -200,7 +197,7 @@ public class Simulation {
 		if (planetSelected) {
 			for (int i = 0; i < planets.length; i++) {
 				if (planets[i].getID() == planetID) {
-					window.selectPlanet(i);
+					window.selectPlanet(planets[i]);
 					break;
 				}
 			}
@@ -214,6 +211,8 @@ public class Simulation {
 	/**
 	 * Calculates the new radius of a planet after a collision with the masses
 	 * of both collided planets and the density of the bigger one.
+	 * 
+	 * I think it does not work right!?
 	 * 
 	 * @param bigMass
 	 * @param bigRadius
