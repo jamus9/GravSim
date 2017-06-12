@@ -58,7 +58,7 @@ public class Window extends Application {
 	public static Planet selectedPlanet;
 
 	// the next planet that will be placed
-	private static Planet nextPlanet = StartConditions.moon;
+	private static Planet nextPlanet;
 
 	// coordinates for mouse dragging
 	public static double mouseX, mouseY;
@@ -378,11 +378,9 @@ public class Window extends Application {
 		 */
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
-
 				if (event.isPrimaryButtonDown()) {
 					tempdx = (event.getX() - mouseX) / zoom;
 					tempdy = (event.getY() - mouseY) / zoom;
-
 					updateOrbits();
 				}
 			}
@@ -392,11 +390,14 @@ public class Window extends Application {
 		 * When the mouse is released the current position is saved in dx dy and
 		 * tempdx tempdy is reset
 		 */
-		scene.setOnMouseReleased(MouseEvent -> {
-			dx += tempdx;
-			dy += tempdy;
-			tempdx = tempdy = 0;
+		scene.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent event) {
+				dx += tempdx;
+				dy += tempdy;
+				tempdx = tempdy = 0;
+			}
 		});
+
 	}
 
 	/**
