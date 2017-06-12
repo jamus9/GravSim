@@ -21,6 +21,7 @@ public class Simulation {
 
 	public static Window window;
 
+
 	public static final double GRAV_CONST = 6.67408e-11;
 	public static final double SPS = 8000; // simulations per second
 	public static int SPScounter = 0; // counts the simulations per second
@@ -181,12 +182,12 @@ public class Simulation {
 		// check selected planet
 		int planetID = -1;
 		Boolean planetSelected = false;
-		if (Window.selectedPlanet != null) {
+		if (window.selectedPlanet != null) {
 			planetSelected = true;
-			if (Window.selectedPlanet.equals(smallP)) {
+			if (window.selectedPlanet.equals(smallP)) {
 				planetID = bigP.getID();
 			} else
-				planetID = Window.selectedPlanet.getID();
+				planetID = window.selectedPlanet.getID();
 			window.deselectPlanet();
 		}
 
@@ -245,7 +246,7 @@ public class Simulation {
 	 */
 	public static void addNewPlanet(Planet planet) {
 		pause = true;
-		
+
 		planet.deleteOrbit();
 		planet.savePosition();
 

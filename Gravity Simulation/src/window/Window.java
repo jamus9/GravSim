@@ -11,13 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -44,41 +38,38 @@ import utils.Vec2D;
 public class Window extends Application {
 
 	// window size in pixel
-	public static int winX = 1200;
-	public static int winY = 700;
-
-	// zoom and translation
-	public static double zoom;
-	public static double dx, dy;
+	public int winX = 1200;
+	public int winY = 700;
 
 	// flags for orbits label and vectors
-	public static boolean orbits, labels, vectors;
+	public boolean orbits, labels, vectors;
+
+	// zoom and translation
+	public double zoom;
+	public double dx, dy;
 
 	// the selected planet
-	public static Planet selectedPlanet;
+	public Planet selectedPlanet;
 
 	// the next planet that will be placed
-	private static Planet nextPlanet;
+	protected Planet nextPlanet;
 
 	// coordinates for mouse dragging
-	public static double mouseX, mouseY;
-	public static double tempdx, tempdy;
+	public double mouseX, mouseY;
+	public double tempdx, tempdy;
 
 	// sub group of root for all orbits
 	private Group orbitGroup = new Group();
 	// sub group of root for all circles, vectors, labels
 	private Group planetGroup = new Group();
 	// sub group of root for all info an the screen
-	private Group infoGroup = new Group();
+	protected Group infoGroup = new Group();
 
 	// info label
-	private Label info = new Label();
+	private Label infoLabel = new Label();
 
-	// CheckMenuItems in options menu
-	private CheckMenuItem infoCMI = new CheckMenuItem("Information");
-	private CheckMenuItem orbitsCMI = new CheckMenuItem("Orbits");
-	private CheckMenuItem labelsCMI = new CheckMenuItem("Namen");
-	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vektoren");
+	// the menu bar
+	private MainWindowMenuBar menuBar = new MainWindowMenuBar();
 
 	/**
 	 * launches the javafx application
@@ -98,119 +89,25 @@ public class Window extends Application {
 
 		// main group
 		Group root = new Group();
-		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
-		// add sub groups
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
+		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
 
 		/**
 		 * info group
 		 */
-
 		Label seconds = new Label();
 		seconds.relocate(0, 40);
 
 		Label sps = new Label();
 		sps.relocate(3, 25);
 
-		info.relocate(3, 70);
-		infoGroup.getChildren().addAll(info, seconds, sps);
+		infoLabel.relocate(3, 70);
+		infoGroup.getChildren().addAll(infoLabel, seconds, sps);
 
 		/**
-		 * simulation menu
+		 * add the menu bar
 		 */
-
-		MenuItem restart = new MenuItem("Neustart");
-		restart.setOnAction(actionEvent -> restart(Simulation.constellation));
-
-		MenuItem resetView = new MenuItem("Ansicht zurücksetzen");
-		resetView.setOnAction(actionEven -> resetView());
-
-		MenuItem exit = new MenuItem("Beenden");
-		exit.setOnAction(ActionEvent -> Platform.exit());
-
-		Menu simulation = new Menu("Simulation");
-		simulation.getItems().addAll(restart, resetView, exit);
-
-		/**
-		 * settings menu
-		 */
-
-		orbitsCMI.setOnAction(actionEvent -> changeOrbitVisibility());
-		labelsCMI.setOnAction(actionEvent -> changeLabelVisibility());
-		infoCMI.setOnAction(ActionEvent -> changeInfoVisibility());
-		vectorsCMI.setOnAction(actionEvent -> changeVectorVisibility());
-
-		Menu settings = new Menu("Einstellungen");
-		settings.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI);
-
-		/**
-		 * constellation loading menu
-		 */
-
-		MenuItem earthMoonItem = new MenuItem(StartConditions.earthSystem.getName());
-		earthMoonItem.setOnAction(actionEvent -> restart(StartConditions.earthSystem));
-
-		MenuItem solarSystemItem = new MenuItem(StartConditions.solarSystem.getName());
-		solarSystemItem.setOnAction(actionEvent -> restart(StartConditions.solarSystem));
-
-		MenuItem marsItem = new MenuItem(StartConditions.marsSystem.getName());
-		marsItem.setOnAction(actionEvent -> restart(StartConditions.marsSystem));
-
-		MenuItem jupiterFlybyItem = new MenuItem(StartConditions.jupiterFlyby.getName());
-		jupiterFlybyItem.setOnAction(actionEvent -> restart(StartConditions.jupiterFlyby));
-
-		MenuItem earthSunLowItem = new MenuItem(StartConditions.earthSunLow.getName());
-		earthSunLowItem.setOnAction(actionEvent -> restart(StartConditions.earthSunLow));
-
-		MenuItem symItem = new MenuItem(StartConditions.symmetrical.getName());
-		symItem.setOnAction(actionEvent -> restart(StartConditions.symmetrical));
-
-		MenuItem randomItem = new MenuItem("Random");
-		randomItem.setOnAction(actionEvent -> restart(StartConditions.getRandom(40)));
-
-		Menu load = new Menu("Lade");
-		load.getItems().addAll(earthMoonItem, solarSystemItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem,
-				randomItem);
-
-		/**
-		 * add planet menu
-		 */
-
-		RadioMenuItem addMoon = new RadioMenuItem(StartConditions.moon.getName());
-		addMoon.setOnAction(actionEvent -> nextPlanet = StartConditions.moon);
-		addMoon.setSelected(true);
-
-		RadioMenuItem addEarth = new RadioMenuItem(StartConditions.earth.getName());
-		addEarth.setOnAction(actionEvent -> nextPlanet = StartConditions.earth);
-
-		RadioMenuItem addMars = new RadioMenuItem(StartConditions.mars.getName());
-		addMars.setOnAction(actionEvent -> nextPlanet = StartConditions.mars);
-
-		RadioMenuItem addJupiter = new RadioMenuItem(StartConditions.jupiter.getName());
-		addJupiter.setOnAction(actionEvent -> nextPlanet = StartConditions.jupiter);
-
-		ToggleGroup toggleGroup = new ToggleGroup();
-		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter);
-
-		Menu add = new Menu("Platzieren");
-		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter);
-
-		/**
-		 * time controls (does not work)
-		 */
-
-		Menu timeSlower = new Menu("<<");
-		timeSlower.setOnAction(actionEvent -> setTimeStep(Simulation.time * 0.5));
-		Menu timeFaster = new Menu(">>");
-		timeFaster.setOnAction(actionEvent -> setTimeStep(Simulation.time * 2));
-
-		/**
-		 * add all menus to the menu bar
-		 */
-
-		MenuBar menuBar = new MenuBar();
 		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
-		menuBar.getMenus().addAll(simulation, load, settings, add);
 		root.getChildren().add(menuBar);
 
 		/**
@@ -407,7 +304,7 @@ public class Window extends Application {
 	 * @param constellation
 	 *            the constellation of the simulation
 	 */
-	private void restart(Constellation constellation) {
+	protected void restart(Constellation constellation) {
 		zoom = 1;
 		dx = dy = 0;
 		tempdx = tempdy = 0;
@@ -416,16 +313,16 @@ public class Window extends Application {
 
 		{
 			orbits = true;
-			orbitsCMI.setSelected(orbits);
+			menuBar.setOrbitsCMI(orbits);
 
 			labels = true;
-			labelsCMI.setSelected(labels);
+			menuBar.setLabelsCMI(labels);
 
 			vectors = false;
-			vectorsCMI.setSelected(vectors);
+			menuBar.setVectorsCMI(vectors);
 
 			infoGroup.setVisible(true);
-			infoCMI.setSelected(true);
+			menuBar.setInfoCMI(true);
 		}
 
 		Simulation.loadConstellation(constellation);
@@ -441,7 +338,7 @@ public class Window extends Application {
 	 * line is stopped in the main window time line if the view is reseted.
 	 * Deselects the selected planet
 	 */
-	private void resetView() {
+	protected void resetView() {
 
 		KeyFrame returnToCenter = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
@@ -532,27 +429,17 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Updates the check menu items in the menu "settings".
-	 */
-	private void updateCMIs() {
-		orbitsCMI.setSelected(orbits);
-		labelsCMI.setSelected(labels);
-		vectorsCMI.setSelected(vectors);
-		infoCMI.setSelected(infoGroup.isVisible());
-	}
-
-	/**
 	 * Updates the displayed information about the system or planet.
 	 */
 	private void updateInfoLabel() {
 		if (selectedPlanet != null) {
-			info.setText(selectedPlanet.getName() + "\nMasse: " + selectedPlanet.getMass() + " kg\nRadius: "
+			infoLabel.setText(selectedPlanet.getName() + "\nMasse: " + selectedPlanet.getMass() + " kg\nRadius: "
 					+ (int) selectedPlanet.getRadius() / 1000 + " km\nGeschwindigkeit: "
 					+ (int) selectedPlanet.getVel().norm() + " m/s" + "\nZeit: x"
 					+ (int) (Simulation.time * Simulation.SPS));
 		} else {
-			info.setText(Simulation.constellation.getName() + "\nObjekte: " + Simulation.planets.length + "\nZeit: x"
-					+ (int) (Simulation.time * Simulation.SPS));
+			infoLabel.setText(Simulation.constellation.getName() + "\nObjekte: " + Simulation.planets.length
+					+ "\nZeit: x" + (int) (Simulation.time * Simulation.SPS));
 		}
 	}
 
@@ -572,7 +459,7 @@ public class Window extends Application {
 	 * @param time
 	 *            the new time step
 	 */
-	private void setTimeStep(double time) {
+	protected void setTimeStep(double time) {
 		Simulation.time = time;
 		updateInfoLabel();
 	}
@@ -585,7 +472,7 @@ public class Window extends Application {
 	 * the orbit group. If the orbits are turned on, set the first position of
 	 * the orbit for all planets.
 	 */
-	private void changeOrbitVisibility() {
+	protected void changeOrbitVisibility() {
 		if (orbits) {
 			orbits = false;
 			orbitGroup.getChildren().clear();
@@ -596,38 +483,38 @@ public class Window extends Application {
 			for (Planet p : Simulation.planets)
 				p.savePosition();
 		}
-		updateCMIs();
+		menuBar.updateCMIs();
 	}
 
 	/**
 	 * Changes the visibility of the label for all planets and updates the check
 	 * menu item.
 	 */
-	private void changeLabelVisibility() {
+	protected void changeLabelVisibility() {
 		labels = !labels;
 		for (Planet p : Simulation.planets)
 			p.setLabelVisibility(labels);
-		updateCMIs();
+		menuBar.updateCMIs();
 	}
 
 	/**
 	 * Changes the visibility of the velocity vector for all planets and updates
 	 * the check menu item.
 	 */
-	private void changeVectorVisibility() {
+	protected void changeVectorVisibility() {
 		vectors = !vectors;
 		for (Planet p : Simulation.planets)
 			p.setVelocityLineVisibility(vectors);
-		updateCMIs();
+		menuBar.updateCMIs();
 	}
 
 	/**
 	 * Changes the visibility of the information group and updates the check
 	 * menu item.
 	 */
-	private void changeInfoVisibility() {
+	protected void changeInfoVisibility() {
 		infoGroup.setVisible(!infoGroup.isVisible());
-		updateCMIs();
+		menuBar.updateCMIs();
 	}
 
 	private Vec2D transfromBack(Vec2D v) {

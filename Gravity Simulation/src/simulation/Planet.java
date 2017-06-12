@@ -1,12 +1,12 @@
 package simulation;
 
 import java.util.LinkedList;
+
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import utils.Vec2D;
-import window.Window;
 
 /**
  * Implements a planet with position and velocity, radius, mass and a name. Each
@@ -133,8 +133,8 @@ public class Planet {
 	 * @return the transformed vector
 	 */
 	private static Vec2D transform(Vec2D v) {
-		double x = Window.zoom * (Simulation.scale * v.x() + Window.dx + Window.tempdx) + Window.winX / 2.0;
-		double y = Window.zoom * (Simulation.scale * -v.y() + Window.dy + Window.tempdy) + Window.winY / 2.0;
+		double x = Simulation.window.zoom * (Simulation.scale * v.x() + Simulation.window.dx + Simulation.window.tempdx) + Simulation.window.winX / 2.0;
+		double y = Simulation.window.zoom * (Simulation.scale * -v.y() + Simulation.window.dy + Simulation.window.tempdy) + Simulation.window.winY / 2.0;
 		return new Vec2D(x, y);
 	}
 
@@ -151,8 +151,8 @@ public class Planet {
 		circle.setRadius(getCircleRadius());
 
 		// update vectors
-		if (Window.vectors) {
-			double scaleFactor = Simulation.scale * Window.zoom * 100000.0;
+		if (Simulation.window.vectors) {
+			double scaleFactor = Simulation.scale * Simulation.window.zoom * 100000.0;
 			velocityLine.setStartX(tp.x());
 			velocityLine.setStartY(tp.y());
 			velocityLine.setEndX(vel.x() * scaleFactor + tp.x());
@@ -160,13 +160,13 @@ public class Planet {
 		}
 
 		// update labels
-		if (Window.labels) {
+		if (Simulation.window.labels) {
 			double offset = getCircleRadius() + 5;
 			label.relocate(tp.x() + offset, tp.y());
 		}
 
 		// update orbits
-		if (Window.orbits) {
+		if (Simulation.window.orbits) {
 			Vec2D tplast = transform(orbitPoints.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
@@ -314,7 +314,7 @@ public class Planet {
 	}
 	
 	private double getCircleRadius() {
-		return Simulation.scale * Window.zoom * radius;
+		return Simulation.scale * Simulation.window.zoom * radius;
 	}
 	
 	public boolean equals(Planet p) {
