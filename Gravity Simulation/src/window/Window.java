@@ -16,6 +16,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -51,9 +53,12 @@ public class Window extends Application {
 
 	// flags for orbits label and vectors
 	public static boolean orbits, labels, vectors;
-	
+
 	// the selected planet
 	public static Planet selectedPlanet;
+
+	// the next planet that will be placed
+	private static Planet nextPlanet = StartConditions.moon;
 
 	// coordinates for mouse dragging
 	public static double mouseX, mouseY;
@@ -100,6 +105,7 @@ public class Window extends Application {
 		/**
 		 * info group
 		 */
+
 		Label seconds = new Label();
 		seconds.relocate(0, 40);
 
@@ -110,16 +116,8 @@ public class Window extends Application {
 		infoGroup.getChildren().addAll(info, seconds, sps);
 
 		/**
-		 * menu bar
-		 */
-		MenuBar menuBar = new MenuBar();
-		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
-		root.getChildren().add(menuBar);
-
-		/**
 		 * simulation menu
 		 */
-		Menu simulation = new Menu("Simulation");
 
 		MenuItem restart = new MenuItem("Neustart");
 		restart.setOnAction(actionEvent -> restart(Simulation.constellation));
@@ -130,30 +128,30 @@ public class Window extends Application {
 		MenuItem exit = new MenuItem("Beenden");
 		exit.setOnAction(ActionEvent -> Platform.exit());
 
+		Menu simulation = new Menu("Simulation");
 		simulation.getItems().addAll(restart, resetView, exit);
 
 		/**
 		 * settings menu
 		 */
-		Menu settings = new Menu("Einstellungen");
 
 		orbitsCMI.setOnAction(actionEvent -> changeOrbitVisibility());
 		labelsCMI.setOnAction(actionEvent -> changeLabelVisibility());
 		infoCMI.setOnAction(ActionEvent -> changeInfoVisibility());
 		vectorsCMI.setOnAction(actionEvent -> changeVectorVisibility());
 
+		Menu settings = new Menu("Einstellungen");
 		settings.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI);
 
 		/**
 		 * constellation loading menu
 		 */
-		Menu load = new Menu("Lade");
-
-		MenuItem solarSystemItem = new MenuItem(StartConditions.solarSystem.getName());
-		solarSystemItem.setOnAction(actionEvent -> restart(StartConditions.solarSystem));
 
 		MenuItem earthMoonItem = new MenuItem(StartConditions.earthSystem.getName());
 		earthMoonItem.setOnAction(actionEvent -> restart(StartConditions.earthSystem));
+
+		MenuItem solarSystemItem = new MenuItem(StartConditions.solarSystem.getName());
+		solarSystemItem.setOnAction(actionEvent -> restart(StartConditions.solarSystem));
 
 		MenuItem marsItem = new MenuItem(StartConditions.marsSystem.getName());
 		marsItem.setOnAction(actionEvent -> restart(StartConditions.marsSystem));
@@ -166,15 +164,41 @@ public class Window extends Application {
 
 		MenuItem symItem = new MenuItem(StartConditions.symmetrical.getName());
 		symItem.setOnAction(actionEvent -> restart(StartConditions.symmetrical));
-		
+
 		MenuItem randomItem = new MenuItem("Random");
 		randomItem.setOnAction(actionEvent -> restart(StartConditions.getRandom(40)));
 
-		load.getItems().addAll(solarSystemItem, earthMoonItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem, randomItem);
+		Menu load = new Menu("Lade");
+		load.getItems().addAll(earthMoonItem, solarSystemItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem,
+				randomItem);
+
+		/**
+		 * add planet menu
+		 */
+
+		RadioMenuItem addMoon = new RadioMenuItem(StartConditions.moon.getName());
+		addMoon.setOnAction(actionEvent -> nextPlanet = StartConditions.moon);
+		addMoon.setSelected(true);
+
+		RadioMenuItem addEarth = new RadioMenuItem(StartConditions.earth.getName());
+		addEarth.setOnAction(actionEvent -> nextPlanet = StartConditions.earth);
+
+		RadioMenuItem addMars = new RadioMenuItem(StartConditions.mars.getName());
+		addMars.setOnAction(actionEvent -> nextPlanet = StartConditions.mars);
+
+		RadioMenuItem addJupiter = new RadioMenuItem(StartConditions.jupiter.getName());
+		addJupiter.setOnAction(actionEvent -> nextPlanet = StartConditions.jupiter);
+
+		ToggleGroup toggleGroup = new ToggleGroup();
+		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter);
+
+		Menu add = new Menu("Platzieren");
+		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter);
 
 		/**
 		 * time controls (does not work)
 		 */
+
 		Menu timeSlower = new Menu("<<");
 		timeSlower.setOnAction(actionEvent -> setTimeStep(Simulation.time * 0.5));
 		Menu timeFaster = new Menu(">>");
@@ -183,7 +207,11 @@ public class Window extends Application {
 		/**
 		 * add all menus to the menu bar
 		 */
-		menuBar.getMenus().addAll(simulation, load, settings);
+
+		MenuBar menuBar = new MenuBar();
+		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
+		menuBar.getMenus().addAll(simulation, load, settings, add);
+		root.getChildren().add(menuBar);
 
 		/**
 		 * starts the simulation and initialize all values to default
@@ -267,6 +295,10 @@ public class Window extends Application {
 				if (key == KeyCode.ESCAPE)
 					Platform.exit();
 
+				// reset
+				if (key == KeyCode.E)
+					resetView();
+
 				// time
 				if (key == KeyCode.PERIOD)
 					setTimeStep(Simulation.time * 2.0);
@@ -308,20 +340,33 @@ public class Window extends Application {
 		});
 
 		/**
-		 * Select planets with primary mouse button and reset view with
-		 * secondary mouse button. Saves click position.
+		 * Select planets with primary mouse button, reset view with middle
+		 * mouse button and add new planet with right mouse button. Saves click
+		 * position.
 		 */
 		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
 				mouseX = event.getX();
 				mouseY = event.getY();
 
+				// select planet
 				if (event.isPrimaryButtonDown()) {
 					deselectPlanet();
 					checkForSelectedPlanet(mouseX, mouseY);
 				}
 
-				if (event.isSecondaryButtonDown())
+				// add new planet
+				if (event.isSecondaryButtonDown()) {
+					Planet newPlanet = nextPlanet.clone();
+
+					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
+					newPlanet.setVel(0, 0);
+
+					Simulation.addNewPlanet(newPlanet);
+				}
+
+				// reset view
+				if (event.isMiddleButtonDown())
 					resetView();
 
 				event.consume();
@@ -334,10 +379,12 @@ public class Window extends Application {
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
 
-				tempdx = (event.getX() - mouseX) / zoom;
-				tempdy = (event.getY() - mouseY) / zoom;
+				if (event.isPrimaryButtonDown()) {
+					tempdx = (event.getX() - mouseX) / zoom;
+					tempdy = (event.getY() - mouseY) / zoom;
 
-				updateOrbits();
+					updateOrbits();
+				}
 			}
 		});
 
@@ -364,6 +411,7 @@ public class Window extends Application {
 		dx = dy = 0;
 		tempdx = tempdy = 0;
 		selectedPlanet = null;
+		nextPlanet = StartConditions.moon.clone();
 
 		{
 			orbits = true;
@@ -579,6 +627,12 @@ public class Window extends Application {
 	private void changeInfoVisibility() {
 		infoGroup.setVisible(!infoGroup.isVisible());
 		updateCMIs();
+	}
+
+	private Vec2D transfromBack(Vec2D v) {
+		double x = ((v.x() - winX / 2) / zoom - dx - tempdx) / Simulation.scale;
+		double y = -((v.y() - winY / 2) / zoom - dy - tempdy) / Simulation.scale;
+		return new Vec2D(x, y);
 	}
 
 }

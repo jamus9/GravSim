@@ -47,7 +47,8 @@ public class Simulation {
 		time = constellation.getTime();
 		scale = constellation.getScale();
 
-		// copies the planets of the new constellation in the local array planets
+		// copies the planets of the new constellation in the local array
+		// planets
 		planets = new Planet[constellation.numberOfPlanets()];
 		for (int i = 0; i < planets.length; i++)
 			planets[i] = constellation.getPlanet(i).clone();
@@ -191,7 +192,6 @@ public class Simulation {
 
 		// copy the new planets in the simulation planets array
 		planets = newPlanets;
-		
 
 		// select big planet if one of the colliding planets was selected
 		if (planetSelected) {
@@ -202,7 +202,7 @@ public class Simulation {
 				}
 			}
 		}
-		
+
 		window.updatePlanets();
 
 		pause = false;
@@ -235,6 +235,37 @@ public class Simulation {
 		double x = (mass1 * vel1.x() + mass2 * vel2.x()) / (mass1 + mass2);
 		double y = (mass1 * vel1.y() + mass2 * vel2.y()) / (mass1 + mass2);
 		return new Vec2D(x, y);
+	}
+
+	/**
+	 * adds a new planet to the simulation
+	 * 
+	 * @param planet
+	 *            the new planet
+	 */
+	public static void addNewPlanet(Planet planet) {
+		pause = true;
+		
+		planet.deleteOrbit();
+		planet.savePosition();
+
+		// the new planets array
+		Planet[] newPlanets = new Planet[planets.length + 1];
+
+		// copy all planets in the new planets array
+		for (int i = 0; i < planets.length; i++)
+			newPlanets[i] = planets[i];
+
+		// the new planet in the last position
+		newPlanets[newPlanets.length - 1] = planet;
+
+		// update the planets array
+		planets = newPlanets;
+
+		// update the window
+		window.updatePlanets();
+
+		pause = false;
 	}
 
 	/**

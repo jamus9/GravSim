@@ -33,7 +33,7 @@ public class StartConditions {
 
 			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0;
 
-	private static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sonne"),
+	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sonne"),
 
 			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
 
@@ -54,6 +54,24 @@ public class StartConditions {
 
 			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun");
 
+	/**
+	 * The Earth-Moon System
+	 */
+	public static final Constellation earthSystem = getEarthSystem();
+
+	public static Constellation getEarthSystem() {
+		double moonDistance = 384.4e6;
+
+		earth.setPos(0, 0);
+		earth.setVel(0, momComp(earthMass, moonMass, -orbVel(earthMass, moonDistance)));
+
+		moon.setPos(-moonDistance, 0);
+		moon.setVel(0, -orbVel(earthMass, moonDistance));
+
+		Planet[] planets = { earth.clone(), moon.clone() };
+		return new Constellation("Erde - Mond System", planets, 0.8e-6, 10);
+	}
+	
 	/**
 	 * The Solar System with the sun and the 9 planets
 	 */
@@ -100,24 +118,6 @@ public class StartConditions {
 				saturn.clone(), uranus.clone(), neptun.clone() };
 
 		return new Constellation("Sonnen System", planets, 2e-9, 100);
-	}
-
-	/**
-	 * The Earth-Moon System
-	 */
-	public static final Constellation earthSystem = getEarthSystem();
-
-	public static Constellation getEarthSystem() {
-		double moonDistance = 384.4e6;
-
-		earth.setPos(0, 0);
-		earth.setVel(0, momComp(earthMass, moonMass, -orbVel(earthMass, moonDistance)));
-
-		moon.setPos(-moonDistance, 0);
-		moon.setVel(0, -orbVel(earthMass, moonDistance));
-
-		Planet[] planets = { earth.clone(), moon.clone() };
-		return new Constellation("Erde - Mond System", planets, 0.8e-6, 20);
 	}
 
 	/**
