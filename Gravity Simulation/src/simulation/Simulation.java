@@ -212,15 +212,13 @@ public class Simulation {
 	 * Calculates the new radius of a planet after a collision with the masses
 	 * of both collided planets and the density of the bigger one.
 	 * 
-	 * I think it does not work right!?
-	 * 
 	 * @param bigMass
 	 * @param bigRadius
 	 * @param smallMass
 	 * @return the new radius
 	 */
 	private static double getNewRadius(double bigMass, double bigRadius, double smallMass) {
-		return Math.pow((16 * Math.pow(bigRadius, 3) * (bigMass + smallMass)) / (9 * bigMass), 1.0 / 3.0);
+		return bigRadius * Math.pow(1 + smallMass / bigMass, 1.0 / 3.0);
 	}
 
 	/**

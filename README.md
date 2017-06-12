@@ -4,7 +4,7 @@ A JavaFX application that simulates the movement of planets in two dimensions in
 Function | Key
 --- | ---
 Restart | R
-Pause | Space or P
+Pause | Space
 Accelerate time | .
 Decelerate time | ,
 Reset time | -

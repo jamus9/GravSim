@@ -94,19 +94,18 @@ public class Window extends Application {
 		// main group
 		Group root = new Group();
 		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
-
 		// add sub groups
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
 
-		// seconds label
+		/**
+		 * info group
+		 */
 		Label seconds = new Label();
 		seconds.relocate(0, 40);
 
-		// steps per second label
 		Label sps = new Label();
 		sps.relocate(3, 25);
 
-		// info label
 		info.relocate(3, 70);
 		infoGroup.getChildren().addAll(info, seconds, sps);
 
@@ -202,14 +201,14 @@ public class Window extends Application {
 				if (winX != (int) scene.getWidth() || winY != (int) scene.getHeight()) {
 					winX = (int) scene.getWidth();
 					winY = (int) scene.getHeight();
-					translateOrbits();
+					updateOrbits();
 				}
 
 				// follow a planet
 				if (selectedPlanet != null) {
 					dx = Simulation.scale * -selectedPlanet.getPos().x();
 					dy = Simulation.scale * selectedPlanet.getPos().y();
-					translateOrbits();
+					updateOrbits();
 				}
 
 				// update all drawn objects
@@ -275,7 +274,7 @@ public class Window extends Application {
 					setTimeStep(Simulation.time * 0.5);
 				if (key == KeyCode.MINUS)
 					setTimeStep(Simulation.constellation.getTime());
-				if (key == KeyCode.SPACE || key == KeyCode.P)
+				if (key == KeyCode.SPACE)
 					Simulation.pause = !Simulation.pause;
 
 				// visibility
@@ -299,13 +298,11 @@ public class Window extends Application {
 				// zoom in
 				if (event.getDeltaY() > 0)
 					zoom *= 1.05;
-
-				// zoom out
-				if (event.getDeltaY() < 0)
+				else
+					// zoom out
 					zoom /= 1.05;
 
-				translateOrbits();
-
+				updateOrbits();
 				event.consume();
 			}
 		});
@@ -340,7 +337,7 @@ public class Window extends Application {
 				tempdx = (event.getX() - mouseX) / zoom;
 				tempdy = (event.getY() - mouseY) / zoom;
 
-				translateOrbits();
+				updateOrbits();
 			}
 		});
 
@@ -420,7 +417,7 @@ public class Window extends Application {
 					dy /= 1.1;
 
 				// update orbits
-				translateOrbits();
+				updateOrbits();
 			}
 		});
 
@@ -440,15 +437,12 @@ public class Window extends Application {
 	 * If a planet is clicked, highlight it and set the variables to follow it.
 	 */
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
-
 		Circle circle;
 		Vec2D mouse, center;
-
 		for (Planet planet : Simulation.planets) {
 			circle = planet.getCircle();
 			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2D(mouseX, mouseY);
-
 			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
 				selectPlanet(planet);
 			}
@@ -517,10 +511,10 @@ public class Window extends Application {
 	 * Translates all Orbits to the new right position if the orbits are
 	 * visible.
 	 */
-	private void translateOrbits() {
+	private void updateOrbits() {
 		if (orbits)
 			for (Planet planet : Simulation.planets)
-				planet.translateOrbit();
+				planet.updateOrbit();
 	}
 
 	/**

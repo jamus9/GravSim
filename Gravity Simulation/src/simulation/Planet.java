@@ -18,23 +18,25 @@ import window.Window;
  * 
  */
 public class Planet {
-	public static int globalID = 1;
+	private static int globalID = 1;
 	
+	// identification
 	private int id;
+	
+	// planet properties
 	private Vec2D pos;
 	private Vec2D vel;
-
 	private double radius;
 	private double mass;
 
+	// drawn objects
 	private Circle circle;
 	private Line velocityLine;
 	private Label label;
 
 	// the orbit lines
 	private LinkedList<Line> orbitLineList;
-
-	// the coordinates of the orbit
+	// the real coordinates of the orbit
 	private LinkedList<Vec2D> orbitPoints;
 
 	/**
@@ -42,13 +44,9 @@ public class Planet {
 	 * name.
 	 * 
 	 * @param xp
-	 *            position x
 	 * @param yp
-	 *            position y
 	 * @param xv
-	 *            velocity x
 	 * @param yv
-	 *            velocity y
 	 * @param mass
 	 * @param radius
 	 * @param color
@@ -150,7 +148,7 @@ public class Planet {
 		// update circle
 		circle.setCenterX(tp.x());
 		circle.setCenterY(tp.y());
-		circle.setRadius(Simulation.scale * Window.zoom * radius);
+		circle.setRadius(getCircleRadius());
 
 		// update vectors
 		if (Window.vectors) {
@@ -163,7 +161,7 @@ public class Planet {
 
 		// update labels
 		if (Window.labels) {
-			double offset = Simulation.scale * Window.zoom * radius + 5;
+			double offset = getCircleRadius() + 5;
 			label.relocate(tp.x() + offset, tp.y());
 		}
 
@@ -172,7 +170,7 @@ public class Planet {
 			Vec2D tplast = transform(orbitPoints.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
-
+				
 				if (orbitLineList.size() > 300) {
 					orbitLineList.removeFirst();
 					orbitPoints.removeFirst();
@@ -190,7 +188,7 @@ public class Planet {
 	/**
 	 * Translate all Lines in orbitLineList with help of orbitPoints.
 	 */
-	public void translateOrbit() {
+	public void updateOrbit() {
 		Vec2D newStart, newEnd;
 		Line line;
 
@@ -313,6 +311,10 @@ public class Planet {
 
 	public LinkedList<Line> getOrbitLineList() {
 		return orbitLineList;
+	}
+	
+	private double getCircleRadius() {
+		return Simulation.scale * Window.zoom * radius;
 	}
 	
 	public boolean equals(Planet p) {
