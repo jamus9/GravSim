@@ -34,24 +34,16 @@ public class StartConditions {
 			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0;
 
 	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sonne"),
-
 			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
-
 			venus = new Planet(venusMass, venusRad, Color.BEIGE, "Venus"),
-
 			earth = new Planet(earthMass, earthRad, Color.BLUE, "Erde"),
 			moon = new Planet(moonMass, moonRad, Color.GRAY, "Mond"),
-
 			mars = new Planet(marsMass, marsRad, Color.RED, "Mars"),
 			phobos = new Planet(1.072e16, 22.5e3, Color.GRAY, "Phobos"),
 			deimos = new Planet(1.8e15, 13e3, Color.GRAY, "Deimos"),
-
 			jupiter = new Planet(jupiterMass, jupiterRad, Color.PERU, "Jupiter"),
-
 			saturn = new Planet(saturnMass, saturnRad, Color.BEIGE, "Saturn"),
-
 			uranus = new Planet(uranusMass, uranusRad, Color.LIGHTBLUE, "Uranus"),
-
 			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun");
 
 	/**
@@ -59,7 +51,7 @@ public class StartConditions {
 	 */
 	public static final Constellation earthSystem = getEarthSystem();
 
-	public static Constellation getEarthSystem() {
+	private static Constellation getEarthSystem() {
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);
@@ -71,13 +63,13 @@ public class StartConditions {
 		Planet[] planets = { earth.clone(), moon.clone() };
 		return new Constellation("Erde - Mond System", planets, 0.8e-6, 10);
 	}
-	
+
 	/**
 	 * The Solar System with the sun and the 9 planets
 	 */
 	public static final Constellation solarSystem = getSolarSystem();
 
-	public static Constellation getSolarSystem() {
+	private static Constellation getSolarSystem() {
 		double merkurDis = 57.909e9;
 		double venusDis = 108.16e9;
 		double earthDis = 149.6e9;
@@ -125,7 +117,7 @@ public class StartConditions {
 	 */
 	public static final Constellation marsSystem = getMarsSystem();
 
-	public static Constellation getMarsSystem() {
+	private static Constellation getMarsSystem() {
 		double phobosDistance = 9378e3;
 		double deimosDistance = 23459e3;
 
@@ -148,7 +140,7 @@ public class StartConditions {
 	 */
 	public static final Constellation jupiterFlyby = getJupiterFlyby();
 
-	public static Constellation getJupiterFlyby() {
+	private static Constellation getJupiterFlyby() {
 		Planet ast1 = new Planet(-133708e3 * 17, -133708e3 * 4, 10000, 0, 0, 0, Color.GRAY, "Asteroid");
 		Planet ast2 = new Planet(-133708e3 * 17, -133708e3 * 8, 10000, 0, 0, 0, Color.GRAY, "Asteroid");
 
@@ -163,7 +155,7 @@ public class StartConditions {
 	 */
 	public static final Constellation symmetrical = getSymmetrical();
 
-	public static Constellation getSymmetrical() {
+	private static Constellation getSymmetrical() {
 		int dis = 3000;
 		double vel = 0.0135;
 		int rad = 100;
@@ -187,7 +179,7 @@ public class StartConditions {
 	 */
 	public static final Constellation earthSunLow = getEarthSunLow();
 
-	public static Constellation getEarthSunLow() {
+	private static Constellation getEarthSunLow() {
 		double earthDis = sunRad * 1.1;
 
 		sun.setPos(0, 0);
@@ -204,7 +196,7 @@ public class StartConditions {
 	 */
 	public static final Constellation collision = getCollision();
 
-	public static Constellation getCollision() {
+	private static Constellation getCollision() {
 		double distance = mars.getRadius() * 100;
 		double vel = 1000;
 
@@ -236,7 +228,7 @@ public class StartConditions {
 					plusMinus() * Math.random() * Main.window.winY * (3.0 / 8.0), plusMinus() * Math.random() * 0.001,
 					plusMinus() * Math.random() * 0.001, 2.5);
 		}
-		
+
 		return new Constellation("Random", planets, 1, 2);
 	}
 

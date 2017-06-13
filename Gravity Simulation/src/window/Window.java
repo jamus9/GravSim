@@ -73,10 +73,9 @@ public class Window extends Application {
 	/**
 	 * Starts the window for the simulation.
 	 */
+	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Gravity Simulation");
-		// primaryStage.setMaximized(true);
-
 		Group root = new Group();
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
 		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
@@ -99,9 +98,10 @@ public class Window extends Application {
 		root.getChildren().add(menuBar);
 
 		/**
-		 * initialize all values to default
+		 * initialize all values to default and load the planet objects
 		 */
-		resetWindow();
+		setToDefault();
+		updatePlanets();
 
 		/**
 		 * The main window time line. 60 times per second updates all drawn
@@ -150,7 +150,6 @@ public class Window extends Application {
 				}
 			}
 		});
-
 		Timeline timeline = new Timeline(drawObjects);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
@@ -176,8 +175,7 @@ public class Window extends Application {
 
 				// restart and exit
 				if (key == KeyCode.R)
-					Main.restart(Main.simulation.getConstellation());
-				// resetWindow(Simulation.constellation);
+					Main.restart();
 				if (key == KeyCode.ESCAPE)
 					Platform.exit();
 
@@ -186,12 +184,18 @@ public class Window extends Application {
 					resetView();
 
 				// time
-				if (key == KeyCode.PERIOD)
-					multTime(2.0);
-				if (key == KeyCode.COMMA)
-					multTime(0.5);
-				if (key == KeyCode.MINUS)
-					multTime(Main.simulation.getConstellation().getTime());
+				if (key == KeyCode.PERIOD) {
+					Main.simulation.multTime(2);
+					updateInfoLabel();
+				}
+				if (key == KeyCode.COMMA) {
+					Main.simulation.multTime(0.5);
+					updateInfoLabel();
+				}
+				if (key == KeyCode.MINUS) {
+					Main.simulation.resetTime();
+					updateInfoLabel();
+				}
 				if (key == KeyCode.SPACE)
 					Main.simulation.setPause(!Main.simulation.isPaused());
 
@@ -213,12 +217,10 @@ public class Window extends Application {
 		scene.setOnScroll(new EventHandler<ScrollEvent>() {
 			public void handle(ScrollEvent event) {
 
-				// zoom in
 				if (event.getDeltaY() > 0)
-					zoom *= 1.05;
+					zoom *= 1.05; // zoom in
 				else
-					// zoom out
-					zoom /= 1.05;
+					zoom /= 1.05; // zoom out
 
 				updateOrbits();
 				event.consume();
@@ -260,7 +262,7 @@ public class Window extends Application {
 		});
 
 		/**
-		 * Translates the view if the mouse is dragged.
+		 * Translates the view if the mouse is dragged with the primary button
 		 */
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
@@ -273,8 +275,7 @@ public class Window extends Application {
 		});
 
 		/**
-		 * When the mouse is released the current position is saved in dx dy and
-		 * tempdx tempdy is reset
+		 * When the mouse is released the current position is saved
 		 */
 		scene.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
@@ -283,34 +284,34 @@ public class Window extends Application {
 				tempdx = tempdy = 0;
 			}
 		});
-
 	}
 
 	/**
 	 * Resets the window to default values
 	 */
-	public void resetWindow() {
+	public void setToDefault() {
 		zoom = 1;
-		dx = dy = 0;
-		tempdx = tempdy = 0;
+		dx = dy = tempdx = tempdy = 0;
 		selectedPlanet = null;
 		nextPlacedPlanet = StartConditions.moon.clone();
 
-		{
-			orbits = true;
-			menuBar.setOrbitsCMI(orbits);
+		orbits = true;
+		labels = true;
+		vectors = false;
+		infoGroup.setVisible(true);
 
-			labels = true;
-			menuBar.setLabelsCMI(labels);
+		menuBar.updateCMIs();
+	}
 
-			vectors = false;
-			menuBar.setVectorsCMI(vectors);
-
-			infoGroup.setVisible(true);
-			menuBar.setInfoCMI(true);
+	/**
+	 * updates all planet objects (circles, vectors, labels)
+	 */
+	public void updatePlanets() {
+		planetGroup.getChildren().clear();
+		for (Planet p : Main.simulation.getPlanets()) {
+			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
 		}
-
-		updatePlanets();
+		updateInfoLabel();
 	}
 
 	Timeline resetTimeline;
@@ -319,21 +320,22 @@ public class Window extends Application {
 	/**
 	 * Starts a time line to reset scale and translation of the view. The time
 	 * line is stopped in the main window time line if the view is reseted.
-	 * Deselects the selected planet
+	 * Deselects the selected planet.
 	 */
 	protected void resetView() {
-
 		KeyFrame returnToCenter = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
 				// reset zoom
 				if (Math.abs(zoom - 1.0) < 0.03)
 					zoom = 1;
-				else if (zoom < 1)
-					zoom *= 1.05;
-				else
-					zoom /= 1.05;
-
+				else {
+					if (zoom < 1)
+						zoom *= 1.05;
+					else
+						zoom /= 1.05;
+				}
+				
 				// reset translation
 				if (Math.abs(dx) < 1.0)
 					dx = 0;
@@ -401,17 +403,6 @@ public class Window extends Application {
 	}
 
 	/**
-	 * updates all circles, vectors and labels
-	 */
-	public void updatePlanets() {
-		planetGroup.getChildren().clear();
-		for (Planet p : Main.simulation.getPlanets()) {
-			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
-		}
-		updateInfoLabel();
-	}
-
-	/**
 	 * Updates the displayed information about the system or planet.
 	 */
 	private void updateInfoLabel() {
@@ -421,8 +412,9 @@ public class Window extends Application {
 					+ (int) selectedPlanet.getVel().norm() + " m/s" + "\nZeit: x"
 					+ (int) (Main.simulation.getTime() * Simulation.SPS));
 		} else {
-			infoLabel.setText(Main.simulation.getConstellation().getName() + "\nObjekte: " + Main.simulation.getPlanets().length
-					+ "\nZeit: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
+			infoLabel.setText(
+					Main.simulation.getConstellation().getName() + "\nObjekte: " + Main.simulation.getPlanets().length
+							+ "\nZeit: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
 		}
 	}
 
@@ -431,19 +423,11 @@ public class Window extends Application {
 	 * visible.
 	 */
 	private void updateOrbits() {
-		if (orbits)
-			for (Planet planet : Main.simulation.getPlanets())
+		if (orbits) {
+			for (Planet planet : Main.simulation.getPlanets()) {
 				planet.updateOrbit();
-	}
-
-	/**
-	 * multiplies the simulation time by a factor
-	 * 
-	 * @param x
-	 */
-	protected void multTime(double x) {
-		Main.simulation.multTime(x);
-		updateInfoLabel();
+			}
+		}
 	}
 
 	/**
@@ -499,6 +483,11 @@ public class Window extends Application {
 		menuBar.updateCMIs();
 	}
 
+	/**
+	 * returns the currently selected planet
+	 * 
+	 * @return the selected planet
+	 */
 	public Planet getSelectedPlanet() {
 		return selectedPlanet;
 	}

@@ -1,7 +1,6 @@
 package simulation;
 
 import constellations.Constellation;
-import constellations.StartConditions;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -60,13 +59,6 @@ public class Simulation {
 			planets[i] = constellation.getPlanet(i).clone();
 
 		run();
-	}
-
-	/**
-	 * Creates a new simulation with the default constellation.
-	 */
-	public Simulation() {
-		this(StartConditions.earthSystem);
 	}
 
 	/**
@@ -269,6 +261,10 @@ public class Simulation {
 	
 	public void multTime(double x) {
 		time *= x;
+	}
+	
+	public void resetTime() {
+		time = constellation.getTime();
 	}
 
 	public int getSpsCounter() {

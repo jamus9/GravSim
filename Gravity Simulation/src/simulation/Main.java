@@ -1,6 +1,7 @@
 package simulation;
 
 import constellations.Constellation;
+import constellations.StartConditions;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import window.Window;
@@ -15,7 +16,7 @@ public class Main extends Application {
 
 	// the current simulation
 	public static Simulation simulation;
-	
+
 	// the main window
 	public static Window window;
 
@@ -32,7 +33,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		simulation = new Simulation();
+		simulation = new Simulation(StartConditions.earthSystem);
 		window = new Window();
 		window.start(primaryStage);
 	}
@@ -44,7 +45,18 @@ public class Main extends Application {
 	 */
 	public static void restart(Constellation newConstellation) {
 		simulation = new Simulation(newConstellation);
-		window.resetWindow();
+		window.setToDefault();
+		window.updatePlanets();
+	}
+
+	/**
+	 * Starts a new simulation with the current constellation in a default
+	 * window.
+	 */
+	public static void restart() {
+		simulation = new Simulation(simulation.getConstellation());
+		window.setToDefault();
+		window.updatePlanets();
 	}
 
 }

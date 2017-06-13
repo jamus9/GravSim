@@ -3,7 +3,7 @@ package utils;
 import simulation.Main;
 
 /**
- * Has some useful methods
+ * Some utility methods
  * 
  * @author Jan Muskalla
  *

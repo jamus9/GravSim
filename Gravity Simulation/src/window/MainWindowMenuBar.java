@@ -33,7 +33,7 @@ public class MainWindowMenuBar extends MenuBar {
 		 */
 
 		MenuItem restart = new MenuItem("Neustart");
-		restart.setOnAction(actionEvent -> Main.restart(Main.simulation.getConstellation()));
+		restart.setOnAction(actionEvent -> Main.restart());
 
 		MenuItem resetView = new MenuItem("Ansicht zurücksetzen");
 		resetView.setOnAction(actionEven -> Main.window.resetView());

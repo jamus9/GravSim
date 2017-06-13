@@ -15,6 +15,14 @@ public class Constellation {
 	private double time;
 	private String name;
 	
+	/**
+	 * Creates a new constellation with name, planets, scale and time scale
+	 * 
+	 * @param name
+	 * @param planetArray
+	 * @param scale
+	 * @param time
+	 */
 	public Constellation(String name, Planet[] planetArray, double scale, double time) {
 		this.name = name;
 		this.planetArray = planetArray;
