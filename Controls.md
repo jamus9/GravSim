@@ -1,5 +1,3 @@
-Controls
-
 Function | Key
 --- | ---
 Restart | R
