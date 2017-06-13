@@ -76,6 +76,8 @@ public class Window extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Gravity Simulation");
+		primaryStage.setMaximized(true);
+		
 		Group root = new Group();
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
 		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
@@ -294,11 +296,12 @@ public class Window extends Application {
 		dx = dy = tempdx = tempdy = 0;
 		selectedPlanet = null;
 		nextPlacedPlanet = StartConditions.moon.clone();
+		menuBar.resetAddMenu();
 
 		orbits = true;
 		labels = true;
 		vectors = false;
-		infoGroup.setVisible(true);
+		infoGroup.setVisible(false);
 
 		menuBar.updateCMIs();
 	}

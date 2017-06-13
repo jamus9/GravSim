@@ -23,6 +23,8 @@ public class MainWindowMenuBar extends MenuBar {
 	private CheckMenuItem orbitsCMI = new CheckMenuItem("Orbits");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Namen");
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vektoren");
+	
+	private RadioMenuItem addMoon;
 
 	protected MainWindowMenuBar() {
 		
@@ -89,7 +91,7 @@ public class MainWindowMenuBar extends MenuBar {
 		 * add planet menu
 		 */
 
-		RadioMenuItem addMoon = new RadioMenuItem(StartConditions.moon.getName());
+		addMoon = new RadioMenuItem(StartConditions.moon.getName());
 		addMoon.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.moon);
 		addMoon.setSelected(true);
 
@@ -139,6 +141,10 @@ public class MainWindowMenuBar extends MenuBar {
 	
 	protected void setInfoCMI(boolean b) {
 		this.infoCMI.setSelected(b);
+	}
+	
+	protected void resetAddMenu() {
+		addMoon.setSelected(true);
 	}
 
 }

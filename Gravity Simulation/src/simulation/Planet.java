@@ -159,7 +159,7 @@ public class Planet {
 
 			if (tp.sub(tplast).norm() > 3) {
 				
-				if (orbitLineList.size() > 300) {
+				if (orbitLineList.size() > 100) {
 					orbitLineList.removeFirst();
 					orbitPoints.removeFirst();
 				}
@@ -227,6 +227,10 @@ public class Planet {
 	 */
 	public void savePosition() {
 		orbitPoints.add(pos.clone());
+	}
+
+	public boolean equals(Planet p) {
+		return getID() == p.getID();
 	}
 
 	public void setPos(Vec2D pos) {
@@ -303,10 +307,6 @@ public class Planet {
 	
 	private double getCircleRadius() {
 		return Main.simulation.getScale() * Main.window.zoom * radius;
-	}
-	
-	public boolean equals(Planet p) {
-		return getID() == p.getID();
 	}
 
 }
