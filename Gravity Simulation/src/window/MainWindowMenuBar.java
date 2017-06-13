@@ -8,8 +8,14 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
-import simulation.Simulation;
+import simulation.Main;
 
+/**
+ * Implements the menu bar for the main window.
+ * 
+ * @author Jan Muskalla
+ *
+ */
 public class MainWindowMenuBar extends MenuBar {
 
 	// CheckMenuItems in settings menu
@@ -18,7 +24,8 @@ public class MainWindowMenuBar extends MenuBar {
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Namen");
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vektoren");
 
-	public MainWindowMenuBar() {
+	protected MainWindowMenuBar() {
+		
 		super();
 
 		/**
@@ -26,10 +33,10 @@ public class MainWindowMenuBar extends MenuBar {
 		 */
 
 		MenuItem restart = new MenuItem("Neustart");
-		restart.setOnAction(actionEvent -> Simulation.window.restart(Simulation.constellation));
+		restart.setOnAction(actionEvent -> Main.restart(Main.simulation.getConstellation()));
 
 		MenuItem resetView = new MenuItem("Ansicht zurücksetzen");
-		resetView.setOnAction(actionEven -> Simulation.window.resetView());
+		resetView.setOnAction(actionEven -> Main.window.resetView());
 
 		MenuItem exit = new MenuItem("Beenden");
 		exit.setOnAction(ActionEvent -> Platform.exit());
@@ -41,10 +48,10 @@ public class MainWindowMenuBar extends MenuBar {
 		 * settings menu
 		 */
 
-		orbitsCMI.setOnAction(actionEvent -> Simulation.window.changeOrbitVisibility());
-		labelsCMI.setOnAction(actionEvent -> Simulation.window.changeLabelVisibility());
-		infoCMI.setOnAction(ActionEvent -> Simulation.window.changeInfoVisibility());
-		vectorsCMI.setOnAction(actionEvent -> Simulation.window.changeVectorVisibility());
+		orbitsCMI.setOnAction(actionEvent -> Main.window.changeOrbitVisibility());
+		labelsCMI.setOnAction(actionEvent -> Main.window.changeLabelVisibility());
+		infoCMI.setOnAction(ActionEvent -> Main.window.changeInfoVisibility());
+		vectorsCMI.setOnAction(actionEvent -> Main.window.changeVectorVisibility());
 
 		Menu settings = new Menu("Einstellungen");
 		settings.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI);
@@ -54,25 +61,25 @@ public class MainWindowMenuBar extends MenuBar {
 		 */
 
 		MenuItem earthMoonItem = new MenuItem(StartConditions.earthSystem.getName());
-		earthMoonItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.earthSystem));
+		earthMoonItem.setOnAction(actionEvent -> Main.restart(StartConditions.earthSystem));
 
 		MenuItem solarSystemItem = new MenuItem(StartConditions.solarSystem.getName());
-		solarSystemItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.solarSystem));
+		solarSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.solarSystem));
 
 		MenuItem marsItem = new MenuItem(StartConditions.marsSystem.getName());
-		marsItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.marsSystem));
+		marsItem.setOnAction(actionEvent -> Main.restart(StartConditions.marsSystem));
 
 		MenuItem jupiterFlybyItem = new MenuItem(StartConditions.jupiterFlyby.getName());
-		jupiterFlybyItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.jupiterFlyby));
+		jupiterFlybyItem.setOnAction(actionEvent -> Main.restart(StartConditions.jupiterFlyby));
 
 		MenuItem earthSunLowItem = new MenuItem(StartConditions.earthSunLow.getName());
-		earthSunLowItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.earthSunLow));
+		earthSunLowItem.setOnAction(actionEvent -> Main.restart(StartConditions.earthSunLow));
 
 		MenuItem symItem = new MenuItem(StartConditions.symmetrical.getName());
-		symItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.symmetrical));
+		symItem.setOnAction(actionEvent -> Main.restart(StartConditions.symmetrical));
 
 		MenuItem randomItem = new MenuItem("Random");
-		randomItem.setOnAction(actionEvent -> Simulation.window.restart(StartConditions.getRandom(40)));
+		randomItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandom(40)));
 
 		Menu load = new Menu("Lade");
 		load.getItems().addAll(earthMoonItem, solarSystemItem, marsItem, jupiterFlybyItem, earthSunLowItem, symItem,
@@ -83,32 +90,23 @@ public class MainWindowMenuBar extends MenuBar {
 		 */
 
 		RadioMenuItem addMoon = new RadioMenuItem(StartConditions.moon.getName());
-		addMoon.setOnAction(actionEvent -> Simulation.window.nextPlanet = StartConditions.moon);
+		addMoon.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.moon);
 		addMoon.setSelected(true);
 
 		RadioMenuItem addEarth = new RadioMenuItem(StartConditions.earth.getName());
-		addEarth.setOnAction(actionEvent -> Simulation.window.nextPlanet = StartConditions.earth);
+		addEarth.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.earth);
 
 		RadioMenuItem addMars = new RadioMenuItem(StartConditions.mars.getName());
-		addMars.setOnAction(actionEvent -> Simulation.window.nextPlanet = StartConditions.mars);
+		addMars.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.mars);
 
 		RadioMenuItem addJupiter = new RadioMenuItem(StartConditions.jupiter.getName());
-		addJupiter.setOnAction(actionEvent -> Simulation.window.nextPlanet = StartConditions.jupiter);
+		addJupiter.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.jupiter);
 
 		ToggleGroup toggleGroup = new ToggleGroup();
 		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter);
 
 		Menu add = new Menu("Platzieren");
 		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter);
-
-		/**
-		 * time controls (does not work)
-		 */
-
-		Menu timeSlower = new Menu("<<");
-		timeSlower.setOnAction(actionEvent -> Simulation.window.setTimeStep(Simulation.time * 0.5));
-		Menu timeFaster = new Menu(">>");
-		timeFaster.setOnAction(actionEvent -> Simulation.window.setTimeStep(Simulation.time * 2));
 
 		/**
 		 * add all menus to the menu bar
@@ -121,10 +119,10 @@ public class MainWindowMenuBar extends MenuBar {
 	 * Updates the check menu items in the menu "settings".
 	 */
 	protected void updateCMIs() {
-		orbitsCMI.setSelected(Simulation.window.orbits);
-		labelsCMI.setSelected(Simulation.window.labels);
-		vectorsCMI.setSelected(Simulation.window.vectors);
-		infoCMI.setSelected(Simulation.window.infoGroup.isVisible());
+		orbitsCMI.setSelected(Main.window.orbits);
+		labelsCMI.setSelected(Main.window.labels);
+		vectorsCMI.setSelected(Main.window.vectors);
+		infoCMI.setSelected(Main.window.infoGroup.isVisible());
 	}
 
 	protected void setOrbitsCMI(boolean b) {

@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import utils.Utils;
 import utils.Vec2D;
 
 /**
@@ -126,24 +127,11 @@ public class Planet {
 	}
 
 	/**
-	 * Transforms a vector from planet coordinates to screen coordinates.
-	 * 
-	 * @param v
-	 *            the vector to transform
-	 * @return the transformed vector
-	 */
-	private static Vec2D transform(Vec2D v) {
-		double x = Simulation.window.zoom * (Simulation.scale * v.x() + Simulation.window.dx + Simulation.window.tempdx) + Simulation.window.winX / 2.0;
-		double y = Simulation.window.zoom * (Simulation.scale * -v.y() + Simulation.window.dy + Simulation.window.tempdy) + Simulation.window.winY / 2.0;
-		return new Vec2D(x, y);
-	}
-
-	/**
 	 * Updates the position and radius of the circle, the vector line, the label
 	 * and the orbit of this planet.
 	 */
 	public void updateObjects() {
-		Vec2D tp = transform(pos);
+		Vec2D tp = Utils.transform(pos);
 
 		// update circle
 		circle.setCenterX(tp.x());
@@ -151,8 +139,8 @@ public class Planet {
 		circle.setRadius(getCircleRadius());
 
 		// update vectors
-		if (Simulation.window.vectors) {
-			double scaleFactor = Simulation.scale * Simulation.window.zoom * 100000.0;
+		if (Main.window.vectors) {
+			double scaleFactor = Main.simulation.getScale() * Main.window.zoom * 100000.0;
 			velocityLine.setStartX(tp.x());
 			velocityLine.setStartY(tp.y());
 			velocityLine.setEndX(vel.x() * scaleFactor + tp.x());
@@ -160,14 +148,14 @@ public class Planet {
 		}
 
 		// update labels
-		if (Simulation.window.labels) {
+		if (Main.window.labels) {
 			double offset = getCircleRadius() + 5;
 			label.relocate(tp.x() + offset, tp.y());
 		}
 
 		// update orbits
-		if (Simulation.window.orbits) {
-			Vec2D tplast = transform(orbitPoints.getLast());
+		if (Main.window.orbits) {
+			Vec2D tplast = Utils.transform(orbitPoints.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
 				
@@ -193,8 +181,8 @@ public class Planet {
 		Line line;
 
 		for (int i = 0; i < orbitLineList.size(); i++) {
-			newStart = transform(orbitPoints.get(i));
-			newEnd = transform(orbitPoints.get(i + 1));
+			newStart = Utils.transform(orbitPoints.get(i));
+			newEnd = Utils.transform(orbitPoints.get(i + 1));
 
 			line = orbitLineList.get(i);
 
@@ -314,7 +302,7 @@ public class Planet {
 	}
 	
 	private double getCircleRadius() {
-		return Simulation.scale * Simulation.window.zoom * radius;
+		return Main.simulation.getScale() * Main.window.zoom * radius;
 	}
 	
 	public boolean equals(Planet p) {
