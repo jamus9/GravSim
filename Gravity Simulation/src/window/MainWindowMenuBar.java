@@ -103,12 +103,15 @@ public class MainWindowMenuBar extends MenuBar {
 
 		RadioMenuItem addJupiter = new RadioMenuItem(StartConditions.jupiter.getName());
 		addJupiter.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.jupiter);
+		
+		RadioMenuItem addBlackHole = new RadioMenuItem(StartConditions.blackHole.getName());
+		addBlackHole.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.blackHole);
 
 		ToggleGroup toggleGroup = new ToggleGroup();
-		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter);
+		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter, addBlackHole);
 
 		Menu add = new Menu("Platzieren");
-		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter);
+		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter, addBlackHole);
 
 		/**
 		 * add all menus to the menu bar

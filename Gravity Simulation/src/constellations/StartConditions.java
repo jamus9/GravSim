@@ -31,7 +31,9 @@ public class StartConditions {
 
 			uranusMass = 8.683e25, uranusRad = 51118e3 / 2.0,
 
-			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0;
+			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0,
+	
+			blackHoleMass = sunMass * 4e6, blackHoleRad = 22.5e9 / 2;
 
 	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sonne"),
 			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
@@ -44,7 +46,8 @@ public class StartConditions {
 			jupiter = new Planet(jupiterMass, jupiterRad, Color.PERU, "Jupiter"),
 			saturn = new Planet(saturnMass, saturnRad, Color.BEIGE, "Saturn"),
 			uranus = new Planet(uranusMass, uranusRad, Color.LIGHTBLUE, "Uranus"),
-			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun");
+			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun"),
+			blackHole = new Planet(blackHoleMass, blackHoleRad, Color.BLACK, "Black Hole");
 
 	/**
 	 * The Earth-Moon System
