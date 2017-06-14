@@ -301,7 +301,7 @@ public class Window extends Application {
 		orbits = true;
 		labels = true;
 		vectors = false;
-		infoGroup.setVisible(false);
+		infoGroup.setVisible(true);
 
 		menuBar.updateCMIs();
 	}
