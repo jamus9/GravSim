@@ -7,7 +7,6 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
-import utils.Utils;
 import utils.Vec2D;
 
 /**
@@ -165,8 +164,8 @@ public class Simulation {
 		}
 
 		// vel, mass and radius of the new planet
-		bigP.setVel(Utils.getCollisionVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
-		bigP.setRadius(Utils.getCollisionRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
+		bigP.setVel(Simulation.getCollisionVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
+		bigP.setRadius(Simulation.getCollisionRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
 		bigP.setMass(bigP.getMass() + smallP.getMass());
 
 		// the new planets array
@@ -210,6 +209,35 @@ public class Simulation {
 		Main.window.updatePlanets();
 
 		pause = false;
+	}
+
+	/**
+	 * Calculates the new velocity of a planet after a collision with momentum
+	 * conservation
+	 * 
+	 * @param mass1
+	 * @param vel1
+	 * @param mass2
+	 * @param vel2
+	 * @return the new velocity
+	 */
+	private static Vec2D getCollisionVel(double mass1, Vec2D vel1, double mass2, Vec2D vel2) {
+		double x = (mass1 * vel1.x() + mass2 * vel2.x()) / (mass1 + mass2);
+		double y = (mass1 * vel1.y() + mass2 * vel2.y()) / (mass1 + mass2);
+		return new Vec2D(x, y);
+	}
+
+	/**
+	 * Calculates the new radius of a planet after a collision with the masses
+	 * of both collided planets and the density of the bigger one.
+	 * 
+	 * @param bigMass
+	 * @param bigRadius
+	 * @param smallMass
+	 * @return the new radius
+	 */
+	private static double getCollisionRadius(double bigMass, double bigRadius, double smallMass) {
+		return bigRadius * Math.pow(1 + smallMass / bigMass, 1.0 / 3.0);
 	}
 
 	/**

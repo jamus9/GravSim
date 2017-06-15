@@ -8,6 +8,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.stage.Stage;
 import simulation.Main;
 
 /**
@@ -26,9 +27,11 @@ public class MainWindowMenuBar extends MenuBar {
 	
 	private RadioMenuItem addMoon;
 
-	protected MainWindowMenuBar() {
+	protected MainWindowMenuBar(Stage primaryStage) {
 		
 		super();
+		
+		prefWidthProperty().bind(primaryStage.widthProperty());
 
 		/**
 		 * simulation menu

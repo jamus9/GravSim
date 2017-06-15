@@ -227,8 +227,8 @@ public class StartConditions {
 		Planet[] planets = new Planet[number];
 
 		for (int i = 0; i < number; i++) {
-			planets[i] = new Planet(plusMinus() * Math.random() * Main.window.winX * (3.0 / 8.0),
-					plusMinus() * Math.random() * Main.window.winY * (3.0 / 8.0), plusMinus() * Math.random() * 0.001,
+			planets[i] = new Planet(plusMinus() * Math.random() * Main.window.getWidth() * (3.0 / 8.0),
+					plusMinus() * Math.random() * Main.window.getHeight() * (3.0 / 8.0), plusMinus() * Math.random() * 0.001,
 					plusMinus() * Math.random() * 0.001, 2.5);
 		}
 

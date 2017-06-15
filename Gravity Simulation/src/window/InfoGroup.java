@@ -19,10 +19,11 @@ public class InfoGroup extends Group {
 	private Label pastTimeLabel;
 	private Label infoLabel;
 
+	/**
+	 * Creates the info group.
+	 */
 	public InfoGroup() {
 		super();
-
-		infoLabel = new Label();
 
 		spsLabel = new Label();
 		spsLabel.relocate(3, 25);
@@ -30,10 +31,14 @@ public class InfoGroup extends Group {
 		pastTimeLabel = new Label();
 		pastTimeLabel.relocate(0, 40);
 
+		infoLabel = new Label();
 		infoLabel.relocate(3, 70);
 		this.getChildren().addAll(spsLabel, pastTimeLabel, infoLabel);
 	}
 
+	/**
+	 * updates the info labels
+	 */
 	public void updateInfo() {
 
 		if (!Main.simulation.isPaused()) {

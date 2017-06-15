@@ -6,8 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import utils.Utils;
 import utils.Vec2D;
+import window.Window;
 
 /**
  * Implements a planet with position and velocity, radius, mass and a name. Each
@@ -131,7 +131,7 @@ public class Planet {
 	 * and the orbit of this planet.
 	 */
 	public void updateObjects() {
-		Vec2D tp = Utils.transform(pos);
+		Vec2D tp = Window.transform(pos);
 
 		// update circle
 		circle.setCenterX(tp.x());
@@ -139,8 +139,8 @@ public class Planet {
 		circle.setRadius(getCircleRadius());
 
 		// update vectors
-		if (Main.window.vectors) {
-			double scaleFactor = Main.simulation.getScale() * Main.window.zoom * 100000.0;
+		if (Main.window.isVectors()) {
+			double scaleFactor = Main.simulation.getScale() * Main.window.getZoom() * 100000.0;
 			velocityLine.setStartX(tp.x());
 			velocityLine.setStartY(tp.y());
 			velocityLine.setEndX(vel.x() * scaleFactor + tp.x());
@@ -148,14 +148,14 @@ public class Planet {
 		}
 
 		// update labels
-		if (Main.window.labels) {
+		if (Main.window.isLabels()) {
 			double offset = getCircleRadius() + 5;
 			label.relocate(tp.x() + offset, tp.y());
 		}
 
 		// update orbits
-		if (Main.window.orbits) {
-			Vec2D tplast = Utils.transform(orbitPoints.getLast());
+		if (Main.window.isOrbits()) {
+			Vec2D tplast = Window.transform(orbitPoints.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
 				
@@ -181,8 +181,8 @@ public class Planet {
 		Line line;
 
 		for (int i = 0; i < orbitLineList.size(); i++) {
-			newStart = Utils.transform(orbitPoints.get(i));
-			newEnd = Utils.transform(orbitPoints.get(i + 1));
+			newStart = Window.transform(orbitPoints.get(i));
+			newEnd = Window.transform(orbitPoints.get(i + 1));
 
 			line = orbitLineList.get(i);
 
@@ -306,7 +306,7 @@ public class Planet {
 	}
 	
 	private double getCircleRadius() {
-		return Main.simulation.getScale() * Main.window.zoom * radius;
+		return Main.simulation.getScale() * Main.window.getZoom() * radius;
 	}
 
 }

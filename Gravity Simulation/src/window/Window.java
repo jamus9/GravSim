@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
 import simulation.Planet;
-import utils.Utils;
 import utils.Vec2D;
 
 /**
@@ -34,38 +33,38 @@ import utils.Vec2D;
  */
 public class Window extends Application {
 
-	// window size in pixel
-	public int winX = 1200;
-	public int winY = 700;
-
 	// flags for orbits label and vectors
-	public boolean orbits, labels, vectors;
+	protected boolean orbits, labels, vectors;
 
 	// zoom and translation
-	public double zoom;
-	public double dx, dy;
-
+	private double zoom;
+	private double dx, dy;
 	// coordinates for mouse dragging
-	public double tempdx, tempdy;
+	private double tempdx, tempdy;
 	private double mouseX, mouseY;
 
 	// the selected planet
 	private Planet selectedPlanet;
 
 	// the next planet that will be placed
-	protected Planet nextPlacedPlanet  = StartConditions.moon.clone();
+	protected Planet nextPlacedPlanet;
 
-	// sub group of root for all orbits
-	private Group orbitGroup = new Group();
-	// sub group of root for all circles, vectors, labels
-	private Group planetGroup = new Group();
-	// sub group of root for all info an the screen
-	protected InfoGroup infoGroup = new InfoGroup();
+	// scene of the window
+	private Scene scene;
+
+	// group for all orbits
+	private Group orbitGroup;
+	// group for all circles, vectors, labels
+	private Group planetGroup;
+	// group for all information an the screen
+	protected InfoGroup infoGroup;
 	// the menu bar
-	private MainWindowMenuBar menuBar = new MainWindowMenuBar();
+	private MainWindowMenuBar menuBar;
 
 	/**
 	 * Starts the window for the simulation.
+	 * 
+	 * @param primaryStage
 	 */
 	@Override
 	public void start(Stage primaryStage) {
@@ -73,30 +72,36 @@ public class Window extends Application {
 		primaryStage.setMaximized(true);
 
 		Group root = new Group();
-		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
+		scene = new Scene(root, 1200, 700, Color.LIGHTBLUE);
+		setSceneEvents(scene);
 
-		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());		
+		// add stuff to root
+		orbitGroup = new Group();
+		planetGroup = new Group();
+		infoGroup = new InfoGroup();
+		menuBar = new MainWindowMenuBar(primaryStage);
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup, menuBar);
 
-		/**
-		 * initialize all values to default and load the planet objects
-		 */
+		// initialize all values to default and load the planet objects
 		setToDefault();
 		updatePlanets();
 
-		/**
-		 * The main window time line. 60 times per second updates all drawn
-		 * objects and adjusts the view.
-		 */
+		nextPlacedPlanet = StartConditions.moon.clone();
+
+		// starts the updating time line
+		runTimeLine();
+
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
+	/**
+	 * The main window time line. 60 times per second updates all drawn objects
+	 * and adjusts the view.
+	 */
+	private void runTimeLine() {
 		KeyFrame drawObjects = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-
-				// change center of the screen after resizing the window
-				if (winX != (int) scene.getWidth() || winY != (int) scene.getHeight()) {
-					winX = (int) scene.getWidth();
-					winY = (int) scene.getHeight();
-					updateOrbits();
-				}
 
 				// follow a planet
 				if (selectedPlanet != null) {
@@ -116,7 +121,7 @@ public class Window extends Application {
 						for (Line line : planet.getOrbitLineList())
 							orbitGroup.getChildren().add(line);
 				}
-				
+
 				// update info
 				infoGroup.updateInfo();
 
@@ -130,10 +135,6 @@ public class Window extends Application {
 		Timeline timeline = new Timeline(drawObjects);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
-
-		this.setSceneEvents(scene);
-		primaryStage.setScene(scene);
-		primaryStage.show();
 	}
 
 	/**
@@ -143,7 +144,7 @@ public class Window extends Application {
 	 */
 	private void setSceneEvents(final Scene scene) {
 
-		/**
+		/*
 		 * keyboard input
 		 */
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -161,13 +162,11 @@ public class Window extends Application {
 					resetView();
 
 				// time
-				if (key == KeyCode.PERIOD) 
+				if (key == KeyCode.PERIOD)
 					Main.simulation.multTime(2);
-				
-				if (key == KeyCode.COMMA) 
+				if (key == KeyCode.COMMA)
 					Main.simulation.multTime(0.5);
-				
-				if (key == KeyCode.MINUS) 
+				if (key == KeyCode.MINUS)
 					Main.simulation.resetTime();
 				if (key == KeyCode.SPACE)
 					Main.simulation.setPause(!Main.simulation.isPaused());
@@ -184,7 +183,7 @@ public class Window extends Application {
 			}
 		});
 
-		/**
+		/*
 		 * Zoom with the mouse wheel.
 		 */
 		scene.setOnScroll(new EventHandler<ScrollEvent>() {
@@ -200,7 +199,7 @@ public class Window extends Application {
 			}
 		});
 
-		/**
+		/*
 		 * Select planets with primary mouse button, reset view with middle
 		 * mouse button and add new planet with right mouse button. Saves click
 		 * position.
@@ -220,7 +219,7 @@ public class Window extends Application {
 				if (event.isSecondaryButtonDown()) {
 					Planet newPlanet = nextPlacedPlanet.clone();
 
-					newPlanet.setPos(Utils.transfromBack(new Vec2D(mouseX, mouseY)));
+					newPlanet.setPos(Window.transfromBack(new Vec2D(mouseX, mouseY)));
 					newPlanet.setVel(0, 0);
 
 					Main.simulation.addNewPlanet(newPlanet);
@@ -234,7 +233,7 @@ public class Window extends Application {
 			}
 		});
 
-		/**
+		/*
 		 * Translates the view if the mouse is dragged with the primary button
 		 */
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -247,7 +246,7 @@ public class Window extends Application {
 			}
 		});
 
-		/**
+		/*
 		 * When the mouse is released the current position is saved
 		 */
 		scene.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -260,7 +259,7 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Resets the window to default values
+	 * Sets the window to default values.
 	 */
 	public void setToDefault() {
 		zoom = 1;
@@ -280,9 +279,9 @@ public class Window extends Application {
 	 */
 	public void updatePlanets() {
 		planetGroup.getChildren().clear();
-		for (Planet p : Main.simulation.getPlanets()) 
+		for (Planet p : Main.simulation.getPlanets())
 			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
-		
+
 	}
 
 	Timeline resetTimeline;
@@ -443,6 +442,58 @@ public class Window extends Application {
 	 */
 	public Planet getSelectedPlanet() {
 		return selectedPlanet;
+	}
+
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param vector
+	 * @return the transformed vector
+	 */
+	public static Vec2D transfromBack(Vec2D vector) {
+		double x = ((vector.x() - Main.window.getWidth() / 2) / Main.window.zoom - Main.window.dx - Main.window.tempdx)
+				/ Main.simulation.getScale();
+		double y = -((vector.y() - Main.window.getHeight() / 2) / Main.window.zoom - Main.window.dy
+				- Main.window.tempdy) / Main.simulation.getScale();
+		return new Vec2D(x, y);
+	}
+
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param vector
+	 * @return the transformed vector
+	 */
+	public static Vec2D transform(Vec2D vector) {
+		double x = Main.window.zoom * (Main.simulation.getScale() * vector.x() + Main.window.dx + Main.window.tempdx)
+				+ Main.window.getWidth() / 2.0;
+		double y = Main.window.zoom * (Main.simulation.getScale() * -vector.y() + Main.window.dy + Main.window.tempdy)
+				+ Main.window.getHeight() / 2.0;
+		return new Vec2D(x, y);
+	}
+
+	public double getWidth() {
+		return scene.getWidth();
+	}
+
+	public double getHeight() {
+		return scene.getHeight();
+	}
+
+	public double getZoom() {
+		return zoom;
+	}
+
+	public boolean isOrbits() {
+		return orbits;
+	}
+
+	public boolean isLabels() {
+		return labels;
+	}
+
+	public boolean isVectors() {
+		return vectors;
 	}
 
 }
