@@ -219,6 +219,7 @@ public class Simulation {
 	 *            the new planet
 	 */
 	public void addNewPlanet(Planet planet) {
+		boolean pauseSave = pause;
 		pause = true;
 
 		planet.deleteOrbit();
@@ -240,7 +241,7 @@ public class Simulation {
 		// update the window
 		Main.window.updatePlanets();
 
-		pause = false;
+		pause = pauseSave;
 	}
 	
 	public Planet[] getPlanets() {

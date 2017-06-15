@@ -106,12 +106,15 @@ public class MainWindowMenuBar extends MenuBar {
 		
 		RadioMenuItem addBlackHole = new RadioMenuItem(StartConditions.blackHole.getName());
 		addBlackHole.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.blackHole);
+		
+		RadioMenuItem addSun = new RadioMenuItem(StartConditions.sun.getName());
+		addSun.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.sun);
 
 		ToggleGroup toggleGroup = new ToggleGroup();
-		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter, addBlackHole);
+		toggleGroup.getToggles().addAll(addMoon, addEarth, addMars, addJupiter, addSun, addBlackHole);
 
 		Menu add = new Menu("Platzieren");
-		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter, addBlackHole);
+		add.getItems().addAll(addMoon, addEarth, addMars, addJupiter, addSun, addBlackHole);
 
 		/**
 		 * add all menus to the menu bar
@@ -146,8 +149,8 @@ public class MainWindowMenuBar extends MenuBar {
 		this.infoCMI.setSelected(b);
 	}
 	
-	protected void resetAddMenu() {
-		addMoon.setSelected(true);
-	}
+//	protected void resetAddMenu() {
+//		addMoon.setSelected(true);
+//	}
 
 }

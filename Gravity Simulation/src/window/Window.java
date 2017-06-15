@@ -10,7 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -22,14 +21,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
 import simulation.Planet;
-import simulation.Simulation;
 import utils.Utils;
 import utils.Vec2D;
 
 /**
  * The main window of the application that handles all drawn objects.
  * 
- * (info update and orbit translate only when needed)
+ * (orbit translate only when needed)
  * 
  * @author Jan Muskalla
  *
@@ -55,18 +53,14 @@ public class Window extends Application {
 	private Planet selectedPlanet;
 
 	// the next planet that will be placed
-	protected Planet nextPlacedPlanet;
+	protected Planet nextPlacedPlanet  = StartConditions.moon.clone();
 
 	// sub group of root for all orbits
 	private Group orbitGroup = new Group();
 	// sub group of root for all circles, vectors, labels
 	private Group planetGroup = new Group();
 	// sub group of root for all info an the screen
-	protected Group infoGroup = new Group();
-
-	// info label
-	private Label infoLabel = new Label();
-
+	protected InfoGroup infoGroup = new InfoGroup();
 	// the menu bar
 	private MainWindowMenuBar menuBar = new MainWindowMenuBar();
 
@@ -77,27 +71,12 @@ public class Window extends Application {
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Gravity Simulation");
 		primaryStage.setMaximized(true);
-		
+
 		Group root = new Group();
-		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup);
 		Scene scene = new Scene(root, winX, winY, Color.LIGHTBLUE);
 
-		/**
-		 * info group
-		 */
-		Label spsLabel = new Label();
-		spsLabel.relocate(3, 25);
-		Label pastTimeLabel = new Label();
-		pastTimeLabel.relocate(0, 40);
-
-		infoLabel.relocate(3, 70);
-		infoGroup.getChildren().addAll(spsLabel, pastTimeLabel, infoLabel);
-
-		/**
-		 * add the menu bar
-		 */
-		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
-		root.getChildren().add(menuBar);
+		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());		
+		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup, menuBar);
 
 		/**
 		 * initialize all values to default and load the planet objects
@@ -137,13 +116,9 @@ public class Window extends Application {
 						for (Line line : planet.getOrbitLineList())
 							orbitGroup.getChildren().add(line);
 				}
-
-				// update counter
-				if (!Main.simulation.isPaused()) {
-					spsLabel.setText("Steps/Sec: " + (Main.simulation.getSpsCounter() * 60));
-					Main.simulation.resetSpsCounter();
-					pastTimeLabel.setText(Utils.pastTime());
-				}
+				
+				// update info
+				infoGroup.updateInfo();
 
 				// return to the center after a reset of the window
 				if (stopResetTimeline && zoom == 1 && dx == 0 && dy == 0) {
@@ -186,18 +161,14 @@ public class Window extends Application {
 					resetView();
 
 				// time
-				if (key == KeyCode.PERIOD) {
+				if (key == KeyCode.PERIOD) 
 					Main.simulation.multTime(2);
-					updateInfoLabel();
-				}
-				if (key == KeyCode.COMMA) {
+				
+				if (key == KeyCode.COMMA) 
 					Main.simulation.multTime(0.5);
-					updateInfoLabel();
-				}
-				if (key == KeyCode.MINUS) {
+				
+				if (key == KeyCode.MINUS) 
 					Main.simulation.resetTime();
-					updateInfoLabel();
-				}
 				if (key == KeyCode.SPACE)
 					Main.simulation.setPause(!Main.simulation.isPaused());
 
@@ -295,8 +266,6 @@ public class Window extends Application {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
 		selectedPlanet = null;
-		nextPlacedPlanet = StartConditions.moon.clone();
-		menuBar.resetAddMenu();
 
 		orbits = true;
 		labels = true;
@@ -311,10 +280,9 @@ public class Window extends Application {
 	 */
 	public void updatePlanets() {
 		planetGroup.getChildren().clear();
-		for (Planet p : Main.simulation.getPlanets()) {
+		for (Planet p : Main.simulation.getPlanets()) 
 			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
-		}
-		updateInfoLabel();
+		
 	}
 
 	Timeline resetTimeline;
@@ -338,7 +306,7 @@ public class Window extends Application {
 					else
 						zoom /= 1.05;
 				}
-				
+
 				// reset translation
 				if (Math.abs(dx) < 1.0)
 					dx = 0;
@@ -391,7 +359,6 @@ public class Window extends Application {
 	public void selectPlanet(Planet planet) {
 		selectedPlanet = planet;
 		planet.select(true);
-		updateInfoLabel();
 	}
 
 	/**
@@ -402,23 +369,6 @@ public class Window extends Application {
 			selectedPlanet.select(false);
 		}
 		selectedPlanet = null;
-		updateInfoLabel();
-	}
-
-	/**
-	 * Updates the displayed information about the system or planet.
-	 */
-	private void updateInfoLabel() {
-		if (selectedPlanet != null) {
-			infoLabel.setText(selectedPlanet.getName() + "\nMasse: " + selectedPlanet.getMass() + " kg\nRadius: "
-					+ (int) selectedPlanet.getRadius() / 1000 + " km\nGeschwindigkeit: "
-					+ (int) selectedPlanet.getVel().norm() + " m/s" + "\nZeit: x"
-					+ (int) (Main.simulation.getTime() * Simulation.SPS));
-		} else {
-			infoLabel.setText(
-					Main.simulation.getConstellation().getName() + "\nObjekte: " + Main.simulation.getPlanets().length
-							+ "\nZeit: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
-		}
 	}
 
 	/**

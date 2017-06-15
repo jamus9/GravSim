@@ -33,7 +33,7 @@ public class StartConditions {
 
 			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0,
 	
-			blackHoleMass = sunMass * 4e6, blackHoleRad = 22.5e9 / 2;
+			blackHoleMass = sunMass * 4e6, blackHoleRad = 22.5e9 / 2.0;
 
 	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sonne"),
 			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
@@ -112,7 +112,7 @@ public class StartConditions {
 		Planet[] planets = { sun.clone(), merkur.clone(), venus.clone(), earth.clone(), mars.clone(), jupiter.clone(),
 				saturn.clone(), uranus.clone(), neptun.clone() };
 
-		return new Constellation("Sonnen System", planets, 2e-9, 100);
+		return new Constellation("Sonnen System", planets, 2e-9, 50);
 	}
 
 	/**
@@ -144,8 +144,8 @@ public class StartConditions {
 	public static final Constellation jupiterFlyby = getJupiterFlyby();
 
 	private static Constellation getJupiterFlyby() {
-		Planet ast1 = new Planet(-133708e3 * 17, -133708e3 * 4, 10000, 0, 0, 0, Color.GRAY, "Asteroid");
-		Planet ast2 = new Planet(-133708e3 * 17, -133708e3 * 8, 10000, 0, 0, 0, Color.GRAY, "Asteroid");
+		Planet ast1 = new Planet(-133708e3 * 17, -133708e3 * 4, 10000, 0, 100, 1, Color.GRAY, "Asteroid");
+		Planet ast2 = new Planet(-133708e3 * 17, -133708e3 * 8, 10000, 0, 100, 1, Color.GRAY, "Asteroid");
 
 		jupiter.setPos(0, 0);
 		jupiter.setVel(0, 0);

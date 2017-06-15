@@ -14,10 +14,14 @@ import window.Window;
  */
 public class Main extends Application {
 
-	// the current simulation
+	/**
+	 *  the current simulation
+	 */
 	public static Simulation simulation;
 
-	// the main window
+	/**
+	 *  the main window
+	 */
 	public static Window window;
 
 	/**
