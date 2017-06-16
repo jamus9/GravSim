@@ -32,14 +32,14 @@ public class StartConditions {
 			uranusMass = 8.683e25, uranusRad = 51118e3 / 2.0,
 
 			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0,
-	
+
 			blackHoleMass = sunMass * 4e6, blackHoleRad = 22.5e9 / 2.0;
 
-	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sonne"),
+	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sun"),
 			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
 			venus = new Planet(venusMass, venusRad, Color.BEIGE, "Venus"),
-			earth = new Planet(earthMass, earthRad, Color.BLUE, "Erde"),
-			moon = new Planet(moonMass, moonRad, Color.GRAY, "Mond"),
+			earth = new Planet(earthMass, earthRad, Color.BLUE, "Earth"),
+			moon = new Planet(moonMass, moonRad, Color.GRAY, "Moon"),
 			mars = new Planet(marsMass, marsRad, Color.RED, "Mars"),
 			phobos = new Planet(1.072e16, 22.5e3, Color.GRAY, "Phobos"),
 			deimos = new Planet(1.8e15, 13e3, Color.GRAY, "Deimos"),
@@ -64,7 +64,7 @@ public class StartConditions {
 		moon.setVel(0, -orbVel(earthMass, moonDistance));
 
 		Planet[] planets = { earth.clone(), moon.clone() };
-		return new Constellation("Erde - Mond System", planets, 0.8e-6, 10);
+		return new Constellation("Earth system", planets, 0.8e-6, 10);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class StartConditions {
 		Planet[] planets = { sun.clone(), merkur.clone(), venus.clone(), earth.clone(), mars.clone(), jupiter.clone(),
 				saturn.clone(), uranus.clone(), neptun.clone() };
 
-		return new Constellation("Sonnen System", planets, 2e-9, 50);
+		return new Constellation("Solar system", planets, 2e-9, 50);
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class StartConditions {
 
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
 
-		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
+		return new Constellation("Mars system", planets, 1.2e-5, 0.5);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class StartConditions {
 		jupiter.setPos(0, 0);
 		jupiter.setVel(0, 0);
 
-		return new Constellation("Jupiter Flyby", new Planet[] { ast1, ast2, jupiter.clone() }, 3e-7, 3);
+		return new Constellation("Jupiter flyby", new Planet[] { ast1, ast2, jupiter.clone() }, 3e-7, 3);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class StartConditions {
 
 		Planet[] planets = { p1, p2, p3, p4, p5, p6, p7, p8 };
 
-		return new Constellation("Symmetrische Konstellation", planets, 0.05, 10);
+		return new Constellation("Symmetrical constellation", planets, 0.05, 10);
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class StartConditions {
 		earth.setPos(-earthDis, 0);
 		earth.setVel(0, -orbVel(sunMass, earthDis));
 
-		return new Constellation("Sonne - Erde", new Planet[] { sun.clone(), earth.clone() }, 4e-7, 0.05);
+		return new Constellation("Earth in low Sun orbit", new Planet[] { sun.clone(), earth.clone() }, 4e-7, 0.05);
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class StartConditions {
 		earth.setPos(-distance, 0);
 		earth.setVel(vel, 0);
 
-		return new Constellation("Kollision", new Planet[] { mars.clone(), mars2, earth.clone() }, 8e-7, 5);
+		return new Constellation("Earth Mars collisions", new Planet[] { mars.clone(), mars2, earth.clone() }, 8e-7, 5);
 	}
 
 	/**
@@ -228,8 +228,8 @@ public class StartConditions {
 
 		for (int i = 0; i < number; i++) {
 			planets[i] = new Planet(plusMinus() * Math.random() * Main.window.getWidth() * (3.0 / 8.0),
-					plusMinus() * Math.random() * Main.window.getHeight() * (3.0 / 8.0), plusMinus() * Math.random() * 0.001,
-					plusMinus() * Math.random() * 0.001, 2.5);
+					plusMinus() * Math.random() * Main.window.getHeight() * (3.0 / 8.0),
+					plusMinus() * Math.random() * 0.001, plusMinus() * Math.random() * 0.001, 2.5);
 		}
 
 		return new Constellation("Random", planets, 1, 2);

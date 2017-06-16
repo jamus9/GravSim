@@ -71,11 +71,12 @@ public class Window extends Application {
 		primaryStage.setTitle("Gravity Simulation");
 		primaryStage.setMaximized(true);
 
+		// set scene
 		Group root = new Group();
 		scene = new Scene(root, 1200, 700, Color.LIGHTBLUE);
 		setSceneEvents(scene);
 
-		// add stuff to root
+		// add everything to root
 		orbitGroup = new Group();
 		planetGroup = new Group();
 		infoGroup = new InfoGroup();
@@ -85,12 +86,12 @@ public class Window extends Application {
 		// initialize all values to default and load the planet objects
 		setToDefault();
 		updatePlanets();
-
 		nextPlacedPlanet = StartConditions.moon.clone();
 
 		// starts the updating time line
 		runTimeLine();
 
+		// show the scene
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
@@ -105,8 +106,10 @@ public class Window extends Application {
 
 				// follow a planet
 				if (selectedPlanet != null) {
-					dx = Main.simulation.getScale() * -selectedPlanet.getPos().x();
-					dy = Main.simulation.getScale() * selectedPlanet.getPos().y();
+					double scale = Main.simulation.getScale();
+					Vec2D pos = selectedPlanet.getPos();
+					dx = scale * -pos.x();
+					dy = scale * pos.y();
 					updateOrbits();
 				}
 
@@ -132,6 +135,7 @@ public class Window extends Application {
 				}
 			}
 		});
+
 		Timeline timeline = new Timeline(drawObjects);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
@@ -317,7 +321,6 @@ public class Window extends Application {
 				else
 					dy /= 1.1;
 
-				// update orbits
 				updateOrbits();
 			}
 		});
@@ -364,9 +367,8 @@ public class Window extends Application {
 	 * Deselects the selected planet and updates the info label.
 	 */
 	public void deselectPlanet() {
-		if (selectedPlanet != null) {
+		if (selectedPlanet != null)
 			selectedPlanet.select(false);
-		}
 		selectedPlanet = null;
 	}
 
@@ -375,11 +377,9 @@ public class Window extends Application {
 	 * visible.
 	 */
 	private void updateOrbits() {
-		if (orbits) {
-			for (Planet planet : Main.simulation.getPlanets()) {
+		if (orbits)
+			for (Planet planet : Main.simulation.getPlanets())
 				planet.updateOrbit();
-			}
-		}
 	}
 
 	/**
