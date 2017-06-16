@@ -24,6 +24,7 @@ public class MainWindowMenuBar extends MenuBar {
 	private CheckMenuItem orbitsCMI = new CheckMenuItem("Orbits");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Labels");
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vectors");
+	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
 
 	protected MainWindowMenuBar(Stage primaryStage) {
 
@@ -55,9 +56,10 @@ public class MainWindowMenuBar extends MenuBar {
 		labelsCMI.setOnAction(actionEvent -> Main.window.changeLabelVisibility());
 		infoCMI.setOnAction(ActionEvent -> Main.window.changeInfoVisibility());
 		vectorsCMI.setOnAction(actionEvent -> Main.window.changeVectorVisibility());
+		orbitModeCMI.setOnAction(actionEvent -> Main.window.changeOrbitMode());
 
 		Menu settingsMenu = new Menu("Settings");
-		settingsMenu.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI);
+		settingsMenu.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI, orbitModeCMI);
 
 		/**
 		 * constellation loading menu
@@ -135,22 +137,7 @@ public class MainWindowMenuBar extends MenuBar {
 		labelsCMI.setSelected(Main.window.labels);
 		vectorsCMI.setSelected(Main.window.vectors);
 		infoCMI.setSelected(Main.window.infoGroup.isVisible());
-	}
-
-	protected void setOrbitsCMI(boolean b) {
-		this.orbitsCMI.setSelected(b);
-	}
-
-	protected void setLabelsCMI(boolean b) {
-		this.labelsCMI.setSelected(b);
-	}
-
-	protected void setVectorsCMI(boolean b) {
-		this.vectorsCMI.setSelected(b);
-	}
-
-	protected void setInfoCMI(boolean b) {
-		this.infoCMI.setSelected(b);
+		orbitModeCMI.setSelected(Main.window.orbitMode);
 	}
 
 }

@@ -50,7 +50,7 @@ public class Window extends Application {
 	// the next planet that will be placed
 	protected Planet nextPlacedPlanet;
 
-	private boolean orbitMode;
+	protected boolean orbitMode;
 
 	// scene of the window
 	private Scene scene;
@@ -91,7 +91,7 @@ public class Window extends Application {
 		updatePlanets();
 
 		nextPlacedPlanet = StartConditions.moon.clone();
-		orbitMode = false;
+		orbitMode = true;
 		infoGroup.setOrbitMode(orbitMode);
 
 		// starts the updating time line
@@ -192,10 +192,8 @@ public class Window extends Application {
 					changeInfoVisibility();
 
 				// orbit mode
-				if (key == KeyCode.M) {
-					orbitMode = !orbitMode;
-					infoGroup.setOrbitMode(orbitMode);
-				}
+				if (key == KeyCode.M) 
+					changeOrbitMode();
 			}
 		});
 
@@ -290,6 +288,7 @@ public class Window extends Application {
 		labels = true;
 		vectors = false;
 		infoGroup.setVisible(true);
+		orbitMode = true;
 
 		menuBar.updateCMIs();
 	}
@@ -448,6 +447,12 @@ public class Window extends Application {
 	 */
 	protected void changeInfoVisibility() {
 		infoGroup.setVisible(!infoGroup.isVisible());
+		menuBar.updateCMIs();
+	}
+	
+	protected void changeOrbitMode() {
+		orbitMode = !orbitMode;
+		infoGroup.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
 	}
 
