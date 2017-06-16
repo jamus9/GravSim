@@ -87,12 +87,18 @@ public class Window extends Application {
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup, menuBar);
 
 		// initialize all values to default and load the planet objects
-		setToDefault();
+		setToDefaultView();
 		updatePlanets();
 
 		nextPlacedPlanet = StartConditions.moon.clone();
+		orbits = true;
+		labels = true;
+		vectors = false;
+		infoGroup.setVisible(true);
 		orbitMode = true;
 		infoGroup.setOrbitMode(orbitMode);
+		
+		menuBar.updateCMIs();
 
 		// starts the updating time line
 		runTimeLine();
@@ -192,7 +198,7 @@ public class Window extends Application {
 					changeInfoVisibility();
 
 				// orbit mode
-				if (key == KeyCode.M) 
+				if (key == KeyCode.M)
 					changeOrbitMode();
 			}
 		});
@@ -235,10 +241,12 @@ public class Window extends Application {
 
 					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
 
-					if (orbitMode) {
-						newPlanet.setVel(Utils.orbVel(Utils.getBiggestInView(Main.simulation.getPlanets(), Main.window), newPlanet.getPos()));
-					} else
+					if (!orbitMode || Main.simulation.getPlanets().length == 0) {
 						newPlanet.setVel(0, 0);
+					} else {
+						Planet biggest = Utils.getBiggestInView(Main.simulation.getPlanets(), Main.window);
+						newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
+					}
 
 					Main.simulation.addNewPlanet(newPlanet);
 				}
@@ -279,18 +287,10 @@ public class Window extends Application {
 	/**
 	 * Sets the window to default values.
 	 */
-	public void setToDefault() {
+	public void setToDefaultView() {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
-		selectedPlanet = null;
-
-		orbits = true;
-		labels = true;
-		vectors = false;
-		infoGroup.setVisible(true);
-		orbitMode = true;
-
-		menuBar.updateCMIs();
+		deselectPlanet();
 	}
 
 	/**
@@ -312,6 +312,8 @@ public class Window extends Application {
 	 * Deselects the selected planet.
 	 */
 	protected void resetView() {
+		deselectPlanet();
+		
 		KeyFrame returnToCenter = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
@@ -343,10 +345,8 @@ public class Window extends Application {
 		resetTimeline = new Timeline(returnToCenter);
 		resetTimeline.setCycleCount(Animation.INDEFINITE);
 		resetTimeline.play();
-
+		
 		stopResetTimeline = true;
-
-		deselectPlanet();
 	}
 
 	/**
@@ -449,7 +449,7 @@ public class Window extends Application {
 		infoGroup.setVisible(!infoGroup.isVisible());
 		menuBar.updateCMIs();
 	}
-	
+
 	protected void changeOrbitMode() {
 		orbitMode = !orbitMode;
 		infoGroup.setOrbitMode(orbitMode);

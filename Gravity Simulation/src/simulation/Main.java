@@ -49,7 +49,7 @@ public class Main extends Application {
 	 */
 	public static void restart(Constellation newConstellation) {
 		simulation = new Simulation(newConstellation);
-		window.setToDefault();
+		window.setToDefaultView();
 		window.updatePlanets();
 	}
 
@@ -59,7 +59,7 @@ public class Main extends Application {
 	 */
 	public static void restart() {
 		simulation = new Simulation(simulation.getConstellation());
-		window.setToDefault();
+		window.setToDefaultView();
 		window.updatePlanets();
 	}
 
