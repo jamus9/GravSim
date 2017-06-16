@@ -1,13 +1,11 @@
 package simulation;
 
 import java.util.LinkedList;
-
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import utils.Vec2D;
-import window.Window;
 
 /**
  * Implements a planet with position and velocity, radius, mass and a name. Each
@@ -58,7 +56,6 @@ public class Planet {
 		this.vel = new Vec2D(xv, yv);
 		this.mass = mass;
 		this.radius = radius;
-		// this.name = name;
 		initializeObjects(color, name);
 		id = globalID++;
 	}
@@ -75,7 +72,6 @@ public class Planet {
 		this(0, 0, 0, 0, mass, radius, color, name);
 	}
 
-	// no name, black, standard mass
 	/**
 	 * Creates a new Planet with position, velocity and radius.
 	 * 
@@ -131,7 +127,7 @@ public class Planet {
 	 * and the orbit of this planet.
 	 */
 	public void updateObjects() {
-		Vec2D tp = Window.transform(pos);
+		Vec2D tp = Main.window.transform(pos);
 
 		// update circle
 		circle.setCenterX(tp.x());
@@ -155,7 +151,7 @@ public class Planet {
 
 		// update orbits
 		if (Main.window.isOrbits()) {
-			Vec2D tplast = Window.transform(orbitPoints.getLast());
+			Vec2D tplast = Main.window.transform(orbitPoints.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
 				
@@ -181,8 +177,8 @@ public class Planet {
 		Line line;
 
 		for (int i = 0; i < orbitLineList.size(); i++) {
-			newStart = Window.transform(orbitPoints.get(i));
-			newEnd = Window.transform(orbitPoints.get(i + 1));
+			newStart = Main.window.transform(orbitPoints.get(i));
+			newEnd = Main.window.transform(orbitPoints.get(i + 1));
 
 			line = orbitLineList.get(i);
 

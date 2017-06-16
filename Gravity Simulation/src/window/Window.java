@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
 import simulation.Planet;
+import utils.Utils;
 import utils.Vec2D;
 
 /**
@@ -48,6 +49,8 @@ public class Window extends Application {
 
 	// the next planet that will be placed
 	protected Planet nextPlacedPlanet;
+
+	private boolean orbitMode;
 
 	// scene of the window
 	private Scene scene;
@@ -86,7 +89,10 @@ public class Window extends Application {
 		// initialize all values to default and load the planet objects
 		setToDefault();
 		updatePlanets();
+
 		nextPlacedPlanet = StartConditions.moon.clone();
+		orbitMode = false;
+		infoGroup.setOrbitMode(orbitMode);
 
 		// starts the updating time line
 		runTimeLine();
@@ -184,6 +190,12 @@ public class Window extends Application {
 					changeVectorVisibility();
 				if (key == KeyCode.I)
 					changeInfoVisibility();
+
+				// orbit mode
+				if (key == KeyCode.M) {
+					orbitMode = !orbitMode;
+					infoGroup.setOrbitMode(orbitMode);
+				}
 			}
 		});
 
@@ -223,8 +235,12 @@ public class Window extends Application {
 				if (event.isSecondaryButtonDown()) {
 					Planet newPlanet = nextPlacedPlanet.clone();
 
-					newPlanet.setPos(Window.transfromBack(new Vec2D(mouseX, mouseY)));
-					newPlanet.setVel(0, 0);
+					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
+
+					if (orbitMode) {
+						newPlanet.setVel(Utils.orbVel(Utils.getBiggestInView(Main.simulation.getPlanets(), Main.window), newPlanet.getPos()));
+					} else
+						newPlanet.setVel(0, 0);
 
 					Main.simulation.addNewPlanet(newPlanet);
 				}
@@ -450,11 +466,9 @@ public class Window extends Application {
 	 * @param vector
 	 * @return the transformed vector
 	 */
-	public static Vec2D transfromBack(Vec2D vector) {
-		double x = ((vector.x() - Main.window.getWidth() / 2) / Main.window.zoom - Main.window.dx - Main.window.tempdx)
-				/ Main.simulation.getScale();
-		double y = -((vector.y() - Main.window.getHeight() / 2) / Main.window.zoom - Main.window.dy
-				- Main.window.tempdy) / Main.simulation.getScale();
+	public Vec2D transfromBack(Vec2D vector) {
+		double x = ((vector.x() - getWidth() / 2) / zoom - dx - tempdx) / Main.simulation.getScale();
+		double y = -((vector.y() - getHeight() / 2) / zoom - dy - tempdy) / Main.simulation.getScale();
 		return new Vec2D(x, y);
 	}
 
@@ -464,11 +478,9 @@ public class Window extends Application {
 	 * @param vector
 	 * @return the transformed vector
 	 */
-	public static Vec2D transform(Vec2D vector) {
-		double x = Main.window.zoom * (Main.simulation.getScale() * vector.x() + Main.window.dx + Main.window.tempdx)
-				+ Main.window.getWidth() / 2.0;
-		double y = Main.window.zoom * (Main.simulation.getScale() * -vector.y() + Main.window.dy + Main.window.tempdy)
-				+ Main.window.getHeight() / 2.0;
+	public Vec2D transform(Vec2D vector) {
+		double x = zoom * (Main.simulation.getScale() * vector.x() + dx + tempdx) + getWidth() / 2.0;
+		double y = zoom * (Main.simulation.getScale() * -vector.y() + dy + tempdy) + getHeight() / 2.0;
 		return new Vec2D(x, y);
 	}
 

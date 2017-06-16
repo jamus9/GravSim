@@ -3,7 +3,7 @@ package constellations;
 import javafx.scene.paint.Color;
 import simulation.Main;
 import simulation.Planet;
-import simulation.Simulation;
+import utils.Utils;
 
 /**
  * A class that creates start conditions (constellations) for the simulation.
@@ -58,13 +58,13 @@ public class StartConditions {
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);
-		earth.setVel(0, momComp(earthMass, moonMass, -orbVel(earthMass, moonDistance)));
+		earth.setVel(0, Utils.momComp(earthMass, moonMass, -Utils.orbSpeed(earth, moonDistance)));
 
 		moon.setPos(-moonDistance, 0);
-		moon.setVel(0, -orbVel(earthMass, moonDistance));
+		moon.setVel(0, -Utils.orbSpeed(earth, moonDistance));
 
 		Planet[] planets = { earth.clone(), moon.clone() };
-		return new Constellation("Earth system", planets, 0.8e-6, 10);
+		return new Constellation("Earth System", planets, 0.8e-6, 10);
 	}
 
 	/**
@@ -86,33 +86,33 @@ public class StartConditions {
 		sun.setVel(0, 0);
 
 		merkur.setPos(merkurDis, 0);
-		merkur.setVel(0, orbVel(sunMass, merkurDis));
+		merkur.setVel(0, Utils.orbSpeed(sun, merkurDis));
 
 		venus.setPos(-venusDis, 0);
-		venus.setVel(0, -orbVel(sunMass, venusDis));
+		venus.setVel(0, -Utils.orbSpeed(sun, venusDis));
 
 		earth.setPos(0, earthDis);
-		earth.setVel(-orbVel(sunMass, earthDis), 0);
+		earth.setVel(-Utils.orbSpeed(sun, earthDis), 0);
 
 		mars.setPos(marsDis, 0);
-		mars.setVel(0, orbVel(sunMass, marsDis));
+		mars.setVel(0, Utils.orbSpeed(sun, marsDis));
 
 		jupiter.setPos(-jupiterDis, 0);
-		jupiter.setVel(0, -orbVel(sunMass, jupiterDis));
+		jupiter.setVel(0, -Utils.orbSpeed(sun, jupiterDis));
 
 		saturn.setPos(saturnDis, 0);
-		saturn.setVel(0, orbVel(sunMass, saturnDis));
+		saturn.setVel(0, Utils.orbSpeed(sun, saturnDis));
 
 		uranus.setPos(0, uranusDis);
-		uranus.setVel(-orbVel(sunMass, uranusDis), 0);
+		uranus.setVel(-Utils.orbSpeed(sun, uranusDis), 0);
 
 		neptun.setPos(0, -neptunDis);
-		neptun.setVel(orbVel(sunMass, neptunDis), 0);
+		neptun.setVel(Utils.orbSpeed(sun, neptunDis), 0);
 
 		Planet[] planets = { sun.clone(), merkur.clone(), venus.clone(), earth.clone(), mars.clone(), jupiter.clone(),
 				saturn.clone(), uranus.clone(), neptun.clone() };
 
-		return new Constellation("Solar system", planets, 2e-9, 50);
+		return new Constellation("Solar System", planets, 2e-9, 50);
 	}
 
 	/**
@@ -128,14 +128,14 @@ public class StartConditions {
 		mars.setVel(0, 0);
 
 		phobos.setPos(phobosDistance, 0);
-		phobos.setVel(0, orbVel(marsMass, phobosDistance));
+		phobos.setVel(0, Utils.orbSpeed(mars, phobosDistance));
 
 		deimos.setPos(-deimosDistance, 0);
-		deimos.setVel(0, -orbVel(marsMass, deimosDistance));
+		deimos.setVel(0, -Utils.orbSpeed(mars, deimosDistance));
 
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
 
-		return new Constellation("Mars system", planets, 1.2e-5, 0.5);
+		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class StartConditions {
 		jupiter.setPos(0, 0);
 		jupiter.setVel(0, 0);
 
-		return new Constellation("Jupiter flyby", new Planet[] { ast1, ast2, jupiter.clone() }, 3e-7, 3);
+		return new Constellation("Jupiter Flyby", new Planet[] { ast1, ast2, jupiter.clone() }, 3e-7, 3);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class StartConditions {
 
 		Planet[] planets = { p1, p2, p3, p4, p5, p6, p7, p8 };
 
-		return new Constellation("Symmetrical constellation", planets, 0.05, 10);
+		return new Constellation("Symmetrical Constellation", planets, 0.05, 10);
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class StartConditions {
 		sun.setVel(0, 0);
 
 		earth.setPos(-earthDis, 0);
-		earth.setVel(0, -orbVel(sunMass, earthDis));
+		earth.setVel(0, -Utils.orbSpeed(sun, earthDis));
 
 		return new Constellation("Earth in low Sun orbit", new Planet[] { sun.clone(), earth.clone() }, 4e-7, 0.05);
 	}
@@ -214,7 +214,7 @@ public class StartConditions {
 		earth.setPos(-distance, 0);
 		earth.setVel(vel, 0);
 
-		return new Constellation("Earth Mars collisions", new Planet[] { mars.clone(), mars2, earth.clone() }, 8e-7, 5);
+		return new Constellation("Earth-Mars Collisions", new Planet[] { mars.clone(), mars2, earth.clone() }, 8e-7, 5);
 	}
 
 	/**
@@ -238,16 +238,6 @@ public class StartConditions {
 	// returns randomly 1 or -1
 	private static double plusMinus() {
 		return Math.signum(Math.random() - 0.5);
-	}
-
-	// momentum compensation
-	private static double momComp(double ownMass, double otherMass, double otherSpeed) {
-		return -otherMass * otherSpeed / ownMass;
-	}
-
-	// orbital velocity
-	private static double orbVel(double otherMass, double distance) {
-		return Math.sqrt(Simulation.GRAV_CONST * otherMass / distance);
 	}
 
 }
