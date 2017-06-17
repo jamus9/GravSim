@@ -77,7 +77,7 @@ public class Utils {
 
 		for (Planet planet : planets) {
 			Vec2D pos = planet.getPos();
-			if (pos.x() > x1 && pos.x() < x2 && pos.y() > y1 && pos.y() < y2)
+			if (pos.x() > x1 && pos.x() < x2 && pos.y() < y1 && pos.y() > y2)
 				planetsInView.add(planet);
 		}
 		
@@ -111,7 +111,7 @@ public class Utils {
 		velDirection = velDirection.mult(1.0 / velDirection.norm());
 
 		// anpassen
-		return velDirection.mult(orbSpeed(planet, r.norm()));
+		return velDirection.mult(orbSpeed(planet, r.norm())).add(planet.getVel());
 	}
 
 	/**

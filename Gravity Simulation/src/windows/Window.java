@@ -248,7 +248,7 @@ public class Window extends Application {
 					if (!orbitMode || Main.simulation.getPlanets().length == 0) {
 						newPlanet.setVel(0, 0);
 					} else {
-						Planet biggest = Utils.getBiggest(Main.simulation.getPlanets());
+						Planet biggest = Utils.getBiggestInView(Main.simulation.getPlanets(), Main.window);
 						newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
 					}
 
