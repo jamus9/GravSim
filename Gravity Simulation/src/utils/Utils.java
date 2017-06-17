@@ -14,9 +14,45 @@ import window.Window;
  *
  */
 public class Utils {
+	
+	/**
+	 * returns the most massive planet from a collection of planets
+	 * 
+	 * if they have the same mass return the first one
+	 * 
+	 * @param planets
+	 * @return the most massive planet
+	 */
+	public static Planet getBiggest(Planet... planets) {
+		if (planets.length == 0)
+			return null;
+		Planet biggest = planets[0];
+		for (Planet p: planets)
+			if (p.getMass() > biggest.getMass())
+				biggest = p;
+		return biggest;
+	}
+	
+	/**
+	 * returns the least massive planet from a collection of planets
+	 * 
+	 * if they have the same mass return the last one
+	 * 
+	 * @param planets
+	 * @return the least massive planet
+	 */
+	public static Planet getSmallest(Planet... planets) {
+		if (planets.length == 0)
+			return null;
+		Planet smallest = planets[0];
+		for (Planet p: planets)
+			if (p.getMass() <= smallest.getMass())
+				smallest = p;
+		return smallest;
+	}
 
 	/**
-	 * Returns the biggest planet in view.
+	 * Returns the biggest planet in view. (does not work!)
 	 * 
 	 * @param planets
 	 * @param x1
@@ -44,12 +80,16 @@ public class Utils {
 			if (pos.x() > x1 && pos.x() < x2 && pos.y() > y1 && pos.y() < y2)
 				planetsInView.add(planet);
 		}
+		
+		if (planetsInView.isEmpty())
+			return null;
 
-		Planet biggest = planets[0];
+		Planet biggest = planetsInView.getFirst();
 
-		for (Planet p : planets)
+		for (Planet p : planetsInView)
 			if (p.getMass() > biggest.getMass())
 				biggest = p;
+		
 		return biggest;
 	}
 
@@ -63,8 +103,6 @@ public class Utils {
 	public static Vec2D orbVel(Planet planet, Vec2D position) {
 		// verbindungsvektor
 		Vec2D r = planet.getPos().sub(position);
-		double distance = r.norm();
-		double speed = orbSpeed(planet, distance);
 
 		// nach kreuzprodukt senkrechter vektor zu r
 		Vec2D velDirection = new Vec2D(r.y(), -r.x());
@@ -73,10 +111,7 @@ public class Utils {
 		velDirection = velDirection.mult(1.0 / velDirection.norm());
 
 		// anpassen
-		velDirection = velDirection.mult(speed);
-		velDirection = velDirection.add(planet.getVel());
-		
-		return velDirection;
+		return velDirection.mult(orbSpeed(planet, r.norm()));
 	}
 
 	/**
@@ -134,5 +169,12 @@ public class Utils {
 			return h + m;
 		else
 			return m + s;
+	}
+
+	/**
+	 * @return randomly 1 or -1
+	 */
+	public static double plusMinus() {
+		return Math.signum(Math.random() - 0.5);
 	}
 }

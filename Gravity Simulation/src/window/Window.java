@@ -87,8 +87,7 @@ public class Window extends Application {
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup, menuBar);
 
 		// initialize all values to default and load the planet objects
-		setToDefaultView();
-		updatePlanets();
+		reset();
 
 		nextPlacedPlanet = StartConditions.moon.clone();
 		orbits = true;
@@ -244,7 +243,7 @@ public class Window extends Application {
 					if (!orbitMode || Main.simulation.getPlanets().length == 0) {
 						newPlanet.setVel(0, 0);
 					} else {
-						Planet biggest = Utils.getBiggestInView(Main.simulation.getPlanets(), Main.window);
+						Planet biggest = Utils.getBiggest(Main.simulation.getPlanets());
 						newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
 					}
 
@@ -285,12 +284,13 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Sets the window to default values.
+	 * Sets the view to default values.
 	 */
-	public void setToDefaultView() {
+	public void reset() {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
 		deselectPlanet();
+		updatePlanets();
 	}
 
 	/**
@@ -374,6 +374,7 @@ public class Window extends Application {
 	 * @param planet
 	 */
 	public void selectPlanet(Planet planet) {
+		deselectPlanet();
 		selectedPlanet = planet;
 		planet.select(true);
 	}

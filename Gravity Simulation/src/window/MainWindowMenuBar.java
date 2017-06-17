@@ -26,32 +26,33 @@ public class MainWindowMenuBar extends MenuBar {
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vectors");
 	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
 
+	/**
+	 * Creates the menu bar.
+	 * 
+	 * @param primaryStage
+	 */
 	protected MainWindowMenuBar(Stage primaryStage) {
-
 		super();
-
 		prefWidthProperty().bind(primaryStage.widthProperty());
 
-		/**
+		/*
 		 * simulation menu
 		 */
-
 		MenuItem restart = new MenuItem("Neustart");
 		restart.setOnAction(actionEvent -> Main.restart());
-
+		
 		MenuItem resetView = new MenuItem("Reset View");
 		resetView.setOnAction(actionEven -> Main.window.resetView());
-
+		
 		MenuItem exit = new MenuItem("Exit");
 		exit.setOnAction(ActionEvent -> Platform.exit());
 
 		Menu simulationMenu = new Menu("Simulation");
 		simulationMenu.getItems().addAll(restart, resetView, exit);
 
-		/**
+		/*
 		 * settings menu
 		 */
-
 		orbitsCMI.setOnAction(actionEvent -> Main.window.changeOrbitVisibility());
 		labelsCMI.setOnAction(actionEvent -> Main.window.changeLabelVisibility());
 		infoCMI.setOnAction(ActionEvent -> Main.window.changeInfoVisibility());
@@ -61,42 +62,43 @@ public class MainWindowMenuBar extends MenuBar {
 		Menu settingsMenu = new Menu("Settings");
 		settingsMenu.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI, orbitModeCMI);
 
-		/**
+		/*
 		 * constellation loading menu
 		 */
+		MenuItem earthSystemItem = new MenuItem("Earth System");
+		earthSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getEarthSystem()));
 
-		MenuItem earthMoonItem = new MenuItem(StartConditions.earthSystem.getName());
-		earthMoonItem.setOnAction(actionEvent -> Main.restart(StartConditions.earthSystem));
+		MenuItem solarSystemItem = new MenuItem("Solar System");
+		solarSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getSolarSystem()));
 
-		MenuItem solarSystemItem = new MenuItem(StartConditions.solarSystem.getName());
-		solarSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.solarSystem));
+		MenuItem marsSystemItem = new MenuItem("Mars System");
+		marsSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getMarsSystem()));
 
-		MenuItem marsItem = new MenuItem(StartConditions.marsSystem.getName());
-		marsItem.setOnAction(actionEvent -> Main.restart(StartConditions.marsSystem));
+		MenuItem jupiterFlybyItem = new MenuItem("Jupiter Flyby");
+		jupiterFlybyItem.setOnAction(actionEvent -> Main.restart(StartConditions.getJupiterFlyby()));
 
-		MenuItem jupiterFlybyItem = new MenuItem(StartConditions.jupiterFlyby.getName());
-		jupiterFlybyItem.setOnAction(actionEvent -> Main.restart(StartConditions.jupiterFlyby));
+		MenuItem earthMarsCollisionItem = new MenuItem("Earth-Mars Collision");
+		earthMarsCollisionItem.setOnAction(actionEvent -> Main.restart(StartConditions.getEarthMarsCollision()));
 
-		MenuItem earthSunLowItem = new MenuItem(StartConditions.earthSunLow.getName());
-		earthSunLowItem.setOnAction(actionEvent -> Main.restart(StartConditions.earthSunLow));
+		MenuItem sym8Item = new MenuItem("Symmetrical 8");
+		sym8Item.setOnAction(actionEvent -> Main.restart(StartConditions.getSym8()));
 
-		MenuItem collisionItem = new MenuItem(StartConditions.collision.getName());
-		collisionItem.setOnAction(actionEvent -> Main.restart(StartConditions.collision));
+		MenuItem randomItem = new MenuItem("Random Planets");
+		randomItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomPlanets(40)));
 
-		MenuItem symItem = new MenuItem(StartConditions.symmetrical.getName());
-		symItem.setOnAction(actionEvent -> Main.restart(StartConditions.symmetrical));
+		MenuItem randomMoonsItem = new MenuItem("Random Moons");
+		randomMoonsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomMoons(30)));
 
-		MenuItem randomItem = new MenuItem("Random");
-		randomItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandom(40)));
+		MenuItem emptyItem = new MenuItem(StartConditions.empty.getName());
+		emptyItem.setOnAction(actionEvent -> Main.restart(StartConditions.empty));
 
 		Menu loadMenu = new Menu("Load");
-		loadMenu.getItems().addAll(earthMoonItem, solarSystemItem, marsItem, jupiterFlybyItem, earthSunLowItem,
-				collisionItem, symItem, randomItem);
+		loadMenu.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterFlybyItem,
+				earthMarsCollisionItem, sym8Item, randomItem, randomMoonsItem, emptyItem);
 
-		/**
+		/*
 		 * place planet menu
 		 */
-
 		RadioMenuItem placeMoon = new RadioMenuItem(StartConditions.moon.getName());
 		placeMoon.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.moon);
 		placeMoon.setSelected(true);
@@ -122,10 +124,9 @@ public class MainWindowMenuBar extends MenuBar {
 		Menu placeMenu = new Menu("Place");
 		placeMenu.getItems().addAll(placeMoon, placeEarth, placeMars, placeJupiter, placeSun, placeBlackHole);
 
-		/**
+		/*
 		 * add all menus to the menu bar
 		 */
-
 		this.getMenus().addAll(simulationMenu, settingsMenu, loadMenu, placeMenu);
 	}
 

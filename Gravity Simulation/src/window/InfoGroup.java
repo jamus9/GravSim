@@ -29,15 +29,19 @@ public class InfoGroup extends Group {
 
 		spsLabel = new Label();
 		spsLabel.relocate(3, 25);
+		spsLabel.setTextFill(Color.BLACK);
 
 		pastTimeLabel = new Label();
 		pastTimeLabel.relocate(0, 40);
+		pastTimeLabel.setTextFill(Color.BLACK);
 		
 		orbitMode = new Label();
 		orbitMode.relocate(3, 55);
 
 		infoLabel = new Label();
 		infoLabel.relocate(3, 85);
+		infoLabel.setTextFill(Color.BLACK);
+		
 		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitMode, infoLabel);
 	}
 
@@ -52,11 +56,11 @@ public class InfoGroup extends Group {
 			pastTimeLabel.setText(Utils.pastTime());
 		}
 
-		Planet sp = Main.window.getSelectedPlanet();
+		Planet selPl = Main.window.getSelectedPlanet();
 
-		if (sp != null) {
-			infoLabel.setText(sp.getName() + "\nMasse: " + sp.getMass() + " kg\nRadius: "
-					+ (int) (sp.getRadius() / 1000.0) + " km\nGeschwindigkeit: " + (int) sp.getVel().norm() + " m/s"
+		if (selPl != null) {
+			infoLabel.setText(selPl.getName() + "\nMasse: " + selPl.getMass() + " kg\nRadius: "
+					+ (int) (selPl.getRadius() / 1000.0) + " km\nGeschwindigkeit: " + (int) selPl.getVel().norm() + " m/s"
 					+ "\nZeit: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
 		} else {
 			infoLabel.setText(

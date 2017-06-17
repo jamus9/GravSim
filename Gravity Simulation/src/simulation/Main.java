@@ -10,23 +10,16 @@ import window.Window;
  * Starts and restarts the simulation and window.
  * 
  * @author Jan Muskalla
- *
  */
 public class Main extends Application {
 
-	/**
-	 *  the current simulation
-	 */
+	/** the current simulation */
 	public static Simulation simulation;
 
-	/**
-	 *  the main window
-	 */
+	/** the main window */
 	public static Window window;
 
-	/**
-	 * Launches the JavaFX application.
-	 */
+	/** Launches the JavaFX application. */
 	public static void main(String... args) {
 		Application.launch(args);
 	}
@@ -37,7 +30,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		simulation = new Simulation(StartConditions.earthSystem);
+		simulation = new Simulation(StartConditions.getEarthSystem());
 		window = new Window();
 		window.start(primaryStage);
 	}
@@ -49,8 +42,7 @@ public class Main extends Application {
 	 */
 	public static void restart(Constellation newConstellation) {
 		simulation = new Simulation(newConstellation);
-		window.setToDefaultView();
-		window.updatePlanets();
+		window.reset();
 	}
 
 	/**
@@ -59,8 +51,7 @@ public class Main extends Application {
 	 */
 	public static void restart() {
 		simulation = new Simulation(simulation.getConstellation());
-		window.setToDefaultView();
-		window.updatePlanets();
+		window.reset();
 	}
 
 }

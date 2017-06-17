@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
+import utils.Utils;
 import utils.Vec2D;
 
 /**
@@ -18,22 +19,23 @@ import utils.Vec2D;
 public class Simulation {
 
 	public static final double GRAV_CONST = 6.67408e-11;
-	public static final double SPS = 8000; // simulations per second
+	/** simulations per second */
+	public static final double SPS = 8000;
 
-	// the current constellation with start conditions
+	/** the current constellation with start conditions */
 	private final Constellation constellation;
-	// scale of the simulation
+	/** scale of the simulation */
 	private final double scale;
-	// time step per simulation
+	/** time step per simulation */
 	private double time;
 
-	// all planets of the current simulation are saved here
+	/** all planets of the current simulation are saved here */
 	private Planet[] planets;
 
-	// the time line in which all calculations happen
+	/** the time line in which all calculations happen */
 	private Timeline timeline;
 
-	private int spsCounter; // counts the simulations per second
+	private int spsCounter;
 	private int secondsCounter;
 	private boolean pause;
 
@@ -51,8 +53,10 @@ public class Simulation {
 		time = constellation.getTime();
 		scale = constellation.getScale();
 
-		// copies the planets of the new constellation in the local array
-		// planets
+		/*
+		 * copies the planets of the new constellation in the local array
+		 * planets
+		 */
 		planets = new Planet[constellation.numberOfPlanets()];
 		for (int i = 0; i < planets.length; i++)
 			planets[i] = constellation.getPlanet(i).clone();
@@ -61,7 +65,7 @@ public class Simulation {
 	}
 
 	/**
-	 * Moves the planets SPS times per second.
+	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	private void run() {
 		KeyFrame timeStep = new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
@@ -131,9 +135,8 @@ public class Simulation {
 			for (int j = i + 1; j < planets.length; j++) {
 				p1 = planets[i];
 				p2 = planets[j];
-				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius()) {
-					collide(i, j);
-				}
+				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius())
+					collide(p1, p2);
 			}
 		}
 	}
@@ -147,68 +150,34 @@ public class Simulation {
 	 * @param index2
 	 *            the index of the collided planet 2
 	 */
-	private void collide(int index1, int index2) {
-		pause = true;
+	private void collide(Planet p1, Planet p2) {
+		// get the bigger planet
+		Planet bigP = Utils.getBiggest(p1, p2);
+		Planet smallP = Utils.getSmallest(p1, p2);
 
-		Planet p1 = planets[index1];
-		Planet p2 = planets[index2];
-		Planet bigP, smallP;
-
-		// get bigger planet
-		if (p1.getMass() >= p2.getMass()) {
-			bigP = p1;
-			smallP = p2;
-		} else {
-			bigP = p2;
-			smallP = p1;
-		}
-
-		// vel, mass and radius of the new planet
-		bigP.setVel(Simulation.getCollisionVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
-		bigP.setRadius(Simulation.getCollisionRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
+		// velocity, mass and radius of the new planet
+		bigP.setVel(getCollisionVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
+		bigP.setRadius(getCollisionRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
 		bigP.setMass(bigP.getMass() + smallP.getMass());
 
-		// the new planets array
-		Planet[] newPlanets = new Planet[planets.length - 1];
-
 		// copy all planets in the new planets array except the smaller one
-		int j = 0;
-		for (int i = 0; i < newPlanets.length; i++) {
+		Planet[] newPlanets = new Planet[planets.length - 1];
+		for (int i = 0, j = 0; i < newPlanets.length; i++) {
 			if (smallP.equals(planets[j]))
 				j++;
-
-			newPlanets[i] = planets[j];
-			j++;
+			newPlanets[i] = planets[j++];
 		}
 
 		// check selected planet
-		int planetID = -1;
-		Boolean planetSelected = false;
-		if (Main.window.getSelectedPlanet() != null) {
-			planetSelected = true;
-			if (Main.window.getSelectedPlanet().equals(smallP)) {
-				planetID = bigP.getID();
-			} else
-				planetID = Main.window.getSelectedPlanet().getID();
-			Main.window.deselectPlanet();
-		}
+		Planet selPl = Main.window.getSelectedPlanet();
+		if (selPl != null && selPl.equals(smallP))
+			Main.window.selectPlanet(bigP);
 
 		// copy the new planets in the simulation planets array
 		planets = newPlanets;
 
-		// select big planet if one of the colliding planets was selected
-		if (planetSelected) {
-			for (int i = 0; i < planets.length; i++) {
-				if (planets[i].getID() == planetID) {
-					Main.window.selectPlanet(planets[i]);
-					break;
-				}
-			}
-		}
-
+		// update window
 		Main.window.updatePlanets();
-
-		pause = false;
 	}
 
 	/**
@@ -247,9 +216,6 @@ public class Simulation {
 	 *            the new planet
 	 */
 	public void addNewPlanet(Planet planet) {
-		boolean pauseSave = pause;
-		pause = true;
-
 		planet.deleteOrbit();
 		planet.savePosition();
 
@@ -268,30 +234,28 @@ public class Simulation {
 
 		// update the window
 		Main.window.updatePlanets();
-
-		pause = pauseSave;
 	}
-	
+
 	public Planet[] getPlanets() {
 		return planets;
 	}
-	
+
 	public boolean isPaused() {
 		return pause;
 	}
-	
+
 	public void setPause(boolean b) {
 		pause = b;
 	}
-	
+
 	public double getTime() {
 		return time;
 	}
-	
+
 	public void multTime(double x) {
 		time *= x;
 	}
-	
+
 	public void resetTime() {
 		time = constellation.getTime();
 	}
@@ -299,11 +263,11 @@ public class Simulation {
 	public int getSpsCounter() {
 		return spsCounter;
 	}
-	
+
 	public void resetSpsCounter() {
 		spsCounter = 0;
 	}
-	
+
 	public int getSecondsCounter() {
 		return secondsCounter;
 	}
