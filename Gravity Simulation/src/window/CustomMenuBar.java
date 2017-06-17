@@ -17,9 +17,9 @@ import simulation.Main;
  * @author Jan Muskalla
  *
  */
-public class MainWindowMenuBar extends MenuBar {
+public class CustomMenuBar extends MenuBar {
 
-	// CheckMenuItems in settings menu
+	/** CheckMenuItems in settings menu */
 	private CheckMenuItem infoCMI = new CheckMenuItem("Information");
 	private CheckMenuItem orbitsCMI = new CheckMenuItem("Orbits");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Labels");
@@ -31,24 +31,27 @@ public class MainWindowMenuBar extends MenuBar {
 	 * 
 	 * @param primaryStage
 	 */
-	protected MainWindowMenuBar(Stage primaryStage) {
+	protected CustomMenuBar(Stage primaryStage) {
 		super();
 		prefWidthProperty().bind(primaryStage.widthProperty());
 
 		/*
 		 * simulation menu
 		 */
-		MenuItem restart = new MenuItem("Neustart");
-		restart.setOnAction(actionEvent -> Main.restart());
-		
-		MenuItem resetView = new MenuItem("Reset View");
-		resetView.setOnAction(actionEven -> Main.window.resetView());
-		
-		MenuItem exit = new MenuItem("Exit");
-		exit.setOnAction(ActionEvent -> Platform.exit());
+		MenuItem restartItem = new MenuItem("Neustart");
+		restartItem.setOnAction(actionEvent -> Main.restart());
+
+		MenuItem resetViewItem = new MenuItem("Reset View");
+		resetViewItem.setOnAction(actionEven -> Main.window.resetView());
+
+		MenuItem helpItem = new MenuItem("Help");
+		helpItem.setOnAction(ActionEvent -> Main.window.openHelpWindow());
+
+		MenuItem exitItem = new MenuItem("Exit");
+		exitItem.setOnAction(ActionEvent -> Platform.exit());
 
 		Menu simulationMenu = new Menu("Simulation");
-		simulationMenu.getItems().addAll(restart, resetView, exit);
+		simulationMenu.getItems().addAll(restartItem, resetViewItem, helpItem, exitItem);
 
 		/*
 		 * settings menu

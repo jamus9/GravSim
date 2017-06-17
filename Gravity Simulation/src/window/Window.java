@@ -62,7 +62,7 @@ public class Window extends Application {
 	// group for all information an the screen
 	protected InfoGroup infoGroup;
 	// the menu bar
-	private MainWindowMenuBar menuBar;
+	private CustomMenuBar menuBar;
 
 	/**
 	 * Starts the window for the simulation.
@@ -83,7 +83,7 @@ public class Window extends Application {
 		orbitGroup = new Group();
 		planetGroup = new Group();
 		infoGroup = new InfoGroup();
-		menuBar = new MainWindowMenuBar(primaryStage);
+		menuBar = new CustomMenuBar(primaryStage);
 		root.getChildren().addAll(orbitGroup, planetGroup, infoGroup, menuBar);
 
 		// initialize all values to default and load the planet objects
@@ -96,7 +96,7 @@ public class Window extends Application {
 		infoGroup.setVisible(true);
 		orbitMode = true;
 		infoGroup.setOrbitMode(orbitMode);
-		
+
 		menuBar.updateCMIs();
 
 		// starts the updating time line
@@ -199,6 +199,10 @@ public class Window extends Application {
 				// orbit mode
 				if (key == KeyCode.M)
 					changeOrbitMode();
+
+				// help window
+				if (key == KeyCode.H)
+					openHelpWindow();
 			}
 		});
 
@@ -283,9 +287,7 @@ public class Window extends Application {
 		});
 	}
 
-	/**
-	 * Sets the view to default values.
-	 */
+	/** Sets the view to default values. */
 	public void reset() {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
@@ -293,9 +295,7 @@ public class Window extends Application {
 		updatePlanets();
 	}
 
-	/**
-	 * updates all planet objects (circles, vectors, labels)
-	 */
+	/** updates all planet objects (circles, vectors, labels) */
 	public void updatePlanets() {
 		planetGroup.getChildren().clear();
 		for (Planet p : Main.simulation.getPlanets())
@@ -313,7 +313,7 @@ public class Window extends Application {
 	 */
 	protected void resetView() {
 		deselectPlanet();
-		
+
 		KeyFrame returnToCenter = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
@@ -345,7 +345,7 @@ public class Window extends Application {
 		resetTimeline = new Timeline(returnToCenter);
 		resetTimeline.setCycleCount(Animation.INDEFINITE);
 		resetTimeline.play();
-		
+
 		stopResetTimeline = true;
 	}
 
@@ -379,9 +379,7 @@ public class Window extends Application {
 		planet.select(true);
 	}
 
-	/**
-	 * Deselects the selected planet and updates the info label.
-	 */
+	/** Deselects the selected planet and updates the info label. */
 	public void deselectPlanet() {
 		if (selectedPlanet != null)
 			selectedPlanet.select(false);
@@ -488,6 +486,17 @@ public class Window extends Application {
 		double x = zoom * (Main.simulation.getScale() * vector.x() + dx + tempdx) + getWidth() / 2.0;
 		double y = zoom * (Main.simulation.getScale() * -vector.y() + dy + tempdy) + getHeight() / 2.0;
 		return new Vec2D(x, y);
+	}
+
+	/** opens the help window */
+	protected void openHelpWindow() {
+		Stage stage = new Stage();
+		HelpWindow hw = new HelpWindow();
+		try {
+			hw.start(stage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public double getWidth() {
