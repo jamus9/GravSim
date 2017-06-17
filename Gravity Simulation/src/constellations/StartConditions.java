@@ -36,17 +36,30 @@ public class StartConditions {
 			blackHoleMass = sunMass * 4e6, blackHoleRad = 22.5e9 / 2.0;
 
 	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sun"),
+
 			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
+
 			venus = new Planet(venusMass, venusRad, Color.BEIGE, "Venus"),
+
 			earth = new Planet(earthMass, earthRad, Color.BLUE, "Earth"),
 			moon = new Planet(moonMass, moonRad, Color.GRAY, "Moon"),
+
 			mars = new Planet(marsMass, marsRad, Color.RED, "Mars"),
 			phobos = new Planet(1.072e16, 22.5e3, Color.GRAY, "Phobos"),
 			deimos = new Planet(1.8e15, 13e3, Color.GRAY, "Deimos"),
+
 			jupiter = new Planet(jupiterMass, jupiterRad, Color.PERU, "Jupiter"),
+			io = new Planet(8.94e22, 1821.6e3, Color.YELLOW, "Io"),
+			europa = new Planet(4.799e22, 1560.8e3, Color.WHITE, "Europa"),
+			ganymede = new Planet(1.4819e23, 2634.1e3, Color.GREY, "Ganymede"),
+			callisto = new Planet(1.075e23, 2410e3, Color.DARKSLATEGRAY, "Callisto"),
+
 			saturn = new Planet(saturnMass, saturnRad, Color.BEIGE, "Saturn"),
+
 			uranus = new Planet(uranusMass, uranusRad, Color.LIGHTBLUE, "Uranus"),
+
 			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun"),
+
 			blackHole = new Planet(blackHoleMass, blackHoleRad, Color.BLACK, "Black Hole");
 
 	/**
@@ -66,37 +79,37 @@ public class StartConditions {
 		double saturnDis = 1433.5e9;
 		double uranusDis = 2872.4e9;
 		double neptunDis = 4498.4e9;
-	
+
 		sun.setPos(0, 0);
 		sun.setVel(0, 0);
-	
+
 		merkur.setPos(merkurDis, 0);
 		merkur.setVel(0, Utils.orbSpeed(sun, merkurDis));
-	
+
 		venus.setPos(-venusDis, 0);
 		venus.setVel(0, -Utils.orbSpeed(sun, venusDis));
-	
+
 		earth.setPos(0, earthDis);
 		earth.setVel(-Utils.orbSpeed(sun, earthDis), 0);
-	
+
 		mars.setPos(marsDis, 0);
 		mars.setVel(0, Utils.orbSpeed(sun, marsDis));
-	
+
 		jupiter.setPos(-jupiterDis, 0);
 		jupiter.setVel(0, -Utils.orbSpeed(sun, jupiterDis));
-	
+
 		saturn.setPos(saturnDis, 0);
 		saturn.setVel(0, Utils.orbSpeed(sun, saturnDis));
-	
+
 		uranus.setPos(0, uranusDis);
 		uranus.setVel(-Utils.orbSpeed(sun, uranusDis), 0);
-	
+
 		neptun.setPos(0, -neptunDis);
 		neptun.setVel(Utils.orbSpeed(sun, neptunDis), 0);
-	
+
 		Planet[] planets = { sun.clone(), merkur.clone(), venus.clone(), earth.clone(), mars.clone(), jupiter.clone(),
 				saturn.clone(), uranus.clone(), neptun.clone() };
-	
+
 		return new Constellation("Solar System", planets, 2e-9, 50);
 	}
 
@@ -135,6 +148,35 @@ public class StartConditions {
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
 
 		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
+	}
+
+	/**
+	 * The Mars system with the two moons Phobos and Deimos
+	 */
+	public static Constellation getJupiterSystem() {
+		double ioDis = 421.7e6;
+		double europaDis = 670.9e6;
+		double ganymadeDis = 1070.4e6;
+		double callistoDis = 1882.7e6;
+
+		jupiter.setPos(0, 0);
+		jupiter.setVel(0, 0);
+
+		io.setPos(0, ioDis);
+		io.setVel(Utils.orbVel(jupiter, io.getPos()));
+
+		europa.setPos(0, -europaDis);
+		europa.setVel(Utils.orbVel(jupiter, europa.getPos()));
+
+		ganymede.setPos(0, ganymadeDis);
+		ganymede.setVel(Utils.orbVel(jupiter, ganymede.getPos()));
+
+		callisto.setPos(0, -callistoDis);
+		callisto.setVel(Utils.orbVel(jupiter, callisto.getPos()));
+
+		Planet[] planets = { jupiter.clone(), io.clone(), europa.clone(), ganymede.clone(), callisto.clone() };
+
+		return new Constellation("Jupiter System", planets, 2e-7, 3);
 	}
 
 	/**
@@ -204,8 +246,8 @@ public class StartConditions {
 
 		for (int i = 0; i < number; i++) {
 			planets[i] = new Planet(Utils.plusMinus() * Math.random() * 1200 * (3.0 / 8.0),
-					Utils.plusMinus() * Math.random() * 700 * (3.0 / 8.0),
-					Utils.plusMinus() * Math.random() * 0.001, Utils.plusMinus() * Math.random() * 0.001, 2.5);
+					Utils.plusMinus() * Math.random() * 700 * (3.0 / 8.0), Utils.plusMinus() * Math.random() * 0.001,
+					Utils.plusMinus() * Math.random() * 0.001, 2.5);
 		}
 
 		return new Constellation("Random Planets", planets, 1, 2);
@@ -216,28 +258,28 @@ public class StartConditions {
 	 */
 	public static Constellation getRandomMoons(int number) {
 		double moonDistance = 384.4e6;
-	
+
 		earth.setPos(0, 0);
 		earth.setVel(0, 0);
-		
+
 		Planet[] planets = new Planet[number];
 		planets[0] = earth.clone();
-	
+
 		double r, x, y;
 		Vec2D pos;
 		for (int i = 1; i < number; i++) {
 			r = (Math.random() * 2.0 + 0.1) * moonDistance;
 			y = Utils.plusMinus() * Math.random() * r;
 			x = Utils.plusMinus() * Math.sqrt(r * r - y * y);
-	
+
 			pos = new Vec2D(x, y);
-	
+
 			moon.setPos(pos);
 			moon.setVel(Utils.orbVel(earth, pos));
-	
+
 			planets[i] = moon.clone();
 		}
-	
+
 		return new Constellation("Random Moons", planets, 5e-7, 5);
 	}
 }

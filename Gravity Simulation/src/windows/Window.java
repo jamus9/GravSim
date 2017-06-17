@@ -130,7 +130,7 @@ public class Window extends Application {
 					planet.updateObjects();
 
 				// draw orbits
-				if (!Main.simulation.isPaused() && orbits) {
+				if (orbits && !Main.simulation.isPaused()) {
 					orbitGroup.getChildren().clear();
 					for (Planet planet : Main.simulation.getPlanets())
 						for (Line line : planet.getOrbitLineList())
@@ -304,8 +304,8 @@ public class Window extends Application {
 
 	}
 
-	Timeline resetTimeline;
-	boolean stopResetTimeline = false;
+	private Timeline resetTimeline;
+	private boolean stopResetTimeline = false;
 
 	/**
 	 * Starts a time line to reset scale and translation of the view. The time

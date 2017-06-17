@@ -77,6 +77,9 @@ public class CustomMenuBar extends MenuBar {
 		MenuItem marsSystemItem = new MenuItem("Mars System");
 		marsSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getMarsSystem()));
 
+		MenuItem jupiterSystemItem = new MenuItem("Jupiter System");
+		jupiterSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getJupiterSystem()));
+
 		MenuItem jupiterFlybyItem = new MenuItem("Jupiter Flyby");
 		jupiterFlybyItem.setOnAction(actionEvent -> Main.restart(StartConditions.getJupiterFlyby()));
 
@@ -96,8 +99,8 @@ public class CustomMenuBar extends MenuBar {
 		emptyItem.setOnAction(actionEvent -> Main.restart(StartConditions.empty));
 
 		Menu loadMenu = new Menu("Load");
-		loadMenu.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterFlybyItem,
-				earthMarsCollisionItem, sym8Item, randomItem, randomMoonsItem, emptyItem);
+		loadMenu.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterSystemItem,
+				jupiterFlybyItem, earthMarsCollisionItem, sym8Item, randomItem, randomMoonsItem, emptyItem);
 
 		/*
 		 * place planet menu

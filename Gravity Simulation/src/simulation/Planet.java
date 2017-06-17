@@ -18,10 +18,10 @@ import utils.Vec2D;
  */
 public class Planet {
 	private static int globalID = 1;
-	
+
 	// identification
 	private int id;
-	
+
 	// planet properties
 	private Vec2D pos;
 	private Vec2D vel;
@@ -252,11 +252,11 @@ public class Planet {
 	public void setLabelVisibility(boolean b) {
 		label.setVisible(b);
 	}
-	
+
 	public void setMass(double mass) {
 		this.mass = mass;
 	}
-	
+
 	public void setRadius(double radius) {
 		this.radius = radius;
 	}
@@ -292,7 +292,7 @@ public class Planet {
 	public String getName() {
 		return label.getText();
 	}
-	
+
 	public int getID() {
 		return id;
 	}
@@ -300,7 +300,7 @@ public class Planet {
 	public LinkedList<Line> getOrbitLineList() {
 		return orbitLineList;
 	}
-	
+
 	private double getCircleRadius() {
 		return Main.simulation.getScale() * Main.window.getZoom() * radius;
 	}
