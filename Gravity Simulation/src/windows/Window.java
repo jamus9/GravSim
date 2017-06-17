@@ -212,12 +212,10 @@ public class Window extends Application {
 		 */
 		scene.setOnScroll(new EventHandler<ScrollEvent>() {
 			public void handle(ScrollEvent event) {
-
 				if (event.getDeltaY() > 0)
-					zoom *= 1.05; // zoom in
+					zoom *= 1.1; // zoom in
 				else
-					zoom /= 1.05; // zoom out
-
+					zoom /= 1.1; // zoom out
 				updateOrbits();
 				event.consume();
 			}
@@ -234,15 +232,16 @@ public class Window extends Application {
 				mouseY = event.getY();
 
 				// select planet
-				if (event.isPrimaryButtonDown()) {
-					deselectPlanet();
+				if (event.isPrimaryButtonDown())
 					checkForSelectedPlanet(mouseX, mouseY);
-				}
+
+				// reset view
+				if (event.isMiddleButtonDown())
+					resetView();
 
 				// add new planet
 				if (event.isSecondaryButtonDown()) {
 					Planet newPlanet = nextPlacedPlanet.clone();
-
 					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
 
 					if (!orbitMode || Main.simulation.getPlanets().length == 0) {
@@ -254,10 +253,6 @@ public class Window extends Application {
 
 					Main.simulation.addNewPlanet(newPlanet);
 				}
-
-				// reset view
-				if (event.isMiddleButtonDown())
-					resetView();
 
 				event.consume();
 			}
@@ -357,6 +352,7 @@ public class Window extends Application {
 	 * If a planet is clicked, highlight it and set the variables to follow it.
 	 */
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
+		deselectPlanet();
 		Circle circle;
 		Vec2D mouse, center;
 		for (Planet planet : Main.simulation.getPlanets()) {

@@ -140,10 +140,10 @@ public class StartConditions {
 		mars.setVel(0, 0);
 
 		phobos.setPos(phobosDistance, 0);
-		phobos.setVel(0, Utils.orbSpeed(mars, phobosDistance));
+		phobos.setVel(Utils.orbVel(mars, phobos.getPos()));
 
 		deimos.setPos(-deimosDistance, 0);
-		deimos.setVel(0, -Utils.orbSpeed(mars, deimosDistance));
+		deimos.setVel(Utils.orbVel(mars, deimos.getPos()));
 
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
 
@@ -151,7 +151,7 @@ public class StartConditions {
 	}
 
 	/**
-	 * The Mars system with the two moons Phobos and Deimos
+	 * The Jupiter System with the four Galilean moons
 	 */
 	public static Constellation getJupiterSystem() {
 		double ioDis = 421.7e6;
