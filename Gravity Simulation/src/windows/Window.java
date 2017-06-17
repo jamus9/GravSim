@@ -50,9 +50,10 @@ public class Window extends Application {
 	// the next planet that will be placed
 	protected Planet nextPlacedPlanet;
 
+	// in orbit mode all planets get placed in orbits
 	protected boolean orbitMode;
 
-	// scene of the window
+	// the scene of the window
 	private Scene scene;
 
 	// group for all orbits
