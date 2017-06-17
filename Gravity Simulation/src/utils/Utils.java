@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import simulation.Main;
 import simulation.Planet;
 import simulation.Simulation;
-import window.Window;
+import windows.Window;
 
 /**
  * Some utility methods

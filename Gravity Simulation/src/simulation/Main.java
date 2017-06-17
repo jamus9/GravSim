@@ -4,7 +4,7 @@ import constellations.Constellation;
 import constellations.StartConditions;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import window.Window;
+import windows.Window;
 
 /**
  * Starts and restarts the simulation and window.
