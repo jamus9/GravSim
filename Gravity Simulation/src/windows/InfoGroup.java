@@ -18,11 +18,11 @@ public class InfoGroup extends Group {
 
 	private Label spsLabel;
 	private Label pastTimeLabel;
-	private Label orbitMode;
+	private Label orbitModeLabel;
 	private Label infoLabel;
 
 	/**
-	 * Creates the info group.
+	 * Creates an information group.
 	 */
 	public InfoGroup() {
 		super();
@@ -32,43 +32,62 @@ public class InfoGroup extends Group {
 		spsLabel.setTextFill(Color.BLACK);
 
 		pastTimeLabel = new Label();
-		pastTimeLabel.relocate(0, 40);
+		pastTimeLabel.relocate(3, 40);
 		pastTimeLabel.setTextFill(Color.BLACK);
-		
-		orbitMode = new Label();
-		orbitMode.relocate(3, 55);
+
+		orbitModeLabel = new Label();
+		orbitModeLabel.relocate(3, 55);
 
 		infoLabel = new Label();
 		infoLabel.relocate(3, 85);
 		infoLabel.setTextFill(Color.BLACK);
-		
-		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitMode, infoLabel);
+
+		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitModeLabel, infoLabel);
 	}
+
+	int[] spsArray = new int[60];
+	int spsFinal = 0;
 
 	/**
 	 * updates the info labels
 	 */
 	public void updateInfo() {
-
+		
 		if (!Main.simulation.isPaused()) {
-			spsLabel.setText("Steps/Sec: " + (Main.simulation.getSpsCounter() * 60));
-			Main.simulation.resetSpsCounter();
-			pastTimeLabel.setText(Utils.pastTime());
+			
+			for (int i = 0; i < spsArray.length; i++) {
+				if (spsArray[i] == 0) {
+					spsArray[i] = Main.simulation.getSpsCounter() * 60;
+					Main.simulation.resetSpsCounter();
+					break;
+				}
+			}
+
+			if (spsArray[spsArray.length - 1] != 0) {
+				double added = 0;
+				for (int i : spsArray)
+					added += i;
+				spsFinal = (int) (added / spsArray.length);
+				spsArray = new int[spsArray.length];
+			}
+
+			spsLabel.setText("Steps/Sec: " + spsFinal);
+			pastTimeLabel.setText(Utils.getTimeString());
 		}
 
 		Planet selPl = Main.window.getSelectedPlanet();
-
+		
 		if (selPl != null) {
-			infoLabel.setText(selPl.getName() + "\nMasse: " + selPl.getMass() + " kg\nRadius: "
-					+ (int) (selPl.getRadius() / 1000.0) + " km\nGeschwindigkeit: " + (int) selPl.getVel().norm() + " m/s"
-					+ "\nZeit: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
+			infoLabel.setText(selPl.getName() + "\nMass: " + selPl.getMass() + " kg\nRadius: "
+					+ Math.round(selPl.getRadius() / 1000.0) + " km\nVelocity: " + (int) selPl.getVel().norm() + " m/s"
+					+ "\nTime: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
 		} else {
 			infoLabel.setText(
-					Main.simulation.getConstellation().getName() + "\nObjekte: " + Main.simulation.getPlanets().length
-							+ "\nZeit: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
+					Main.simulation.getConstellation().getName() + "\nObjects: " + Main.simulation.getPlanets().length
+							+ "\nTime: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
 		}
 	}
-	
+
 	/**
 	 * updates the orbit mode label
 	 * 
@@ -76,11 +95,11 @@ public class InfoGroup extends Group {
 	 */
 	public void setOrbitMode(boolean b) {
 		if (b) {
-			orbitMode.setText("Orbit Mode: On");
-			orbitMode.setTextFill(Color.RED);
-		}else {
-			orbitMode.setText("Orbit Mode: Off");
-			orbitMode.setTextFill(Color.BLACK);
+			orbitModeLabel.setText("Orbit Mode: On");
+			orbitModeLabel.setTextFill(Color.RED);
+		} else {
+			orbitModeLabel.setText("Orbit Mode: Off");
+			orbitModeLabel.setTextFill(Color.BLACK);
 		}
 	}
 

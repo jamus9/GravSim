@@ -20,7 +20,7 @@ public class Simulation {
 
 	public static final double GRAV_CONST = 6.67408e-11;
 	/** simulations per second */
-	public static final double SPS = 8000;
+	public static final double SPS = 6000;
 
 	/** the current constellation with start conditions */
 	private final Constellation constellation;
@@ -33,10 +33,10 @@ public class Simulation {
 	private Planet[] planets;
 
 	/** the time line in which all calculations happen */
-	private Timeline timeline;
+	public Timeline timeline;
 
 	private int spsCounter;
-	private int secondsCounter;
+	private double secondsCounter;
 	private boolean pause;
 
 	/**
@@ -86,22 +86,21 @@ public class Simulation {
 	 * simulation time and then moves all current planets one time step ahead.
 	 */
 	private void movePlanets() {
-		spsCounter++;
-		secondsCounter += time;
-
-		Vec2D accVec, dirVec;
+		Vec2D accVec, dirVec, x, v, a;
 
 		// array with an acceleration vector for each planet
 		Vec2D[] planetsAcc = new Vec2D[planets.length];
 
 		for (int i = 0; i < planets.length; i++) {
+			// initialize array
 			planetsAcc[i] = new Vec2D();
+			
 			for (int j = 0; j < planets.length; j++) {
 				if (i != j) {
 					// direction of the acceleration vector
 					dirVec = (planets[j].getPos()).sub(planets[i].getPos());
 
-					// acceleration vector: accVec-> = r-> * G * m / r^3
+					// acceleration vector: accVec = r * G * m / |r|^3
 					accVec = dirVec.mult(GRAV_CONST * planets[j].getMass() / Math.pow(dirVec.norm(), 3));
 
 					// add all acceleration vectors for one planet
@@ -110,24 +109,24 @@ public class Simulation {
 			}
 		}
 
-		double t = time;
-		Vec2D pos0, vel0, acc0;
-
 		// change the position of all planets with the calculated vectors
 		for (int i = 0; i < planets.length; i++) {
-			pos0 = planets[i].getPos();
-			vel0 = planets[i].getVel();
-			acc0 = planetsAcc[i];
+			x = planets[i].getPos();
+			v = planets[i].getVel();
+			a = planetsAcc[i];
 
-			// v0 + a0 * t
-			planets[i].setVel(vel0.add(acc0.mult(t)));
-			// r0 + v0 * t + 1/2 * a0 * t^2
-			planets[i].setPos(pos0.add(vel0.mult(t)).add(acc0.mult(t * t * 0.5)));
+			// v + a*t
+			planets[i].setVel(v.add(a.mult(time)));
+			// r + v*t + 1/2*a*t^2
+			planets[i].setPos(x.add(v.mult(time)).add(a.mult(time * time * 0.5)));
 		}
+		
+		spsCounter++;
+		secondsCounter += time;
 	}
 
 	/**
-	 * Checks all planets for collisions.
+	 * Checks all planets for collisions and calls collide if necessary
 	 */
 	private void checkForCollisions() {
 		Planet p1, p2;
@@ -156,9 +155,8 @@ public class Simulation {
 		Planet smallP = Utils.getSmallest(p1, p2);
 
 		// velocity, mass and radius of the new planet
-		bigP.setVel(getCollisionVel(bigP.getMass(), bigP.getVel(), smallP.getMass(), smallP.getVel()));
-		bigP.setRadius(getCollisionRadius(bigP.getMass(), bigP.getRadius(), smallP.getMass()));
-		bigP.setMass(bigP.getMass() + smallP.getMass());
+		bigP.setVel(getCollisionVel(bigP, smallP));
+		bigP.setMass(bigP.getMass() + smallP.getMass(), bigP.getDensity());
 
 		// copy all planets in the new planets array except the smaller one
 		Planet[] newPlanets = new Planet[planets.length - 1];
@@ -184,29 +182,14 @@ public class Simulation {
 	 * Calculates the new velocity of a planet after a collision with momentum
 	 * conservation
 	 * 
-	 * @param mass1
-	 * @param vel1
-	 * @param mass2
-	 * @param vel2
+	 * @param p1
+	 * @param p2
 	 * @return the new velocity
 	 */
-	private static Vec2D getCollisionVel(double mass1, Vec2D vel1, double mass2, Vec2D vel2) {
-		double x = (mass1 * vel1.x() + mass2 * vel2.x()) / (mass1 + mass2);
-		double y = (mass1 * vel1.y() + mass2 * vel2.y()) / (mass1 + mass2);
+	private static Vec2D getCollisionVel(Planet p1, Planet p2) {
+		double x = (p1.getMass() * p1.getVel().x() + p2.getMass() * p2.getVel().x()) / (p1.getMass() + p2.getMass());
+		double y = (p1.getMass() * p1.getVel().y() + p2.getMass() * p2.getVel().y()) / (p1.getMass() + p2.getMass());
 		return new Vec2D(x, y);
-	}
-
-	/**
-	 * Calculates the new radius of a planet after a collision with the masses
-	 * of both collided planets and the density of the bigger one.
-	 * 
-	 * @param bigMass
-	 * @param bigRadius
-	 * @param smallMass
-	 * @return the new radius
-	 */
-	private static double getCollisionRadius(double bigMass, double bigRadius, double smallMass) {
-		return bigRadius * Math.pow(1 + smallMass / bigMass, 1.0 / 3.0);
 	}
 
 	/**
@@ -216,23 +199,19 @@ public class Simulation {
 	 *            the new planet
 	 */
 	public void addNewPlanet(Planet planet) {
-		planet.deleteOrbit();
+		planet.deleteTrail();
 		planet.savePosition();
 
-		// the new planets array
-		Planet[] newPlanets = new Planet[planets.length + 1];
-
 		// copy all planets in the new planets array
+		Planet[] newPlanets = new Planet[planets.length + 1];
 		for (int i = 0; i < planets.length; i++)
 			newPlanets[i] = planets[i];
 
 		// the new planet in the last position
 		newPlanets[newPlanets.length - 1] = planet;
 
-		// update the planets array
+		// update the planets array and window
 		planets = newPlanets;
-
-		// update the window
 		Main.window.updatePlanets();
 	}
 
@@ -268,7 +247,7 @@ public class Simulation {
 		spsCounter = 0;
 	}
 
-	public int getSecondsCounter() {
+	public double getSecondsCounter() {
 		return secondsCounter;
 	}
 

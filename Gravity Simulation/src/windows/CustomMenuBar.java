@@ -21,7 +21,7 @@ public class CustomMenuBar extends MenuBar {
 
 	/** CheckMenuItems in settings menu */
 	private CheckMenuItem infoCMI = new CheckMenuItem("Information");
-	private CheckMenuItem orbitsCMI = new CheckMenuItem("Orbits");
+	private CheckMenuItem trailsCMI = new CheckMenuItem("Trails");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Labels");
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vectors");
 	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
@@ -56,17 +56,24 @@ public class CustomMenuBar extends MenuBar {
 		/*
 		 * settings menu
 		 */
-		orbitsCMI.setOnAction(actionEvent -> Main.window.changeOrbitVisibility());
-		labelsCMI.setOnAction(actionEvent -> Main.window.changeLabelVisibility());
-		infoCMI.setOnAction(ActionEvent -> Main.window.changeInfoVisibility());
-		vectorsCMI.setOnAction(actionEvent -> Main.window.changeVectorVisibility());
 		orbitModeCMI.setOnAction(actionEvent -> Main.window.changeOrbitMode());
 
 		Menu settingsMenu = new Menu("Settings");
-		settingsMenu.getItems().addAll(orbitsCMI, labelsCMI, infoCMI, vectorsCMI, orbitModeCMI);
+		settingsMenu.getItems().addAll(orbitModeCMI);
 
 		/*
-		 * constellation loading menu
+		 * view menu
+		 */
+		trailsCMI.setOnAction(actionEvent -> Main.window.changeTrailsVisibility());
+		labelsCMI.setOnAction(actionEvent -> Main.window.changeLabelsVisibility());
+		infoCMI.setOnAction(ActionEvent -> Main.window.changeInfoVisibility());
+		vectorsCMI.setOnAction(actionEvent -> Main.window.changeVectorsVisibility());
+
+		Menu viewMenu = new Menu("View");
+		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, vectorsCMI);
+
+		/*
+		 * open constellation menu
 		 */
 		MenuItem earthSystemItem = new MenuItem("Earth System");
 		earthSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getEarthSystem()));
@@ -89,21 +96,21 @@ public class CustomMenuBar extends MenuBar {
 		MenuItem sym8Item = new MenuItem("Symmetrical 8");
 		sym8Item.setOnAction(actionEvent -> Main.restart(StartConditions.getSym8()));
 
-		MenuItem randomItem = new MenuItem("Random Planets");
-		randomItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomPlanets(40)));
+		MenuItem randomPlanetsItem = new MenuItem("Random Planets");
+		randomPlanetsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomPlanets()));
 
 		MenuItem randomMoonsItem = new MenuItem("Random Moons");
-		randomMoonsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomMoons(30)));
+		randomMoonsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomMoons()));
 
 		MenuItem emptyItem = new MenuItem(StartConditions.empty.getName());
 		emptyItem.setOnAction(actionEvent -> Main.restart(StartConditions.empty));
 
-		Menu loadMenu = new Menu("Load");
-		loadMenu.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterSystemItem,
-				jupiterFlybyItem, earthMarsCollisionItem, sym8Item, randomItem, randomMoonsItem, emptyItem);
+		Menu openMenu = new Menu("Open");
+		openMenu.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterSystemItem,
+				jupiterFlybyItem, earthMarsCollisionItem, sym8Item, randomMoonsItem, randomPlanetsItem, emptyItem);
 
 		/*
-		 * place planet menu
+		 * add planet menu
 		 */
 		RadioMenuItem placeMoon = new RadioMenuItem(StartConditions.moon.getName());
 		placeMoon.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.moon);
@@ -124,23 +131,23 @@ public class CustomMenuBar extends MenuBar {
 		RadioMenuItem placeSun = new RadioMenuItem(StartConditions.sun.getName());
 		placeSun.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.sun);
 
-		ToggleGroup placeToggleGroup = new ToggleGroup();
-		placeToggleGroup.getToggles().addAll(placeMoon, placeEarth, placeMars, placeJupiter, placeSun, placeBlackHole);
+		ToggleGroup addToggleGroup = new ToggleGroup();
+		addToggleGroup.getToggles().addAll(placeMoon, placeEarth, placeMars, placeJupiter, placeSun, placeBlackHole);
 
-		Menu placeMenu = new Menu("Place");
-		placeMenu.getItems().addAll(placeMoon, placeEarth, placeMars, placeJupiter, placeSun, placeBlackHole);
+		Menu addMenu = new Menu("Add");
+		addMenu.getItems().addAll(placeMoon, placeEarth, placeMars, placeJupiter, placeSun, placeBlackHole);
 
 		/*
 		 * add all menus to the menu bar
 		 */
-		this.getMenus().addAll(simulationMenu, settingsMenu, loadMenu, placeMenu);
+		this.getMenus().addAll(simulationMenu, settingsMenu, viewMenu, openMenu, addMenu);
 	}
 
 	/**
 	 * Updates the check menu items in the menu "settings".
 	 */
 	protected void updateCMIs() {
-		orbitsCMI.setSelected(Main.window.orbits);
+		trailsCMI.setSelected(Main.window.trails);
 		labelsCMI.setSelected(Main.window.labels);
 		vectorsCMI.setSelected(Main.window.vectors);
 		infoCMI.setSelected(Main.window.infoGroup.isVisible());

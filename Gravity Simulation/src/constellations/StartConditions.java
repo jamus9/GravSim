@@ -13,7 +13,7 @@ import utils.Vec2D;
  */
 public class StartConditions {
 
-	private static final double sunMass = 1.9884e30, sunRad = 696342e3,
+	private static final double sunMass = 1.988e30, sunRad = 696342e3,
 
 			merkurMass = 3.301e23, merkurRad = 4879.4e3 / 2.0,
 
@@ -27,11 +27,11 @@ public class StartConditions {
 
 			jupiterMass = 1.899e27, jupiterRad = 133708e3 / 2.0,
 
-			saturnMass = 5.68319e26, saturnRad = 58232e3,
+			saturnMass = 5.683e26, saturnRad = 58232e3,
 
 			uranusMass = 8.683e25, uranusRad = 51118e3 / 2.0,
 
-			neptunMass = 1.0243e26, neptunRad = 49528e3 / 2.0,
+			neptunMass = 1.024e26, neptunRad = 49528e3 / 2.0,
 
 			blackHoleMass = sunMass * 4e6, blackHoleRad = 22.5e9 / 2.0;
 
@@ -198,16 +198,17 @@ public class StartConditions {
 	public static Constellation getSym8() {
 		int dis = 3000;
 		double vel = 0.0135;
-		int rad = 100;
-		Planet p1 = new Planet(dis, 0, 0, vel, rad);
-		Planet p2 = new Planet(-dis, 0, 0, -vel, rad);
-		Planet p3 = new Planet(0, dis, -vel, 0, rad);
-		Planet p4 = new Planet(0, -dis, vel, 0, rad);
+		double mass = 5e9;
+		int density = 2000;
+		Planet p1 = new Planet(dis, 0, 0, vel, mass, density);
+		Planet p2 = new Planet(-dis, 0, 0, -vel, mass, density);
+		Planet p3 = new Planet(0, dis, -vel, 0, mass, density);
+		Planet p4 = new Planet(0, -dis, vel, 0, mass, density);
 
-		Planet p5 = new Planet(dis, dis, -vel, vel, rad);
-		Planet p6 = new Planet(-dis, -dis, vel, -vel, rad);
-		Planet p7 = new Planet(-dis, dis, -vel, -vel, rad);
-		Planet p8 = new Planet(dis, -dis, vel, vel, rad);
+		Planet p5 = new Planet(dis, dis, -vel, vel, mass, density);
+		Planet p6 = new Planet(-dis, -dis, vel, -vel, mass, density);
+		Planet p7 = new Planet(-dis, dis, -vel, -vel, mass, density);
+		Planet p8 = new Planet(dis, -dis, vel, vel, mass, density);
 
 		Planet[] planets = { p1, p2, p3, p4, p5, p6, p7, p8 };
 
@@ -236,27 +237,37 @@ public class StartConditions {
 	}
 
 	/**
-	 * returns a number of random planets
+	 * random planets
 	 * 
-	 * @param number
 	 * @return a constellation of random planets
 	 */
-	public static Constellation getRandomPlanets(int number) {
+	public static Constellation getRandomPlanets() {
+		int number = 40;
 		Planet[] planets = new Planet[number];
 
 		for (int i = 0; i < number; i++) {
-			planets[i] = new Planet(Utils.plusMinus() * Math.random() * 1200 * (3.0 / 8.0),
-					Utils.plusMinus() * Math.random() * 700 * (3.0 / 8.0), Utils.plusMinus() * Math.random() * 0.001,
-					Utils.plusMinus() * Math.random() * 0.001, 2.5);
+			Planet p = randomPlanet();
+
+			double x = Utils.plusMinus() * Math.random() * 5e7 * 12;
+			double y = Utils.plusMinus() * Math.random() * 5e7 * 7;
+
+			p.setPos(x, y);
+
+			p.setVel(Utils.plusMinus() * Math.random() * 1000, Utils.plusMinus() * Math.random() * 1000);
+
+			p.setColor(Utils.getRandomColor());
+
+			planets[i] = p;
 		}
 
-		return new Constellation("Random Planets", planets, 1, 2);
+		return new Constellation("Random Planets", planets, 7e-7, 3);
 	}
 
 	/**
 	 * a number of random moons in orbit around the earth
 	 */
-	public static Constellation getRandomMoons(int number) {
+	public static Constellation getRandomMoons() {
+		int number = 40;
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);
@@ -265,21 +276,57 @@ public class StartConditions {
 		Planet[] planets = new Planet[number];
 		planets[0] = earth.clone();
 
-		double r, x, y;
+		double radius, x, y;
 		Vec2D pos;
 		for (int i = 1; i < number; i++) {
-			r = (Math.random() * 2.0 + 0.1) * moonDistance;
-			y = Utils.plusMinus() * Math.random() * r;
-			x = Utils.plusMinus() * Math.sqrt(r * r - y * y);
+			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance * 0.5);
 
+			y = Utils.plusMinus() * Math.random() * radius;
+			x = Utils.plusMinus() * Math.sqrt(radius * radius - y * y);
 			pos = new Vec2D(x, y);
 
-			moon.setPos(pos);
-			moon.setVel(Utils.orbVel(earth, pos));
+			Planet randomMoon = randomMoon();
 
-			planets[i] = moon.clone();
+			randomMoon.setPos(pos);
+			randomMoon.setVel(Utils.orbVel(earth, pos));
+			randomMoon.setColor(Utils.getRandomColor());
+
+			planets[i] = randomMoon.clone();
 		}
 
-		return new Constellation("Random Moons", planets, 5e-7, 5);
+		return new Constellation("Random Moons", planets, 2e-6, 1);
+	}
+
+	/**
+	 * returns a random moon with a mass between 1/3 moon and moon mass
+	 * 
+	 * @return the random Planet
+	 */
+	public static Planet randomMoon() {
+		double density = moonMass / ((4 / 3) * Math.PI * Math.pow(moonRad, 3));
+		double mass = Utils.getRandomInInervall(moonMass / 3, moonMass);
+		return new Planet(0, 0, 0, 0, mass, density);
+	}
+
+	/**
+	 * returns a random planet with a mass between merkur and 2 earth masses
+	 * 
+	 * @return the random Planet
+	 */
+	public static Planet randomPlanet() {
+		double density = earthMass / ((4 / 3) * Math.PI * Math.pow(earthRad, 3));
+		double mass = Utils.getRandomInInervall(merkurMass, earthMass * 2);
+		return new Planet(0, 0, 0, 0, mass, density);
+	}
+
+	/**
+	 * returns a random gas giant with a mass between uranus and jupiter
+	 * 
+	 * @return the random Planet
+	 */
+	public static Planet randomGasGiant() {
+		double density = uranusMass / ((4 / 3) * Math.PI * Math.pow(uranusRad, 3));
+		double mass = Utils.getRandomInInervall(uranusMass, jupiterMass);
+		return new Planet(0, 0, 0, 0, mass, density);
 	}
 }

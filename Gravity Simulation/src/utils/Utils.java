@@ -1,7 +1,7 @@
 package utils;
 
 import java.util.LinkedList;
-
+import javafx.scene.paint.Color;
 import simulation.Main;
 import simulation.Planet;
 import simulation.Simulation;
@@ -14,7 +14,7 @@ import windows.Window;
  *
  */
 public class Utils {
-	
+
 	/**
 	 * returns the most massive planet from a collection of planets
 	 * 
@@ -27,12 +27,12 @@ public class Utils {
 		if (planets.length == 0)
 			return null;
 		Planet biggest = planets[0];
-		for (Planet p: planets)
+		for (Planet p : planets)
 			if (p.getMass() > biggest.getMass())
 				biggest = p;
 		return biggest;
 	}
-	
+
 	/**
 	 * returns the least massive planet from a collection of planets
 	 * 
@@ -45,14 +45,14 @@ public class Utils {
 		if (planets.length == 0)
 			return null;
 		Planet smallest = planets[0];
-		for (Planet p: planets)
+		for (Planet p : planets)
 			if (p.getMass() <= smallest.getMass())
 				smallest = p;
 		return smallest;
 	}
 
 	/**
-	 * Returns the biggest planet in view. (does not work!)
+	 * returns the biggest planet on the screen
 	 * 
 	 * @param planets
 	 * @param x1
@@ -61,9 +61,8 @@ public class Utils {
 	 * @param y2
 	 * @return the biggest planet
 	 */
-	public static Planet getBiggestInView(Planet[] planets, Window win) {
-		if (planets.length == 0)
-			return null;
+	public static Planet getBiggestInView(Window win, Planet... planets) {
+		LinkedList<Planet> planetsInView = new LinkedList<Planet>();
 
 		Vec2D topLeft = win.transfromBack(new Vec2D(0, 0));
 		Vec2D bottomRight = win.transfromBack(new Vec2D(win.getWidth(), win.getHeight()));
@@ -73,24 +72,15 @@ public class Utils {
 		double y1 = topLeft.y();
 		double y2 = bottomRight.y();
 
-		LinkedList<Planet> planetsInView = new LinkedList<Planet>();
+		Vec2D pos;
 
 		for (Planet planet : planets) {
-			Vec2D pos = planet.getPos();
+			pos = planet.getPos();
 			if (pos.x() > x1 && pos.x() < x2 && pos.y() < y1 && pos.y() > y2)
 				planetsInView.add(planet);
 		}
-		
-		if (planetsInView.isEmpty())
-			return null;
 
-		Planet biggest = planetsInView.getFirst();
-
-		for (Planet p : planetsInView)
-			if (p.getMass() > biggest.getMass())
-				biggest = p;
-		
-		return biggest;
+		return getBiggest(planetsInView.toArray(new Planet[planetsInView.size()]));
 	}
 
 	/**
@@ -98,7 +88,7 @@ public class Utils {
 	 * 
 	 * @param planet
 	 * @param position
-	 * @return the orbital velocity
+	 * @return the orbital velocity as a vector
 	 */
 	public static Vec2D orbVel(Planet planet, Vec2D position) {
 		// verbindungsvektor
@@ -119,7 +109,7 @@ public class Utils {
 	 * 
 	 * @param planet
 	 * @param distance
-	 * @return the orbital speed as a double
+	 * @return orbital speed as a double
 	 */
 	public static double orbSpeed(Planet planet, double distance) {
 		return Math.sqrt(Simulation.GRAV_CONST * planet.getMass() / distance);
@@ -138,12 +128,12 @@ public class Utils {
 	}
 
 	/**
-	 * Gives the time in a nice format.
+	 * Gives the past seconds in a nice time format.
 	 * 
 	 * @return the past time as a String
 	 */
-	public static String pastTime() {
-		int secs = Main.simulation.getSecondsCounter();
+	public static String getTimeString() {
+		int secs = (int) Main.simulation.getSecondsCounter();
 		int mins, hours, days, years;
 
 		years = secs / 31536000;
@@ -155,26 +145,43 @@ public class Utils {
 		mins = secs / 60;
 		secs -= mins * 60;
 
-		String y = " Y: " + Integer.toString(years);
-		String d = " D: " + Integer.toString(days);
-		String h = " H: " + Integer.toString(hours);
-		String m = " M: " + Integer.toString(mins);
-		String s = " S: " + Integer.toString(secs);
-
 		if (years > 0)
-			return y + d;
+			return String.format("Y: %1$d D: %2$d", years, days);
 		else if (days > 0)
-			return d + h;
+			return String.format("Y: %1$d D: %2$d H: %3$d", years, days, hours);
 		else if (hours > 0)
-			return h + m;
+			return String.format("Y: %1$d D: %2$d H: %3$d M: %4$d", years, days, hours, mins);
 		else
-			return m + s;
+			return String.format("Y: %1$d D: %2$d H: %3$d M: %4$d S: %5$d", years, days, hours, mins, secs);
 	}
 
 	/**
-	 * @return randomly 1 or -1
+	 * returns 1 or -1 randomly
+	 * 
+	 * @return 1 or -1
 	 */
 	public static double plusMinus() {
 		return Math.signum(Math.random() - 0.5);
 	}
+
+	/**
+	 * returns a random double in an interval
+	 * 
+	 * @param min
+	 * @param max
+	 * @return random double
+	 */
+	public static double getRandomInInervall(double min, double max) {
+		return min + (int) (Math.random() * ((max - min) + 1));
+	}
+
+	/**
+	 * returns a random rgb-color
+	 * 
+	 * @return a color
+	 */
+	public static Color getRandomColor() {
+		return Color.color(Math.random(), Math.random(), Math.random());
+	}
+
 }

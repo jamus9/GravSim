@@ -34,9 +34,9 @@ public class Planet {
 	private Label label;
 
 	// the orbit lines
-	private LinkedList<Line> orbitLineList;
+	private LinkedList<Line> trailLineList;
 	// the real coordinates of the orbit
-	private LinkedList<Vec2D> orbitPoints;
+	private LinkedList<Vec2D> trailPointsList;
 
 	/**
 	 * Creates a new Planet with position, velocity, mass, radius, color and
@@ -57,7 +57,6 @@ public class Planet {
 		this.mass = mass;
 		this.radius = radius;
 		initializeObjects(color, name);
-		id = globalID++;
 	}
 
 	/**
@@ -73,7 +72,7 @@ public class Planet {
 	}
 
 	/**
-	 * Creates a new Planet with position, velocity and radius.
+	 * Creates a new Planet with position, velocity and mass.
 	 * 
 	 * @param xp
 	 * @param yp
@@ -81,8 +80,11 @@ public class Planet {
 	 * @param yv
 	 * @param radius
 	 */
-	public Planet(double xp, double yp, double xv, double yv, double radius) {
-		this(xp, yp, xv, yv, standardMass(radius), radius, Color.BLACK, "");
+	public Planet(double xp, double yp, double xv, double yv, double mass, double density) {
+		this.pos = new Vec2D(xp, yp);
+		this.vel = new Vec2D(xv, yv);
+		setMass(mass, density);
+		initializeObjects(Color.BLACK, "P" + Integer.toString(id));
 	}
 
 	/**
@@ -92,34 +94,22 @@ public class Planet {
 	 * @param name
 	 */
 	private void initializeObjects(Color color, String name) {
+		id = globalID++;
+
 		circle = new Circle();
 		circle.setFill(color);
 		circle.setStroke(Color.BLACK);
+
+		label = new Label(name);
 
 		velocityLine = new Line();
 		velocityLine.setStroke(Color.RED);
 		velocityLine.setVisible(false);
 
-		label = new Label(name);
-
-		orbitLineList = new LinkedList<Line>();
-		orbitPoints = new LinkedList<Vec2D>();
+		trailLineList = new LinkedList<Line>();
+		trailPointsList = new LinkedList<Vec2D>();
 
 		savePosition();
-	}
-
-	/**
-	 * Returns the mass of a 3D planet with a given radius and a default
-	 * density.
-	 * 
-	 * @param radius
-	 *            the radius of the planet
-	 * @return the mass of the planet
-	 */
-	private static double standardMass(double radius) {
-		// typical asteroid? in kg/m^3
-		double density = 2000;
-		return (4.0 / 3.0) * Math.PI * Math.pow(radius, 3) * density;
 	}
 
 	/**
@@ -150,37 +140,35 @@ public class Planet {
 		}
 
 		// update orbits
-		if (Main.window.isOrbits()) {
-			Vec2D tplast = Main.window.transform(orbitPoints.getLast());
+		if (Main.window.isTrails()) {
+			Vec2D tplast = Main.window.transform(trailPointsList.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
-				
-				if (orbitLineList.size() > 100) {
-					orbitLineList.removeFirst();
-					orbitPoints.removeFirst();
+
+				if (trailLineList.size() > 100) {
+					trailLineList.removeFirst();
+					trailPointsList.removeFirst();
 				}
 
 				Line line = new Line(tplast.x(), tplast.y(), tp.x(), tp.y());
 				line.setStroke(Color.RED);
-				orbitLineList.add(line);
+				trailLineList.add(line);
 
 				savePosition();
 			}
 		}
 	}
 
-	/**
-	 * Translate all Lines in orbitLineList with help of orbitPoints.
-	 */
-	public void updateOrbit() {
+	/** Translate all Lines in orbitLineList with help of orbitPoints. */
+	public void updateTrail() {
 		Vec2D newStart, newEnd;
 		Line line;
 
-		for (int i = 0; i < orbitLineList.size(); i++) {
-			newStart = Main.window.transform(orbitPoints.get(i));
-			newEnd = Main.window.transform(orbitPoints.get(i + 1));
+		for (int i = 0; i < trailLineList.size(); i++) {
+			newStart = Main.window.transform(trailPointsList.get(i));
+			newEnd = Main.window.transform(trailPointsList.get(i + 1));
 
-			line = orbitLineList.get(i);
+			line = trailLineList.get(i);
 
 			line.setStartX(newStart.x());
 			line.setStartY(newStart.y());
@@ -189,40 +177,29 @@ public class Planet {
 		}
 	}
 
-	/**
-	 * Deletes all orbit data.
-	 */
-	public void deleteOrbit() {
-		orbitLineList.clear();
-		orbitPoints.clear();
+	/** Deletes all orbit data. */
+	public void deleteTrail() {
+		trailLineList.clear();
+		trailPointsList.clear();
 	}
 
-	/**
-	 * Return a copy of this planet.
-	 */
+	/** Return a copy of this planet. */
 	@Override
 	public Planet clone() {
 		return new Planet(pos.x(), pos.y(), vel.x(), vel.y(), mass, radius, (Color) circle.getFill(), getName());
 	}
 
-	/**
-	 * If the planet is selected turn the border white or turn it black again.
-	 * 
-	 * @param selected
-	 *            true if selected, false if not
-	 */
-	public void select(boolean selected) {
-		if (selected)
-			circle.setStroke(Color.WHITE);
-		else
-			circle.setStroke(Color.BLACK);
+	/** saves the current position in the list orbitPoints */
+	public void savePosition() {
+		trailPointsList.add(pos.clone());
 	}
 
-	/**
-	 * saves the current position in the list orbitPoints
-	 */
-	public void savePosition() {
-		orbitPoints.add(pos.clone());
+	public void select() {
+		circle.setStroke(Color.WHITE);
+	}
+
+	public void deselect() {
+		circle.setStroke(Color.BLACK);
 	}
 
 	public boolean equals(Planet p) {
@@ -253,12 +230,13 @@ public class Planet {
 		label.setVisible(b);
 	}
 
-	public void setMass(double mass) {
+	public void setMass(double mass, double density) {
 		this.mass = mass;
+		this.radius = Math.pow(3 * mass / (4 * Math.PI * density), 1d / 3);
 	}
 
-	public void setRadius(double radius) {
-		this.radius = radius;
+	public void setColor(Color col) {
+		this.circle.setFill(col);
 	}
 
 	public Vec2D getPos() {
@@ -275,6 +253,10 @@ public class Planet {
 
 	public double getRadius() {
 		return radius;
+	}
+
+	public double getDensity() {
+		return mass / ((4d / 3) * Math.PI * radius * radius * radius);
 	}
 
 	public Circle getCircle() {
@@ -298,7 +280,7 @@ public class Planet {
 	}
 
 	public LinkedList<Line> getOrbitLineList() {
-		return orbitLineList;
+		return trailLineList;
 	}
 
 	private double getCircleRadius() {
