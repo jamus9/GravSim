@@ -45,7 +45,6 @@ public class Simulation {
 	 * @param constellation
 	 */
 	public Simulation(Constellation constellation) {
-		// pause = false;
 		spsCounter = 0;
 		secondsCounter = 0;
 
@@ -68,13 +67,12 @@ public class Simulation {
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	private void run() {
-		KeyFrame timeStep = new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
+		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				movePlanets();
 				checkForCollisions();
 			}
-		});
-		timeline = new Timeline(timeStep);
+		}));
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
 	}
@@ -155,6 +153,8 @@ public class Simulation {
 		// velocity, mass and radius of the new planet
 		bigP.setVel(getCollisionVel(bigP, smallP));
 		bigP.setMass(bigP.getMass() + smallP.getMass(), bigP.getDensity());
+		
+		smallP.deleteTrail();
 
 		// copy all planets in the new planets array except the smaller one
 		Planet[] newPlanets = new Planet[planets.length - 1];
@@ -218,6 +218,10 @@ public class Simulation {
 			timeline.pause();
 		else
 			timeline.play();
+	}
+	
+	public void stop() {
+		timeline.stop();
 	}
 
 	public boolean isPaused() {

@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import utils.Vec2D;
+import javafx.scene.layout.Pane;
 
 /**
  * Implements a planet with position and velocity, radius, mass and a name. Each
@@ -84,7 +85,7 @@ public class Planet {
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		setMass(mass, density);
-		initializeObjects(Color.BLACK, "P" + Integer.toString(id));
+		initializeObjects(Color.BLACK, null);
 	}
 
 	/**
@@ -100,7 +101,11 @@ public class Planet {
 		circle.setFill(color);
 		circle.setStroke(Color.BLACK);
 
-		label = new Label(name);
+		label = new Label();
+		if (name == null)
+			label.setText("P" + Integer.toString(id));
+		else
+			label.setText(name);
 
 		velocityLine = new Line();
 		velocityLine.setStroke(Color.RED);
@@ -114,7 +119,7 @@ public class Planet {
 
 	/**
 	 * Updates the position and radius of the circle, the vector line, the label
-	 * and the orbit of this planet.
+	 * and the trail of this planet.
 	 */
 	public void updateObjects() {
 		Vec2D tp = Main.win.transform(pos);
@@ -124,7 +129,7 @@ public class Planet {
 		circle.setCenterY(tp.y());
 		circle.setRadius(getCircleRadius());
 
-		// update vectors
+		// update vector
 		if (Main.win.isVectors()) {
 			double scaleFactor = Main.sim.getScale() * Main.win.getZoom() * 100000.0;
 			velocityLine.setStartX(tp.x());
@@ -133,19 +138,20 @@ public class Planet {
 			velocityLine.setEndY(-vel.y() * scaleFactor + tp.y());
 		}
 
-		// update labels
+		// update label
 		if (Main.win.isLabels()) {
 			double offset = getCircleRadius() + 5;
 			label.relocate(tp.x() + offset, tp.y());
 		}
 
-		// update orbits
+		// update trail
 		if (Main.win.isTrails()) {
 			Vec2D tplast = Main.win.transform(trailPointsList.getLast());
 
-			if (tp.sub(tplast).norm() > 3) {
+			if (tp.sub(tplast).norm() > 5) {
 
-				if (trailLineList.size() > 100) {
+				if (trailLineList.size() > 50) {
+					((Pane) trailLineList.getFirst().getParent()).getChildren().remove(trailLineList.getFirst());
 					trailLineList.removeFirst();
 					trailPointsList.removeFirst();
 				}
@@ -153,10 +159,16 @@ public class Planet {
 				Line line = new Line(tplast.x(), tplast.y(), tp.x(), tp.y());
 				line.setStroke(Color.RED);
 				trailLineList.add(line);
+				Main.win.addTrail(line);
 
 				savePosition();
 			}
 		}
+	}
+
+	/** returns the scaled radius of the circle */
+	private double getCircleRadius() {
+		return Main.sim.getScale() * Main.win.getZoom() * radius;
 	}
 
 	/** Translate all Lines in orbitLineList with help of orbitPoints. */
@@ -179,6 +191,9 @@ public class Planet {
 
 	/** Deletes all orbit data. */
 	public void deleteTrail() {
+		for (Line line : trailLineList) {
+			((Pane) line.getParent()).getChildren().remove(line);
+		}
 		trailLineList.clear();
 		trailPointsList.clear();
 	}
@@ -230,6 +245,7 @@ public class Planet {
 		label.setVisible(b);
 	}
 
+	/** sets the mass and the radius of the planet with with a given density */
 	public void setMass(double mass, double density) {
 		this.mass = mass;
 		this.radius = Math.pow(3 * mass / (4 * Math.PI * density), 1d / 3);
@@ -281,10 +297,6 @@ public class Planet {
 
 	public LinkedList<Line> getOrbitLineList() {
 		return trailLineList;
-	}
-
-	private double getCircleRadius() {
-		return Main.sim.getScale() * Main.win.getZoom() * radius;
 	}
 
 }

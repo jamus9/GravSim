@@ -150,7 +150,7 @@ public class CustomMenuBar extends MenuBar {
 		trailsCMI.setSelected(Main.win.trails);
 		labelsCMI.setSelected(Main.win.labels);
 		vectorsCMI.setSelected(Main.win.vectors);
-		infoCMI.setSelected(Main.win.infoGroup.isVisible());
+		infoCMI.setSelected(Main.win.infoPane.isVisible());
 		orbitModeCMI.setSelected(Main.win.orbitMode);
 	}
 

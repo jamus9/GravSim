@@ -41,6 +41,7 @@ public class Main extends Application {
 	 * @param newConstellation
 	 */
 	public static void restart(Constellation newConstellation) {
+		sim.stop();
 		sim = new Simulation(newConstellation);
 		win.reset();
 	}
@@ -50,6 +51,7 @@ public class Main extends Application {
 	 * window.
 	 */
 	public static void restart() {
+		sim.stop();
 		sim = new Simulation(sim.getConstellation());
 		win.reset();
 	}

@@ -1,7 +1,7 @@
 package windows;
 
-import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import simulation.Main;
 import simulation.Planet;
@@ -14,7 +14,7 @@ import utils.Utils;
  * @author Jan Muskalla
  *
  */
-public class InfoGroup extends Group {
+public class InfoPane extends Pane {
 
 	private Label spsLabel;
 	private Label pastTimeLabel;
@@ -24,7 +24,7 @@ public class InfoGroup extends Group {
 	/**
 	 * Creates an information group.
 	 */
-	public InfoGroup() {
+	public InfoPane() {
 		super();
 
 		spsLabel = new Label();

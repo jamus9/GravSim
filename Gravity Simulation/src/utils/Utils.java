@@ -65,7 +65,7 @@ public class Utils {
 		LinkedList<Planet> planetsInView = new LinkedList<Planet>();
 
 		Vec2D topLeft = win.transfromBack(new Vec2D(0, 0));
-		Vec2D bottomRight = win.transfromBack(new Vec2D(win.getWidth(), win.getHeight()));
+		Vec2D bottomRight = win.transfromBack(new Vec2D(win.getX(), win.getY()));
 
 		double x1 = topLeft.x();
 		double x2 = bottomRight.x();

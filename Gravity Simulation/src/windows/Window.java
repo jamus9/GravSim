@@ -15,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -35,13 +36,12 @@ import utils.Vec2D;
  */
 public class Window extends Application {
 
-	// flags for orbits label and vectors
+	// flags for trails label and vectors
 	protected boolean trails, labels, vectors;
 
 	// zoom and translation
 	private double zoom;
 	private double dx, dy;
-	// coordinates for mouse dragging
 	private double tempdx, tempdy;
 	private double mouseX, mouseY;
 
@@ -54,17 +54,17 @@ public class Window extends Application {
 	// in orbit mode all planets get placed in orbits
 	protected boolean orbitMode;
 
+	// true if window size was changed
 	private boolean winWasChanged;
 
 	// the scene of the window
 	private Scene scene;
-
-	// group for all orbits
-	private Group trailGroup;
+	// group for all trails
+	private Pane trailPane;
 	// group for all circles, vectors, labels
-	private Group planetGroup;
-	// group for all information an the screen
-	protected InfoGroup infoGroup;
+	private Pane planetPane;
+	// group for all information
+	protected InfoPane infoPane;
 	// the menu bar
 	private CustomMenuBar menuBar;
 
@@ -84,11 +84,11 @@ public class Window extends Application {
 		setSceneEvents(scene);
 
 		// add everything to root
-		trailGroup = new Group();
-		planetGroup = new Group();
-		infoGroup = new InfoGroup();
+		trailPane = new Pane();
+		planetPane = new Pane();
+		infoPane = new InfoPane();
 		menuBar = new CustomMenuBar(primaryStage);
-		root.getChildren().addAll(trailGroup, planetGroup, infoGroup, menuBar);
+		root.getChildren().addAll(trailPane, planetPane, infoPane, menuBar);
 
 		// initialize all values to default and load the planet objects
 		reset();
@@ -97,9 +97,9 @@ public class Window extends Application {
 		trails = true;
 		labels = true;
 		vectors = false;
-		infoGroup.setVisible(true);
+		infoPane.setVisible(true);
 		orbitMode = true;
-		infoGroup.setOrbitMode(orbitMode);
+		infoPane.setOrbitMode(orbitMode);
 
 		menuBar.updateCMIs();
 
@@ -145,16 +145,8 @@ public class Window extends Application {
 				for (Planet planet : Main.sim.getPlanets())
 					planet.updateObjects();
 
-				// draw orbits
-				if (trails && !Main.sim.isPaused()) {
-					trailGroup.getChildren().clear();
-					for (Planet planet : Main.sim.getPlanets())
-						for (Line line : planet.getOrbitLineList())
-							trailGroup.getChildren().add(line);
-				}
-
 				// update info
-				infoGroup.updateInfo();
+				infoPane.updateInfo();
 
 				// return to the center after a reset of the window
 				if (stopResetTimeline && zoom == 1 && dx == 0 && dy == 0) {
@@ -307,15 +299,16 @@ public class Window extends Application {
 	public void reset() {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
+		trailPane.getChildren().clear();
 		deselectPlanet();
 		updatePlanets();
 	}
 
 	/** updates all planet objects (circles, vectors, labels) */
 	public void updatePlanets() {
-		planetGroup.getChildren().clear();
+		planetPane.getChildren().clear();
 		for (Planet p : Main.sim.getPlanets())
-			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
+			planetPane.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
 
 	}
 
@@ -424,12 +417,9 @@ public class Window extends Application {
 	protected void changeTrailsVisibility() {
 		if (trails) {
 			trails = false;
-			trailGroup.getChildren().clear();
 			for (Planet p : Main.sim.getPlanets())
 				p.deleteTrail();
 		} else {
-			for (Planet p : Main.sim.getPlanets())
-				p.deleteTrail();
 			trails = true;
 			for (Planet p : Main.sim.getPlanets())
 				p.savePosition();
@@ -464,38 +454,14 @@ public class Window extends Application {
 	 * menu item.
 	 */
 	protected void changeInfoVisibility() {
-		infoGroup.setVisible(!infoGroup.isVisible());
+		infoPane.setVisible(!infoPane.isVisible());
 		menuBar.updateCMIs();
 	}
 
 	protected void changeOrbitMode() {
 		orbitMode = !orbitMode;
-		infoGroup.setOrbitMode(orbitMode);
+		infoPane.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
-	}
-
-	/**
-	 * Transforms a vector from planet coordinates to screen coordinates.
-	 * 
-	 * @param vector
-	 * @return the transformed vector
-	 */
-	public Vec2D transfromBack(Vec2D vector) {
-		double x = ((vector.x() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
-		double y = -((vector.y() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
-		return new Vec2D(x, y);
-	}
-
-	/**
-	 * Transforms a vector from planet coordinates to screen coordinates.
-	 * 
-	 * @param vector
-	 * @return the transformed vector
-	 */
-	public Vec2D transform(Vec2D vector) {
-		double x = zoom * (Main.sim.getScale() * vector.x() + dx + tempdx) + getWidth() / 2.0;
-		double y = zoom * (Main.sim.getScale() * -vector.y() + dy + tempdy) + getHeight() / 2.0;
-		return new Vec2D(x, y);
 	}
 
 	/** opens the help window */
@@ -508,21 +474,47 @@ public class Window extends Application {
 			e.printStackTrace();
 		}
 	}
-	
-	public Planet getSelectedPlanet() {
-		return selectedPlanet;
+
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param vector
+	 * @return the transformed vector
+	 */
+	public Vec2D transfromBack(Vec2D vector) {
+		double x = ((vector.x() - getX() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
+		double y = -((vector.y() - getY() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
+		return new Vec2D(x, y);
 	}
 
-	public double getWidth() {
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param vector
+	 * @return the transformed vector
+	 */
+	public Vec2D transform(Vec2D vector) {
+		double x = zoom * (Main.sim.getScale() * vector.x() + dx + tempdx) + getX() / 2.0;
+		double y = zoom * (Main.sim.getScale() * -vector.y() + dy + tempdy) + getY() / 2.0;
+		return new Vec2D(x, y);
+	}
+
+	/** returns the width of the window */
+	public double getX() {
 		return scene.getWidth();
 	}
 
-	public double getHeight() {
+	/** returns the height of the window */
+	public double getY() {
 		return scene.getHeight();
 	}
 
 	public double getZoom() {
 		return zoom;
+	}
+
+	public Planet getSelectedPlanet() {
+		return selectedPlanet;
 	}
 
 	public boolean isTrails() {
@@ -535,6 +527,10 @@ public class Window extends Application {
 
 	public boolean isVectors() {
 		return vectors;
+	}
+	
+	public void addTrail(Line line) {
+		trailPane.getChildren().add(line);
 	}
 
 }
