@@ -133,7 +133,7 @@ public class Utils {
 	 * @return the past time as a String
 	 */
 	public static String getTimeString() {
-		int secs = (int) Main.simulation.getSecondsCounter();
+		int secs = (int) Main.sim.getSecondsCounter();
 		int mins, hours, days, years;
 
 		years = secs / 31536000;

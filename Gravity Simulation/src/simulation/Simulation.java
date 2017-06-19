@@ -35,9 +35,9 @@ public class Simulation {
 	/** the time line in which all calculations happen */
 	public Timeline timeline;
 
+	/** time counter */
 	private int spsCounter;
 	private double secondsCounter;
-	private boolean pause;
 
 	/**
 	 * Creates a new simulation with a given constellation.
@@ -45,7 +45,7 @@ public class Simulation {
 	 * @param constellation
 	 */
 	public Simulation(Constellation constellation) {
-		pause = false;
+		// pause = false;
 		spsCounter = 0;
 		secondsCounter = 0;
 
@@ -70,10 +70,8 @@ public class Simulation {
 	private void run() {
 		KeyFrame timeStep = new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-				if (!pause) {
-					movePlanets();
-					checkForCollisions();
-				}
+				movePlanets();
+				checkForCollisions();
 			}
 		});
 		timeline = new Timeline(timeStep);
@@ -94,7 +92,7 @@ public class Simulation {
 		for (int i = 0; i < planets.length; i++) {
 			// initialize array
 			planetsAcc[i] = new Vec2D();
-			
+
 			for (int j = 0; j < planets.length; j++) {
 				if (i != j) {
 					// direction of the acceleration vector
@@ -120,7 +118,7 @@ public class Simulation {
 			// r + v*t + 1/2*a*t^2
 			planets[i].setPos(x.add(v.mult(time)).add(a.mult(time * time * 0.5)));
 		}
-		
+
 		spsCounter++;
 		secondsCounter += time;
 	}
@@ -167,15 +165,15 @@ public class Simulation {
 		}
 
 		// check selected planet
-		Planet selPl = Main.window.getSelectedPlanet();
+		Planet selPl = Main.win.getSelectedPlanet();
 		if (selPl != null && selPl.equals(smallP))
-			Main.window.selectPlanet(bigP);
+			Main.win.selectPlanet(bigP);
 
 		// copy the new planets in the simulation planets array
 		planets = newPlanets;
 
 		// update window
-		Main.window.updatePlanets();
+		Main.win.updatePlanets();
 	}
 
 	/**
@@ -212,19 +210,18 @@ public class Simulation {
 
 		// update the planets array and window
 		planets = newPlanets;
-		Main.window.updatePlanets();
-	}
-
-	public Planet[] getPlanets() {
-		return planets;
-	}
-
-	public boolean isPaused() {
-		return pause;
+		Main.win.updatePlanets();
 	}
 
 	public void setPause(boolean b) {
-		pause = b;
+		if (b)
+			timeline.pause();
+		else
+			timeline.play();
+	}
+
+	public boolean isPaused() {
+		return timeline.getStatus() == Animation.Status.PAUSED;
 	}
 
 	public double getTime() {
@@ -253,6 +250,10 @@ public class Simulation {
 
 	public Constellation getConstellation() {
 		return constellation;
+	}
+
+	public Planet[] getPlanets() {
+		return planets;
 	}
 
 	public double getScale() {

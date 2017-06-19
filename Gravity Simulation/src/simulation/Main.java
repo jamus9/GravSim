@@ -14,10 +14,10 @@ import windows.Window;
 public class Main extends Application {
 
 	/** the current simulation */
-	public static Simulation simulation;
+	public static Simulation sim;
 
 	/** the main window */
-	public static Window window;
+	public static Window win;
 
 	/** Launches the JavaFX application. */
 	public static void main(String... args) {
@@ -30,9 +30,9 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		simulation = new Simulation(StartConditions.getEarthSystem());
-		window = new Window();
-		window.start(primaryStage);
+		sim = new Simulation(StartConditions.getEarthSystem());
+		win = new Window();
+		win.start(primaryStage);
 	}
 
 	/**
@@ -41,8 +41,8 @@ public class Main extends Application {
 	 * @param newConstellation
 	 */
 	public static void restart(Constellation newConstellation) {
-		simulation = new Simulation(newConstellation);
-		window.reset();
+		sim = new Simulation(newConstellation);
+		win.reset();
 	}
 
 	/**
@@ -50,8 +50,8 @@ public class Main extends Application {
 	 * window.
 	 */
 	public static void restart() {
-		simulation = new Simulation(simulation.getConstellation());
-		window.reset();
+		sim = new Simulation(sim.getConstellation());
+		win.reset();
 	}
 
 }

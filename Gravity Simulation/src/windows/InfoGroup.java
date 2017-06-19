@@ -53,12 +53,12 @@ public class InfoGroup extends Group {
 	 */
 	public void updateInfo() {
 		
-		if (!Main.simulation.isPaused()) {
+		if (!Main.sim.isPaused()) {
 			
 			for (int i = 0; i < spsArray.length; i++) {
 				if (spsArray[i] == 0) {
-					spsArray[i] = Main.simulation.getSpsCounter() * 60;
-					Main.simulation.resetSpsCounter();
+					spsArray[i] = Main.sim.getSpsCounter() * 60;
+					Main.sim.resetSpsCounter();
 					break;
 				}
 			}
@@ -75,16 +75,16 @@ public class InfoGroup extends Group {
 			pastTimeLabel.setText(Utils.getTimeString());
 		}
 
-		Planet selPl = Main.window.getSelectedPlanet();
+		Planet selPl = Main.win.getSelectedPlanet();
 		
 		if (selPl != null) {
 			infoLabel.setText(selPl.getName() + "\nMass: " + selPl.getMass() + " kg\nRadius: "
 					+ Math.round(selPl.getRadius() / 1000.0) + " km\nVelocity: " + (int) selPl.getVel().norm() + " m/s"
-					+ "\nTime: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
+					+ "\nTime: x" + (int) (Main.sim.getTime() * Simulation.SPS));
 		} else {
 			infoLabel.setText(
-					Main.simulation.getConstellation().getName() + "\nObjects: " + Main.simulation.getPlanets().length
-							+ "\nTime: x" + (int) (Main.simulation.getTime() * Simulation.SPS));
+					Main.sim.getConstellation().getName() + "\nObjects: " + Main.sim.getPlanets().length
+							+ "\nTime: x" + (int) (Main.sim.getTime() * Simulation.SPS));
 		}
 	}
 

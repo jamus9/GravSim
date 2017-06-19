@@ -117,7 +117,7 @@ public class Planet {
 	 * and the orbit of this planet.
 	 */
 	public void updateObjects() {
-		Vec2D tp = Main.window.transform(pos);
+		Vec2D tp = Main.win.transform(pos);
 
 		// update circle
 		circle.setCenterX(tp.x());
@@ -125,8 +125,8 @@ public class Planet {
 		circle.setRadius(getCircleRadius());
 
 		// update vectors
-		if (Main.window.isVectors()) {
-			double scaleFactor = Main.simulation.getScale() * Main.window.getZoom() * 100000.0;
+		if (Main.win.isVectors()) {
+			double scaleFactor = Main.sim.getScale() * Main.win.getZoom() * 100000.0;
 			velocityLine.setStartX(tp.x());
 			velocityLine.setStartY(tp.y());
 			velocityLine.setEndX(vel.x() * scaleFactor + tp.x());
@@ -134,14 +134,14 @@ public class Planet {
 		}
 
 		// update labels
-		if (Main.window.isLabels()) {
+		if (Main.win.isLabels()) {
 			double offset = getCircleRadius() + 5;
 			label.relocate(tp.x() + offset, tp.y());
 		}
 
 		// update orbits
-		if (Main.window.isTrails()) {
-			Vec2D tplast = Main.window.transform(trailPointsList.getLast());
+		if (Main.win.isTrails()) {
+			Vec2D tplast = Main.win.transform(trailPointsList.getLast());
 
 			if (tp.sub(tplast).norm() > 3) {
 
@@ -165,8 +165,8 @@ public class Planet {
 		Line line;
 
 		for (int i = 0; i < trailLineList.size(); i++) {
-			newStart = Main.window.transform(trailPointsList.get(i));
-			newEnd = Main.window.transform(trailPointsList.get(i + 1));
+			newStart = Main.win.transform(trailPointsList.get(i));
+			newEnd = Main.win.transform(trailPointsList.get(i + 1));
 
 			line = trailLineList.get(i);
 
@@ -284,7 +284,7 @@ public class Planet {
 	}
 
 	private double getCircleRadius() {
-		return Main.simulation.getScale() * Main.window.getZoom() * radius;
+		return Main.sim.getScale() * Main.win.getZoom() * radius;
 	}
 
 }

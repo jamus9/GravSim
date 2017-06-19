@@ -42,10 +42,10 @@ public class CustomMenuBar extends MenuBar {
 		restartItem.setOnAction(actionEvent -> Main.restart());
 
 		MenuItem resetViewItem = new MenuItem("Reset View");
-		resetViewItem.setOnAction(actionEven -> Main.window.resetView());
+		resetViewItem.setOnAction(actionEven -> Main.win.resetView());
 
 		MenuItem helpItem = new MenuItem("Help");
-		helpItem.setOnAction(ActionEvent -> Main.window.openHelpWindow());
+		helpItem.setOnAction(ActionEvent -> Main.win.openHelpWindow());
 
 		MenuItem exitItem = new MenuItem("Exit");
 		exitItem.setOnAction(ActionEvent -> Platform.exit());
@@ -56,7 +56,7 @@ public class CustomMenuBar extends MenuBar {
 		/*
 		 * settings menu
 		 */
-		orbitModeCMI.setOnAction(actionEvent -> Main.window.changeOrbitMode());
+		orbitModeCMI.setOnAction(actionEvent -> Main.win.changeOrbitMode());
 
 		Menu settingsMenu = new Menu("Settings");
 		settingsMenu.getItems().addAll(orbitModeCMI);
@@ -64,10 +64,10 @@ public class CustomMenuBar extends MenuBar {
 		/*
 		 * view menu
 		 */
-		trailsCMI.setOnAction(actionEvent -> Main.window.changeTrailsVisibility());
-		labelsCMI.setOnAction(actionEvent -> Main.window.changeLabelsVisibility());
-		infoCMI.setOnAction(ActionEvent -> Main.window.changeInfoVisibility());
-		vectorsCMI.setOnAction(actionEvent -> Main.window.changeVectorsVisibility());
+		trailsCMI.setOnAction(actionEvent -> Main.win.changeTrailsVisibility());
+		labelsCMI.setOnAction(actionEvent -> Main.win.changeLabelsVisibility());
+		infoCMI.setOnAction(ActionEvent -> Main.win.changeInfoVisibility());
+		vectorsCMI.setOnAction(actionEvent -> Main.win.changeVectorsVisibility());
 
 		Menu viewMenu = new Menu("View");
 		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, vectorsCMI);
@@ -113,23 +113,23 @@ public class CustomMenuBar extends MenuBar {
 		 * add planet menu
 		 */
 		RadioMenuItem placeMoon = new RadioMenuItem(StartConditions.moon.getName());
-		placeMoon.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.moon);
+		placeMoon.setOnAction(actionEvent -> Main.win.nextPlacedPlanet = StartConditions.moon);
 		placeMoon.setSelected(true);
 
 		RadioMenuItem placeEarth = new RadioMenuItem(StartConditions.earth.getName());
-		placeEarth.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.earth);
+		placeEarth.setOnAction(actionEvent -> Main.win.nextPlacedPlanet = StartConditions.earth);
 
 		RadioMenuItem placeMars = new RadioMenuItem(StartConditions.mars.getName());
-		placeMars.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.mars);
+		placeMars.setOnAction(actionEvent -> Main.win.nextPlacedPlanet = StartConditions.mars);
 
 		RadioMenuItem placeJupiter = new RadioMenuItem(StartConditions.jupiter.getName());
-		placeJupiter.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.jupiter);
+		placeJupiter.setOnAction(actionEvent -> Main.win.nextPlacedPlanet = StartConditions.jupiter);
 
 		RadioMenuItem placeBlackHole = new RadioMenuItem(StartConditions.blackHole.getName());
-		placeBlackHole.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.blackHole);
+		placeBlackHole.setOnAction(actionEvent -> Main.win.nextPlacedPlanet = StartConditions.blackHole);
 
 		RadioMenuItem placeSun = new RadioMenuItem(StartConditions.sun.getName());
-		placeSun.setOnAction(actionEvent -> Main.window.nextPlacedPlanet = StartConditions.sun);
+		placeSun.setOnAction(actionEvent -> Main.win.nextPlacedPlanet = StartConditions.sun);
 
 		ToggleGroup addToggleGroup = new ToggleGroup();
 		addToggleGroup.getToggles().addAll(placeMoon, placeEarth, placeMars, placeJupiter, placeSun, placeBlackHole);
@@ -147,11 +147,11 @@ public class CustomMenuBar extends MenuBar {
 	 * Updates the check menu items in the menu "settings".
 	 */
 	protected void updateCMIs() {
-		trailsCMI.setSelected(Main.window.trails);
-		labelsCMI.setSelected(Main.window.labels);
-		vectorsCMI.setSelected(Main.window.vectors);
-		infoCMI.setSelected(Main.window.infoGroup.isVisible());
-		orbitModeCMI.setSelected(Main.window.orbitMode);
+		trailsCMI.setSelected(Main.win.trails);
+		labelsCMI.setSelected(Main.win.labels);
+		vectorsCMI.setSelected(Main.win.vectors);
+		infoCMI.setSelected(Main.win.infoGroup.isVisible());
+		orbitModeCMI.setSelected(Main.win.orbitMode);
 	}
 
 }

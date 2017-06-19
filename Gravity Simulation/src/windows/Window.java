@@ -134,7 +134,7 @@ public class Window extends Application {
 
 				// follow a planet
 				if (selectedPlanet != null) {
-					double scale = Main.simulation.getScale();
+					double scale = Main.sim.getScale();
 					Vec2D pos = selectedPlanet.getPos();
 					dx = scale * -pos.x();
 					dy = scale * pos.y();
@@ -142,13 +142,13 @@ public class Window extends Application {
 				}
 
 				// update all drawn objects
-				for (Planet planet : Main.simulation.getPlanets())
+				for (Planet planet : Main.sim.getPlanets())
 					planet.updateObjects();
 
 				// draw orbits
-				if (trails && !Main.simulation.isPaused()) {
+				if (trails && !Main.sim.isPaused()) {
 					trailGroup.getChildren().clear();
-					for (Planet planet : Main.simulation.getPlanets())
+					for (Planet planet : Main.sim.getPlanets())
 						for (Line line : planet.getOrbitLineList())
 							trailGroup.getChildren().add(line);
 				}
@@ -195,15 +195,13 @@ public class Window extends Application {
 
 				// time
 				if (key == KeyCode.PERIOD)
-					Main.simulation.multTime(2);
+					Main.sim.multTime(2);
 				if (key == KeyCode.COMMA)
-					Main.simulation.multTime(0.5);
+					Main.sim.multTime(0.5);
 				if (key == KeyCode.MINUS)
-					Main.simulation.resetTime();
-				if (key == KeyCode.SPACE) {
-					Main.simulation.setPause(!Main.simulation.isPaused());
-//					Main.simulation.timeline.pause();
-				}
+					Main.sim.resetTime();
+				if (key == KeyCode.SPACE)
+					Main.sim.setPause(!Main.sim.isPaused());
 
 				// visibility
 				if (key == KeyCode.O)
@@ -265,15 +263,15 @@ public class Window extends Application {
 					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
 
 					// velocity
-					if (!orbitMode || Main.simulation.getPlanets().length == 0) {
+					if (!orbitMode || Main.sim.getPlanets().length == 0) {
 						newPlanet.setVel(0, 0);
 					} else {
-						Planet biggest = Utils.getBiggestInView(Main.window, Main.simulation.getPlanets());
+						Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
 						newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
 					}
 
 					// add
-					Main.simulation.addNewPlanet(newPlanet);
+					Main.sim.addNewPlanet(newPlanet);
 				}
 
 				event.consume();
@@ -316,7 +314,7 @@ public class Window extends Application {
 	/** updates all planet objects (circles, vectors, labels) */
 	public void updatePlanets() {
 		planetGroup.getChildren().clear();
-		for (Planet p : Main.simulation.getPlanets())
+		for (Planet p : Main.sim.getPlanets())
 			planetGroup.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
 
 	}
@@ -377,7 +375,7 @@ public class Window extends Application {
 		deselectPlanet();
 		Circle circle;
 		Vec2D mouse, center;
-		for (Planet planet : Main.simulation.getPlanets()) {
+		for (Planet planet : Main.sim.getPlanets()) {
 			circle = planet.getCircle();
 			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2D(mouseX, mouseY);
@@ -411,7 +409,7 @@ public class Window extends Application {
 	 */
 	private void updateTrails() {
 		if (trails)
-			for (Planet planet : Main.simulation.getPlanets())
+			for (Planet planet : Main.sim.getPlanets())
 				planet.updateTrail();
 	}
 
@@ -427,13 +425,13 @@ public class Window extends Application {
 		if (trails) {
 			trails = false;
 			trailGroup.getChildren().clear();
-			for (Planet p : Main.simulation.getPlanets())
+			for (Planet p : Main.sim.getPlanets())
 				p.deleteTrail();
 		} else {
-			for (Planet p : Main.simulation.getPlanets())
+			for (Planet p : Main.sim.getPlanets())
 				p.deleteTrail();
 			trails = true;
-			for (Planet p : Main.simulation.getPlanets())
+			for (Planet p : Main.sim.getPlanets())
 				p.savePosition();
 		}
 		menuBar.updateCMIs();
@@ -445,7 +443,7 @@ public class Window extends Application {
 	 */
 	protected void changeLabelsVisibility() {
 		labels = !labels;
-		for (Planet p : Main.simulation.getPlanets())
+		for (Planet p : Main.sim.getPlanets())
 			p.setLabelVisibility(labels);
 		menuBar.updateCMIs();
 	}
@@ -456,7 +454,7 @@ public class Window extends Application {
 	 */
 	protected void changeVectorsVisibility() {
 		vectors = !vectors;
-		for (Planet p : Main.simulation.getPlanets())
+		for (Planet p : Main.sim.getPlanets())
 			p.setVelocityLineVisibility(vectors);
 		menuBar.updateCMIs();
 	}
@@ -483,8 +481,8 @@ public class Window extends Application {
 	 * @return the transformed vector
 	 */
 	public Vec2D transfromBack(Vec2D vector) {
-		double x = ((vector.x() - getWidth() / 2) / zoom - dx - tempdx) / Main.simulation.getScale();
-		double y = -((vector.y() - getHeight() / 2) / zoom - dy - tempdy) / Main.simulation.getScale();
+		double x = ((vector.x() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
+		double y = -((vector.y() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
 		return new Vec2D(x, y);
 	}
 
@@ -495,8 +493,8 @@ public class Window extends Application {
 	 * @return the transformed vector
 	 */
 	public Vec2D transform(Vec2D vector) {
-		double x = zoom * (Main.simulation.getScale() * vector.x() + dx + tempdx) + getWidth() / 2.0;
-		double y = zoom * (Main.simulation.getScale() * -vector.y() + dy + tempdy) + getHeight() / 2.0;
+		double x = zoom * (Main.sim.getScale() * vector.x() + dx + tempdx) + getWidth() / 2.0;
+		double y = zoom * (Main.sim.getScale() * -vector.y() + dy + tempdy) + getHeight() / 2.0;
 		return new Vec2D(x, y);
 	}
 
