@@ -1,8 +1,5 @@
 package window;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-
 import constellations.StartConditions;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -48,6 +45,9 @@ public class Window extends Application {
 	private double dx, dy;
 	private double tempdx, tempdy;
 	private double mouseX, mouseY;
+	
+	// mouse position
+	Vec2D mousePos;
 
 	// the selected planet
 	private Planet selectedPlanet;
@@ -105,6 +105,8 @@ public class Window extends Application {
 		infoPane.setVisible(true);
 		orbitMode = true;
 		infoPane.setOrbitMode(orbitMode);
+		mousePos = new Vec2D();
+		winWasChanged = true;
 		
 		menuBar.updateCMIs();
 
@@ -134,6 +136,7 @@ public class Window extends Application {
 				// transform trails if window size has changed
 				if (winWasChanged) {
 					updateTrails();
+					infoPane.relocateTimeButtons();
 					winWasChanged = false;
 				}
 
@@ -141,8 +144,8 @@ public class Window extends Application {
 				if (selectedPlanet != null) {
 					double scale = Main.sim.getScale();
 					Vec2D pos = selectedPlanet.getPos();
-					dx = scale * -pos.x();
-					dy = scale * pos.y();
+					dx = scale * -pos.getX();
+					dy = scale * pos.getY();
 					updateTrails();
 				}
 
@@ -190,16 +193,16 @@ public class Window extends Application {
 
 				// time
 				if (key == KeyCode.PERIOD)
-					Main.sim.multTime(3d / 2);
+					Main.sim.multTime(2);
 				if (key == KeyCode.COMMA)
-					Main.sim.multTime(2d / 3);
+					Main.sim.multTime(0.5);
 				if (key == KeyCode.MINUS)
 					Main.sim.resetTime();
 				if (key == KeyCode.SPACE)
 					Main.sim.setPause(!Main.sim.isPaused());
 
 				// visibility
-				if (key == KeyCode.O)
+				if (key == KeyCode.T)
 					changeTrailsVisibility();
 				if (key == KeyCode.L)
 					changeLabelsVisibility();
@@ -209,8 +212,8 @@ public class Window extends Application {
 					changeInfoVisibility();
 
 				// adding
-//				if (key == KeyCode.A)
-//					addNextPlanet();
+				if (key == KeyCode.A)
+					addNextPlanet();
 				if (key == KeyCode.M)
 					changeOrbitMode();
 
@@ -254,21 +257,7 @@ public class Window extends Application {
 
 				// add new planet
 				if (event.isSecondaryButtonDown()) {
-					Planet newPlanet = nextAddedPlanet.clone();
-
-					// position
-					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
-
-					// velocity
-					if (!orbitMode || Main.sim.getPlanets().length == 0) {
-						newPlanet.setVel(0, 0);
-					} else {
-						Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
-						newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
-					}
-
-					// add
-					Main.sim.addNewPlanet(newPlanet);
+					addNextPlanet();
 				}
 
 				event.consume();
@@ -296,6 +285,12 @@ public class Window extends Application {
 				dx += tempdx;
 				dy += tempdy;
 				tempdx = tempdy = 0;
+			}
+		});
+		
+		scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent event) {
+				mousePos.set(event.getX(), event.getY());
 			}
 		});
 	}
@@ -408,7 +403,7 @@ public class Window extends Application {
 		Planet newPlanet = nextAddedPlanet.clone();
 
 		// position
-		newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
+		newPlanet.setPos(transfromBack(mousePos));
 
 		// velocity
 		if (!orbitMode || Main.sim.getPlanets().length == 0) {
@@ -508,8 +503,8 @@ public class Window extends Application {
 	 * @return the transformed vector
 	 */
 	public Vec2D transfromBack(Vec2D vector) {
-		double x = ((vector.x() - getX() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
-		double y = -((vector.y() - getY() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
+		double x = ((vector.getX() - getX() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
+		double y = -((vector.getY() - getY() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
 		return new Vec2D(x, y);
 	}
 
@@ -520,8 +515,8 @@ public class Window extends Application {
 	 * @return the transformed vector
 	 */
 	public Vec2D transform(Vec2D vector) {
-		double x = zoom * (Main.sim.getScale() * vector.x() + dx + tempdx) + getX() / 2.0;
-		double y = zoom * (Main.sim.getScale() * -vector.y() + dy + tempdy) + getY() / 2.0;
+		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getX() / 2.0;
+		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getY() / 2.0;
 		return new Vec2D(x, y);
 	}
 

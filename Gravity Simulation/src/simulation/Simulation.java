@@ -179,8 +179,8 @@ public class Simulation {
 	 * @return the new velocity
 	 */
 	private static Vec2D getCollisionVel(Planet p1, Planet p2) {
-		double x = (p1.getMass() * p1.getVel().x() + p2.getMass() * p2.getVel().x()) / (p1.getMass() + p2.getMass());
-		double y = (p1.getMass() * p1.getVel().y() + p2.getMass() * p2.getVel().y()) / (p1.getMass() + p2.getMass());
+		double x = (p1.getMass() * p1.getVel().getX() + p2.getMass() * p2.getVel().getX()) / (p1.getMass() + p2.getMass());
+		double y = (p1.getMass() * p1.getVel().getY() + p2.getMass() * p2.getVel().getY()) / (p1.getMass() + p2.getMass());
 		return new Vec2D(x, y);
 	}
 

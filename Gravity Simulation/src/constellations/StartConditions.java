@@ -37,28 +37,28 @@ public class StartConditions {
 
 	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sun"),
 
-			merkur = new Planet(merkurMass, merkurRad, Color.GREY, "Merkur"),
+			merkur = new Planet(merkurMass, merkurRad, Color.rgb(212,201,156), "Merkur"),
 
 			venus = new Planet(venusMass, venusRad, Color.BEIGE, "Venus"),
 
-			earth = new Planet(earthMass, earthRad, Color.BLUE, "Earth"),
+			earth = new Planet(earthMass, earthRad, Color.rgb(79,76,176), "Earth"),
 			moon = new Planet(moonMass, moonRad, Color.GRAY, "Moon"),
 
 			mars = new Planet(marsMass, marsRad, Color.RED, "Mars"),
 			phobos = new Planet(1.072e16, 22.5e3, Color.GRAY, "Phobos"),
 			deimos = new Planet(1.8e15, 13e3, Color.GRAY, "Deimos"),
 
-			jupiter = new Planet(jupiterMass, jupiterRad, Color.PERU, "Jupiter"),
+			jupiter = new Planet(jupiterMass, jupiterRad, Color.rgb(201, 144, 57), "Jupiter"),
 			io = new Planet(8.94e22, 1821.6e3, Color.YELLOW, "Io"),
 			europa = new Planet(4.799e22, 1560.8e3, Color.WHITE, "Europa"),
 			ganymede = new Planet(1.4819e23, 2634.1e3, Color.GREY, "Ganymede"),
 			callisto = new Planet(1.075e23, 2410e3, Color.DARKSLATEGRAY, "Callisto"),
 
-			saturn = new Planet(saturnMass, saturnRad, Color.BEIGE, "Saturn"),
+			saturn = new Planet(saturnMass, saturnRad, Color.rgb(216, 202, 157), "Saturn"),
 
-			uranus = new Planet(uranusMass, uranusRad, Color.LIGHTBLUE, "Uranus"),
+			uranus = new Planet(uranusMass, uranusRad, Color.rgb(225,238,238), "Uranus"),
 
-			neptun = new Planet(neptunMass, neptunRad, Color.BLUE, "Neptun"),
+			neptun = new Planet(neptunMass, neptunRad, Color.rgb(63,84,186), "Neptun"),
 
 			blackHole = new Planet(blackHoleMass, blackHoleRad, Color.BLACK, "Black Hole");
 
@@ -110,7 +110,7 @@ public class StartConditions {
 		Planet[] planets = { sun.clone(), merkur.clone(), venus.clone(), earth.clone(), mars.clone(), jupiter.clone(),
 				saturn.clone(), uranus.clone(), neptun.clone() };
 
-		return new Constellation("Solar System", planets, 2e-9, 50);
+		return new Constellation("Solar System", planets, 2e-9, 200);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class StartConditions {
 		moon.setVel(0, -Utils.orbSpeed(earth, moonDistance));
 
 		Planet[] planets = { earth.clone(), moon.clone() };
-		return new Constellation("Earth System", planets, 0.8e-6, 10);
+		return new Constellation("Earth System", planets, 0.8e-6, 20);
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class StartConditions {
 	 * a number of random moons in orbit around the earth
 	 */
 	public static Constellation getRandomMoons() {
-		int number = 40;
+		int number = 42;
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);

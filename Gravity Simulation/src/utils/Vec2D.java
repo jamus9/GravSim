@@ -19,11 +19,11 @@ public class Vec2D {
 		this(0, 0);
 	}
 	
-	public double x() {
+	public double getX() {
 		return x;
 	}
 
-	public double y() {
+	public double getY() {
 		return y;
 	}
 
@@ -48,11 +48,17 @@ public class Vec2D {
 	}
 
 	public boolean isEqual(Vec2D vec) {
-		return (vec.x() == x && vec.y() == y);
+		return (vec.getX() == x && vec.getY() == y);
 	}
 
 	@Override
 	public Vec2D clone() {
 		return new Vec2D(x, y);
 	}
+	
+	public void set(double x, double y) {
+		this.x = x;
+		this.y = y;
+	}
+	
 }

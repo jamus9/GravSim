@@ -36,6 +36,12 @@ public class AddMenu extends Menu {
 
 		RadioMenuItem addSaturn = new RadioMenuItem(StartConditions.saturn.getName());
 		addSaturn.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.saturn));
+		
+		RadioMenuItem addUranus = new RadioMenuItem(StartConditions.uranus.getName());
+		addUranus.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.uranus));
+		
+		RadioMenuItem addNeptun = new RadioMenuItem(StartConditions.neptun.getName());
+		addNeptun.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.neptun));
 
 		RadioMenuItem addSun = new RadioMenuItem(StartConditions.sun.getName());
 		addSun.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.sun));
@@ -43,7 +49,7 @@ public class AddMenu extends Menu {
 		RadioMenuItem addBlackHole = new RadioMenuItem(StartConditions.blackHole.getName());
 		addBlackHole.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.blackHole));
 
-		addAll(addMoon, addMerkur, addVenus, addEarth, placeMars, addJupiter, addSaturn, addSun, addBlackHole);
+		addAll(addMoon, addMerkur, addVenus, addEarth, placeMars, addJupiter, addSaturn, addUranus, addNeptun, addSun, addBlackHole);
 	}
 
 	private void addAll(RadioMenuItem... items) {

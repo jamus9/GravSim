@@ -67,16 +67,16 @@ public class Utils {
 		Vec2D topLeft = win.transfromBack(new Vec2D(0, 0));
 		Vec2D bottomRight = win.transfromBack(new Vec2D(win.getX(), win.getY()));
 
-		double x1 = topLeft.x();
-		double x2 = bottomRight.x();
-		double y1 = topLeft.y();
-		double y2 = bottomRight.y();
+		double x1 = topLeft.getX();
+		double x2 = bottomRight.getX();
+		double y1 = topLeft.getY();
+		double y2 = bottomRight.getY();
 
 		Vec2D pos;
 
 		for (Planet planet : planets) {
 			pos = planet.getPos();
-			if (pos.x() > x1 && pos.x() < x2 && pos.y() < y1 && pos.y() > y2)
+			if (pos.getX() > x1 && pos.getX() < x2 && pos.getY() < y1 && pos.getY() > y2)
 				planetsInView.add(planet);
 		}
 
@@ -95,7 +95,7 @@ public class Utils {
 		Vec2D r = planet.getPos().sub(position);
 
 		// nach kreuzprodukt senkrechter vektor zu r
-		Vec2D velDirection = new Vec2D(r.y(), -r.x());
+		Vec2D velDirection = new Vec2D(r.getY(), -r.getX());
 
 		// normieren
 		velDirection = velDirection.mult(1.0 / velDirection.norm());

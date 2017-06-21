@@ -1,10 +1,13 @@
 package simulation;
 
 import java.util.LinkedList;
+
+import javafx.animation.FadeTransition;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.util.Duration;
 import utils.Vec2D;
 import javafx.scene.layout.Pane;
 
@@ -87,7 +90,7 @@ public class Planet {
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		setMass(mass, density);
-		initializeObjects(Color.BLACK, "P" + Integer.toString(id));
+		initializeObjects(Color.BLACK, "");
 	}
 
 	/**
@@ -121,39 +124,45 @@ public class Planet {
 		Vec2D tp = Main.win.transform(pos);
 
 		// update circle
-		circle.setCenterX(tp.x());
-		circle.setCenterY(tp.y());
+		circle.setCenterX(tp.getX());
+		circle.setCenterY(tp.getY());
 		circle.setRadius(getCircleRadius());
 
 		// update vector
 		if (Main.win.isVectors()) {
 			double scaleFactor = Main.sim.getScale() * Main.win.getZoom() * 100000.0;
-			velocityLine.setStartX(tp.x());
-			velocityLine.setStartY(tp.y());
-			velocityLine.setEndX(vel.x() * scaleFactor + tp.x());
-			velocityLine.setEndY(-vel.y() * scaleFactor + tp.y());
+			velocityLine.setStartX(tp.getX());
+			velocityLine.setStartY(tp.getY());
+			velocityLine.setEndX(vel.getX() * scaleFactor + tp.getX());
+			velocityLine.setEndY(-vel.getY() * scaleFactor + tp.getY());
 		}
 
 		// update label
 		if (Main.win.isLabels()) {
 			double offset = getCircleRadius() + 5;
-			label.relocate(tp.x() + offset, tp.y());
+			label.relocate(tp.getX() + offset, tp.getY());
 		}
 
 		// update trail
 		if (Main.win.isTrails()) {
 			Vec2D tplast = Main.win.transform(trailPointsList.getLast());
 
-			if (tp.sub(tplast).norm() > 5) {
-				if (trailLineList.size() > 100) {
+			if (tp.sub(tplast).norm() > 3) {
+				if (trailLineList.size() > 500) {
 					Line line = trailLineList.getFirst();
 					((Pane) line.getParent()).getChildren().remove(line);
 					trailLineList.removeFirst();
 					trailPointsList.removeFirst();
 				}
 
-				Line line = new Line(tplast.x(), tplast.y(), tp.x(), tp.y());
+				Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
 				line.setStroke(Color.RED);
+
+				FadeTransition ft = new FadeTransition(Duration.seconds(10), line);
+				ft.setFromValue(1.0);
+				ft.setToValue(0.0);
+				ft.play();
+
 				trailLineList.add(line);
 				Main.win.addTrail(line);
 
@@ -178,10 +187,10 @@ public class Planet {
 			newStart = Main.win.transform(trailPointsList.get(i));
 			newEnd = Main.win.transform(trailPointsList.get(i + 1));
 
-			line.setStartX(newStart.x());
-			line.setStartY(newStart.y());
-			line.setEndX(newEnd.x());
-			line.setEndY(newEnd.y());
+			line.setStartX(newStart.getX());
+			line.setStartY(newStart.getY());
+			line.setEndX(newEnd.getX());
+			line.setEndY(newEnd.getY());
 		}
 	}
 
@@ -197,7 +206,8 @@ public class Planet {
 	/** Return a copy of this planet. */
 	@Override
 	public Planet clone() {
-		return new Planet(pos.x(), pos.y(), vel.x(), vel.y(), mass, radius, (Color) circle.getFill(), getName());
+		return new Planet(pos.getX(), pos.getY(), vel.getX(), vel.getY(), mass, radius, (Color) circle.getFill(),
+				getName());
 	}
 
 	/** saves the current position in the list orbitPoints */
