@@ -279,7 +279,7 @@ public class StartConditions {
 		double radius, x, y;
 		Vec2D pos;
 		for (int i = 1; i < number; i++) {
-			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance * 0.5);
+			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance*0.5);
 
 			y = Utils.plusMinus() * Math.random() * radius;
 			x = Utils.plusMinus() * Math.sqrt(radius * radius - y * y);
@@ -294,7 +294,7 @@ public class StartConditions {
 			planets[i] = randomMoon.clone();
 		}
 
-		return new Constellation("Random Moons", planets, 2e-6, 1);
+		return new Constellation("Random Moons", planets, 1.9e-6, 1);
 	}
 
 	/**

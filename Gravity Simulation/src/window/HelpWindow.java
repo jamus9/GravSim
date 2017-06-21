@@ -1,4 +1,4 @@
-package windows;
+package window;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -23,23 +23,24 @@ public class HelpWindow extends Application {
 
 		Label helpLabel = new Label();
 		helpLabel.relocate(10, 10);
-		helpLabel.setText("Restart = R\n"
-				+ "Reset view = E\n"
-				+ "Pause = Space\n"
-				+ "Accelerate time = .\n"
-				+ "Decelerate time = ,\n"
-				+ "Reset time = -\n"
-				+ "Vectors = V\n"
-				+ "Orbits = O\n"
-				+ "Labels = L\n"
-				+ "Information = I\n"
-				+ "Select planet = Left mouse button\n"
-				+ "Add new planet = Right mouse button\n"
-				+ "Orbit mode = M\n"
-				+ "Reset view = Middle mouse button\n"
-				+ "Drag view = Left mouse button\n"
-				+ "Zoom = Mouse scroll\n"
-				+ "Exit = Esc");
+		helpLabel.setText(
+				  "Restart			R\n"
+				+ "Reset view		E\n"
+				+ "Pause			Space\n"
+				+ "Accelerate time	.\n"
+				+ "Decelerate time	,\n"
+				+ "Reset time		-\n"
+				+ "Vectors			V\n"
+				+ "Orbits			O\n"
+				+ "Labels			L\n"
+				+ "Information		I\n"
+				+ "Select planet		Left mouse button\n"
+				+ "Add new planet	Right mouse button\n"
+				+ "Orbit mode		M\n"
+				+ "Reset view		Middle mouse button\n"
+				+ "Drag view		Left mouse button\n"
+				+ "Zoom			Mouse scroll\n"
+				+ "Exit				Esc");
 		
 		root.getChildren().add(helpLabel);
 		

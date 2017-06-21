@@ -2,10 +2,8 @@ package utils;
 
 import java.util.LinkedList;
 import javafx.scene.paint.Color;
-import simulation.Main;
 import simulation.Planet;
-import simulation.Simulation;
-import windows.Window;
+import window.Window;
 
 /**
  * Some utility methods
@@ -14,6 +12,8 @@ import windows.Window;
  *
  */
 public class Utils {
+	
+	public static final double GRAV_CONST = 6.67408e-11;
 
 	/**
 	 * returns the most massive planet from a collection of planets
@@ -112,7 +112,7 @@ public class Utils {
 	 * @return orbital speed as a double
 	 */
 	public static double orbSpeed(Planet planet, double distance) {
-		return Math.sqrt(Simulation.GRAV_CONST * planet.getMass() / distance);
+		return Math.sqrt(GRAV_CONST * planet.getMass() / distance);
 	}
 
 	/**
@@ -132,8 +132,8 @@ public class Utils {
 	 * 
 	 * @return the past time as a String
 	 */
-	public static String getTimeString() {
-		int secs = (int) Main.sim.getSecondsCounter();
+	public static String getTimeString(double seconds) {
+		int secs = (int) seconds;
 		int mins, hours, days, years;
 
 		years = secs / 31536000;

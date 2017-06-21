@@ -1,4 +1,7 @@
-package windows;
+package window;
+
+import java.awt.MouseInfo;
+import java.awt.Point;
 
 import constellations.StartConditions;
 import javafx.animation.Animation;
@@ -25,6 +28,7 @@ import simulation.Main;
 import simulation.Planet;
 import utils.Utils;
 import utils.Vec2D;
+import window.menuBar.CustomMenuBar;
 
 /**
  * The main window of the application that handles all drawn objects.
@@ -37,7 +41,7 @@ import utils.Vec2D;
 public class Window extends Application {
 
 	// flags for trails label and vectors
-	protected boolean trails, labels, vectors;
+	private boolean trails, labels, vectors;
 
 	// zoom and translation
 	private double zoom;
@@ -49,10 +53,10 @@ public class Window extends Application {
 	private Planet selectedPlanet;
 
 	// the next planet that will be placed
-	protected Planet nextPlacedPlanet;
+	private Planet nextAddedPlanet;
 
 	// in orbit mode all planets get placed in orbits
-	protected boolean orbitMode;
+	private boolean orbitMode;
 
 	// true if window size was changed
 	private boolean winWasChanged;
@@ -64,7 +68,7 @@ public class Window extends Application {
 	// group for all circles, vectors, labels
 	private Pane planetPane;
 	// group for all information
-	protected InfoPane infoPane;
+	private InfoPane infoPane;
 	// the menu bar
 	private CustomMenuBar menuBar;
 
@@ -76,31 +80,32 @@ public class Window extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Gravity Simulation");
-//		primaryStage.setMaximized(true);
+		// primaryStage.setMaximized(true);
 
 		// set scene
 		Group root = new Group();
 		scene = new Scene(root, 1200, 700, Color.LIGHTBLUE);
 		setSceneEvents(scene);
+		primaryStage.setScene(scene);
 
 		// add everything to root
 		trailPane = new Pane();
 		planetPane = new Pane();
 		infoPane = new InfoPane();
-		menuBar = new CustomMenuBar(primaryStage);
+		menuBar = new CustomMenuBar(primaryStage, this);
 		root.getChildren().addAll(trailPane, planetPane, infoPane, menuBar);
 
 		// initialize all values to default and load the planet objects
 		reset();
 
-		nextPlacedPlanet = StartConditions.moon.clone();
+		nextAddedPlanet = StartConditions.moon.clone();
 		trails = true;
 		labels = true;
 		vectors = false;
 		infoPane.setVisible(true);
 		orbitMode = true;
 		infoPane.setOrbitMode(orbitMode);
-
+		
 		menuBar.updateCMIs();
 
 		// starts the updating time line
@@ -114,7 +119,7 @@ public class Window extends Application {
 		primaryStage.maximizedProperty().addListener(stageMaxListener);
 
 		// show the scene
-		primaryStage.setScene(scene);
+		
 		primaryStage.show();
 	}
 
@@ -123,7 +128,7 @@ public class Window extends Application {
 	 * and adjusts the view.
 	 */
 	private void runTimeLine() {
-		KeyFrame drawObjects = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
+		Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
 				// transform trails if window size has changed
@@ -154,9 +159,7 @@ public class Window extends Application {
 					stopResetTimeline = false;
 				}
 			}
-		});
-
-		Timeline timeline = new Timeline(drawObjects);
+		}));
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
 	}
@@ -187,9 +190,9 @@ public class Window extends Application {
 
 				// time
 				if (key == KeyCode.PERIOD)
-					Main.sim.multTime(2);
+					Main.sim.multTime(3d / 2);
 				if (key == KeyCode.COMMA)
-					Main.sim.multTime(0.5);
+					Main.sim.multTime(2d / 3);
 				if (key == KeyCode.MINUS)
 					Main.sim.resetTime();
 				if (key == KeyCode.SPACE)
@@ -205,7 +208,9 @@ public class Window extends Application {
 				if (key == KeyCode.I)
 					changeInfoVisibility();
 
-				// orbit mode
+				// adding
+//				if (key == KeyCode.A)
+//					addNextPlanet();
 				if (key == KeyCode.M)
 					changeOrbitMode();
 
@@ -249,8 +254,8 @@ public class Window extends Application {
 
 				// add new planet
 				if (event.isSecondaryButtonDown()) {
-					Planet newPlanet = nextPlacedPlanet.clone();
-					
+					Planet newPlanet = nextAddedPlanet.clone();
+
 					// position
 					newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
 
@@ -301,14 +306,14 @@ public class Window extends Application {
 		dx = dy = tempdx = tempdy = 0;
 		trailPane.getChildren().clear();
 		deselectPlanet();
-		updatePlanets();
+		updatePlanets(Main.sim.getPlanets());
 	}
 
 	/** updates all planet objects (circles, vectors, labels) */
-	public void updatePlanets() {
+	public void updatePlanets(Planet[] planets) {
 		planetPane.getChildren().clear();
-		for (Planet p : Main.sim.getPlanets())
-			planetPane.getChildren().addAll(p.getCircle(), p.getVelocityLine(), p.getLabel());
+		for (Planet p : planets)
+			planetPane.getChildren().addAll(p.getVelocityLine(), p.getCircle(), p.getLabel());
 
 	}
 
@@ -320,7 +325,7 @@ public class Window extends Application {
 	 * line is stopped in the main window time line if the view is reseted.
 	 * Deselects the selected planet.
 	 */
-	protected void resetView() {
+	public void resetView() {
 		deselectPlanet();
 
 		KeyFrame returnToCenter = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
@@ -395,6 +400,27 @@ public class Window extends Application {
 			selectedPlanet.deselect();
 		selectedPlanet = null;
 	}
+	
+	/**
+	 * does not work
+	 */
+	private void addNextPlanet() {
+		Planet newPlanet = nextAddedPlanet.clone();
+
+		// position
+		newPlanet.setPos(transfromBack(new Vec2D(mouseX, mouseY)));
+
+		// velocity
+		if (!orbitMode || Main.sim.getPlanets().length == 0) {
+			newPlanet.setVel(0, 0);
+		} else {
+			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
+			newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
+		}
+
+		// add
+		Main.sim.addNewPlanet(newPlanet);
+	}
 
 	/**
 	 * Translates all Orbits to the new right position if the orbits are
@@ -414,7 +440,7 @@ public class Window extends Application {
 	 * the orbit group. If the orbits are turned on, set the first position of
 	 * the orbit for all planets.
 	 */
-	protected void changeTrailsVisibility() {
+	public void changeTrailsVisibility() {
 		if (trails) {
 			trails = false;
 			for (Planet p : Main.sim.getPlanets())
@@ -431,7 +457,7 @@ public class Window extends Application {
 	 * Changes the visibility of the label for all planets and updates the check
 	 * menu item.
 	 */
-	protected void changeLabelsVisibility() {
+	public void changeLabelsVisibility() {
 		labels = !labels;
 		for (Planet p : Main.sim.getPlanets())
 			p.setLabelVisibility(labels);
@@ -442,7 +468,7 @@ public class Window extends Application {
 	 * Changes the visibility of the velocity vector for all planets and updates
 	 * the check menu item.
 	 */
-	protected void changeVectorsVisibility() {
+	public void changeVectorsVisibility() {
 		vectors = !vectors;
 		for (Planet p : Main.sim.getPlanets())
 			p.setVelocityLineVisibility(vectors);
@@ -453,19 +479,19 @@ public class Window extends Application {
 	 * Changes the visibility of the information group and updates the check
 	 * menu item.
 	 */
-	protected void changeInfoVisibility() {
+	public void changeInfoVisibility() {
 		infoPane.setVisible(!infoPane.isVisible());
 		menuBar.updateCMIs();
 	}
 
-	protected void changeOrbitMode() {
+	public void changeOrbitMode() {
 		orbitMode = !orbitMode;
 		infoPane.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
 	}
 
 	/** opens the help window */
-	protected void openHelpWindow() {
+	public void openHelpWindow() {
 		Stage stage = new Stage();
 		HelpWindow hw = new HelpWindow();
 		try {
@@ -528,9 +554,21 @@ public class Window extends Application {
 	public boolean isVectors() {
 		return vectors;
 	}
-	
+
 	public void addTrail(Line line) {
 		trailPane.getChildren().add(line);
+	}
+
+	public void setNextAddedPlanet(Planet p) {
+		this.nextAddedPlanet = p;
+	}
+
+	public boolean isOrbitMode() {
+		return orbitMode;
+	}
+
+	public boolean isInfoVisible() {
+		return infoPane.isVisible();
 	}
 
 }

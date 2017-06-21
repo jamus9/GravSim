@@ -53,6 +53,7 @@ public class Planet {
 	 * @param name
 	 */
 	public Planet(double xp, double yp, double xv, double yv, double mass, double radius, Color color, String name) {
+		id = globalID++;
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		this.mass = mass;
@@ -82,10 +83,11 @@ public class Planet {
 	 * @param radius
 	 */
 	public Planet(double xp, double yp, double xv, double yv, double mass, double density) {
+		id = globalID++;
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		setMass(mass, density);
-		initializeObjects(Color.BLACK, null);
+		initializeObjects(Color.BLACK, "P" + Integer.toString(id));
 	}
 
 	/**
@@ -95,20 +97,14 @@ public class Planet {
 	 * @param name
 	 */
 	private void initializeObjects(Color color, String name) {
-		id = globalID++;
-
 		circle = new Circle();
 		circle.setFill(color);
 		circle.setStroke(Color.BLACK);
 
-		label = new Label();
-		if (name == null)
-			label.setText("P" + Integer.toString(id));
-		else
-			label.setText(name);
+		label = new Label(name);
 
 		velocityLine = new Line();
-		velocityLine.setStroke(Color.RED);
+		velocityLine.setStroke(Color.GREEN);
 		velocityLine.setVisible(false);
 
 		trailLineList = new LinkedList<Line>();
@@ -149,9 +145,9 @@ public class Planet {
 			Vec2D tplast = Main.win.transform(trailPointsList.getLast());
 
 			if (tp.sub(tplast).norm() > 5) {
-
-				if (trailLineList.size() > 50) {
-					((Pane) trailLineList.getFirst().getParent()).getChildren().remove(trailLineList.getFirst());
+				if (trailLineList.size() > 100) {
+					Line line = trailLineList.getFirst();
+					((Pane) line.getParent()).getChildren().remove(line);
 					trailLineList.removeFirst();
 					trailPointsList.removeFirst();
 				}
@@ -177,10 +173,10 @@ public class Planet {
 		Line line;
 
 		for (int i = 0; i < trailLineList.size(); i++) {
+			line = trailLineList.get(i);
+
 			newStart = Main.win.transform(trailPointsList.get(i));
 			newEnd = Main.win.transform(trailPointsList.get(i + 1));
-
-			line = trailLineList.get(i);
 
 			line.setStartX(newStart.x());
 			line.setStartY(newStart.y());

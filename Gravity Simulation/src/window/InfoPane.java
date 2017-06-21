@@ -1,4 +1,4 @@
-package windows;
+package window;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -72,7 +72,7 @@ public class InfoPane extends Pane {
 			}
 
 			spsLabel.setText("Steps/Sec: " + spsFinal);
-			pastTimeLabel.setText(Utils.getTimeString());
+			pastTimeLabel.setText(Utils.getTimeString(Main.sim.getSecondsCounter()));
 		}
 
 		Planet selPl = Main.win.getSelectedPlanet();

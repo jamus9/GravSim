@@ -4,7 +4,7 @@ import constellations.Constellation;
 import constellations.StartConditions;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import windows.Window;
+import window.Window;
 
 /**
  * Starts and restarts the simulation and window.
@@ -32,6 +32,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		sim = new Simulation(StartConditions.getEarthSystem());
 		win = new Window();
+		sim.run();
 		win.start(primaryStage);
 	}
 
@@ -43,6 +44,7 @@ public class Main extends Application {
 	public static void restart(Constellation newConstellation) {
 		sim.stop();
 		sim = new Simulation(newConstellation);
+		sim.run();
 		win.reset();
 	}
 
@@ -53,6 +55,7 @@ public class Main extends Application {
 	public static void restart() {
 		sim.stop();
 		sim = new Simulation(sim.getConstellation());
+		sim.run();
 		win.reset();
 	}
 

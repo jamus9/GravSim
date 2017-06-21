@@ -18,7 +18,6 @@ import utils.Vec2D;
  */
 public class Simulation {
 
-	public static final double GRAV_CONST = 6.67408e-11;
 	/** simulations per second */
 	public static final double SPS = 6000;
 
@@ -52,21 +51,16 @@ public class Simulation {
 		time = constellation.getTime();
 		scale = constellation.getScale();
 
-		/*
-		 * copies the planets of the new constellation in the local array
-		 * planets
-		 */
+		// copy the planets of the new constellation in the local array
 		planets = new Planet[constellation.numberOfPlanets()];
 		for (int i = 0; i < planets.length; i++)
 			planets[i] = constellation.getPlanet(i).clone();
-
-		run();
 	}
 
 	/**
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
-	private void run() {
+	public void run() {
 		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				movePlanets();
@@ -97,7 +91,7 @@ public class Simulation {
 					dirVec = (planets[j].getPos()).sub(planets[i].getPos());
 
 					// acceleration vector: accVec = r * G * m / |r|^3
-					accVec = dirVec.mult(GRAV_CONST * planets[j].getMass() / Math.pow(dirVec.norm(), 3));
+					accVec = dirVec.mult(Utils.GRAV_CONST * planets[j].getMass() / Math.pow(dirVec.norm(), 3));
 
 					// add all acceleration vectors for one planet
 					planetsAcc[i] = planetsAcc[i].add(accVec);
@@ -153,7 +147,7 @@ public class Simulation {
 		// velocity, mass and radius of the new planet
 		bigP.setVel(getCollisionVel(bigP, smallP));
 		bigP.setMass(bigP.getMass() + smallP.getMass(), bigP.getDensity());
-		
+
 		smallP.deleteTrail();
 
 		// copy all planets in the new planets array except the smaller one
@@ -173,7 +167,7 @@ public class Simulation {
 		planets = newPlanets;
 
 		// update window
-		Main.win.updatePlanets();
+		Main.win.updatePlanets(planets);
 	}
 
 	/**
@@ -210,7 +204,12 @@ public class Simulation {
 
 		// update the planets array and window
 		planets = newPlanets;
-		Main.win.updatePlanets();
+		Main.win.updatePlanets(planets);
+	}
+
+	/** stops the simulation */
+	public void stop() {
+		timeline.stop();
 	}
 
 	public void setPause(boolean b) {
@@ -218,10 +217,6 @@ public class Simulation {
 			timeline.pause();
 		else
 			timeline.play();
-	}
-	
-	public void stop() {
-		timeline.stop();
 	}
 
 	public boolean isPaused() {
