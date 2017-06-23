@@ -198,7 +198,7 @@ public class Window extends Application {
 					Main.sim.multTime(0.5);
 				if (key == KeyCode.MINUS)
 					Main.sim.resetTime();
-				if (key == KeyCode.SPACE)
+				if (key == KeyCode.P)
 					Main.sim.setPause(!Main.sim.isPaused());
 
 				// visibility
