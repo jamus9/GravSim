@@ -20,7 +20,7 @@ import javafx.scene.layout.Pane;
  * @author Jan Muskalla
  * 
  */
-public class Planet {
+public class Planet implements Body {
 	private static int globalID = 1;
 
 	// identification

@@ -11,6 +11,7 @@ import javafx.stage.Stage;
  * Implements the help window
  * 
  * @author Jan Muskalla
+ * 
  */
 public class HelpWindow extends Application {
 
@@ -26,12 +27,12 @@ public class HelpWindow extends Application {
 		helpLabel.setText(
 				  "Restart			R\n"
 				+ "Reset view		E\n"
-				+ "Pause			Space\n"
+				+ "Pause			P\n"
 				+ "Accelerate time	.\n"
 				+ "Decelerate time	,\n"
 				+ "Reset time		-\n"
 				+ "Vectors			V\n"
-				+ "Orbits			O\n"
+				+ "Orbits			T\n"
 				+ "Labels			L\n"
 				+ "Information		I\n"
 				+ "Select planet		Left mouse button\n"
