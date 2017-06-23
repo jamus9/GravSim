@@ -6,9 +6,18 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
 import window.Window;
 
+/**
+ * The menu to add new planets to the scene
+ * 
+ * @author Jan Muskalla
+ *
+ */
 public class AddMenu extends Menu {
 
+	/** the parent window */
 	Window win;
+
+	/** toggle group for all elements so only one can be selected */
 	ToggleGroup toggleGroup = new ToggleGroup();
 
 	public AddMenu(Window win) {
@@ -36,10 +45,10 @@ public class AddMenu extends Menu {
 
 		RadioMenuItem addSaturn = new RadioMenuItem(StartConditions.saturn.getName());
 		addSaturn.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.saturn));
-		
+
 		RadioMenuItem addUranus = new RadioMenuItem(StartConditions.uranus.getName());
 		addUranus.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.uranus));
-		
+
 		RadioMenuItem addNeptun = new RadioMenuItem(StartConditions.neptun.getName());
 		addNeptun.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.neptun));
 
@@ -49,9 +58,15 @@ public class AddMenu extends Menu {
 		RadioMenuItem addBlackHole = new RadioMenuItem(StartConditions.blackHole.getName());
 		addBlackHole.setOnAction(actionEvent -> win.setNextAddedPlanet(StartConditions.blackHole));
 
-		addAll(addMoon, addMerkur, addVenus, addEarth, placeMars, addJupiter, addSaturn, addUranus, addNeptun, addSun, addBlackHole);
+		addAll(addMoon, addMerkur, addVenus, addEarth, placeMars, addJupiter, addSaturn, addUranus, addNeptun, addSun,
+				addBlackHole);
 	}
 
+	/**
+	 * adds all menu items to the menu and the toggle group
+	 * 
+	 * @param items
+	 */
 	private void addAll(RadioMenuItem... items) {
 		toggleGroup.getToggles().addAll(items);
 		this.getItems().addAll(items);

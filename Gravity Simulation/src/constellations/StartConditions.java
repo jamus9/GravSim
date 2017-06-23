@@ -267,7 +267,7 @@ public class StartConditions {
 	 * a number of random moons in orbit around the earth
 	 */
 	public static Constellation getRandomMoons() {
-		int number = 42;
+		int number = 40;
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);
@@ -295,6 +295,13 @@ public class StartConditions {
 		}
 
 		return new Constellation("Random Moons", planets, 1.9e-6, 1);
+	}
+	
+	public static Planet randomAsteroid() {
+		// typical asteroid
+		double density = 2000;
+		double mass = Utils.getRandomInInervall(10e4, 10e20);
+		return new Planet(0, 0, 0, 0, mass, density);
 	}
 
 	/**

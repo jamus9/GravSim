@@ -15,6 +15,7 @@ import utils.Vec2D;
  * constellation.
  * 
  * @author Jan Muskalla
+ * 
  */
 public class Simulation {
 

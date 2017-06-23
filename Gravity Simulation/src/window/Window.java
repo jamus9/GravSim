@@ -37,39 +37,43 @@ import window.menuBar.CustomMenuBar;
  */
 public class Window extends Application {
 
-	// flags for trails label and vectors
+	/** flags for trails label and vectors */
 	private boolean trails, labels, vectors;
 
-	// zoom and translation
+	/** coordinates for zoom and translation */
 	private double zoom;
 	private double dx, dy;
 	private double tempdx, tempdy;
 	private double mouseX, mouseY;
-	
-	// mouse position
+
+	/** the current mouse position */
 	Vec2D mousePos;
 
-	// the selected planet
+	/** the currently selected planet */
 	private Planet selectedPlanet;
 
-	// the next planet that will be placed
+	/** the next planet that will be added */
 	private Planet nextAddedPlanet;
 
-	// in orbit mode all planets get placed in orbits
+	/** in orbit mode all planets get placed in orbits */
 	private boolean orbitMode;
 
-	// true if window size was changed
+	/** true if window size was changed */
 	private boolean winWasChanged;
 
-	// the scene of the window
+	/** the scene of the window */
 	private Scene scene;
-	// group for all trails
+	
+	/** pane for all trails */
 	private Pane trailPane;
-	// group for all circles, vectors, labels
+	
+	/** pane for all circles, vectors, labels */
 	private Pane planetPane;
-	// group for all information
+	
+	/** pane for all information */
 	private InfoPane infoPane;
-	// the menu bar
+	
+	/** the menu bar */
 	private CustomMenuBar menuBar;
 
 	/**
@@ -79,16 +83,18 @@ public class Window extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
-		primaryStage.setTitle("Gravity Simulation");
-		// primaryStage.setMaximized(true);
 
-		// set scene
+		// scene and root
 		Group root = new Group();
 		scene = new Scene(root, 1200, 700, Color.LIGHTBLUE);
 		setSceneEvents(scene);
-		primaryStage.setScene(scene);
 
-		// add everything to root
+		// stage
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Gravity Simulation");
+		// primaryStage.setMaximized(true);
+
+		// add panes and menu to root
 		trailPane = new Pane();
 		planetPane = new Pane();
 		infoPane = new InfoPane();
@@ -98,16 +104,16 @@ public class Window extends Application {
 		// initialize all values to default and load the planet objects
 		reset();
 
-		nextAddedPlanet = StartConditions.moon.clone();
 		trails = true;
 		labels = true;
 		vectors = false;
-		infoPane.setVisible(true);
+
+		nextAddedPlanet = StartConditions.moon.clone();
 		orbitMode = true;
 		infoPane.setOrbitMode(orbitMode);
+
 		mousePos = new Vec2D();
 		winWasChanged = true;
-		
 		menuBar.updateCMIs();
 
 		// starts the updating time line
@@ -121,7 +127,6 @@ public class Window extends Application {
 		primaryStage.maximizedProperty().addListener(stageMaxListener);
 
 		// show the scene
-		
 		primaryStage.show();
 	}
 
@@ -174,9 +179,7 @@ public class Window extends Application {
 	 */
 	private void setSceneEvents(final Scene scene) {
 
-		/*
-		 * keyboard input
-		 */
+		// keyboard input
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				KeyCode key = event.getCode();
@@ -187,21 +190,9 @@ public class Window extends Application {
 				if (key == KeyCode.ESCAPE)
 					Platform.exit();
 
-				// View
+				// View options
 				if (key == KeyCode.E)
 					resetView();
-
-				// time
-				if (key == KeyCode.PERIOD)
-					Main.sim.multTime(2);
-				if (key == KeyCode.COMMA)
-					Main.sim.multTime(0.5);
-				if (key == KeyCode.MINUS)
-					Main.sim.resetTime();
-				if (key == KeyCode.SPACE)
-					Main.sim.setPause(!Main.sim.isPaused());
-
-				// visibility
 				if (key == KeyCode.T)
 					changeTrailsVisibility();
 				if (key == KeyCode.L)
@@ -211,7 +202,17 @@ public class Window extends Application {
 				if (key == KeyCode.I)
 					changeInfoVisibility();
 
-				// adding
+				// time controls
+				if (key == KeyCode.PERIOD)
+					Main.sim.multTime(2);
+				if (key == KeyCode.COMMA)
+					Main.sim.multTime(0.5);
+				if (key == KeyCode.MINUS)
+					Main.sim.resetTime();
+				if (key == KeyCode.SPACE)
+					Main.sim.setPause(!Main.sim.isPaused());
+
+				// adding planets
 				if (key == KeyCode.A)
 					addNextPlanet();
 				if (key == KeyCode.M)
@@ -223,9 +224,7 @@ public class Window extends Application {
 			}
 		});
 
-		/*
-		 * Zoom with the mouse wheel.
-		 */
+		// zoom with the mouse wheel
 		scene.setOnScroll(new EventHandler<ScrollEvent>() {
 			public void handle(ScrollEvent event) {
 				if (event.getDeltaY() > 0)
@@ -264,9 +263,7 @@ public class Window extends Application {
 			}
 		});
 
-		/*
-		 * Translates the view if the mouse is dragged with the primary button
-		 */
+		// translates the view if the mouse is dragged with the primary button
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
 				if (event.isPrimaryButtonDown()) {
@@ -277,9 +274,7 @@ public class Window extends Application {
 			}
 		});
 
-		/*
-		 * When the mouse is released the current position is saved
-		 */
+		// when the mouse is released the current position is saved
 		scene.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
 				dx += tempdx;
@@ -287,7 +282,8 @@ public class Window extends Application {
 				tempdx = tempdy = 0;
 			}
 		});
-		
+
+		// always updates the current mouse position
 		scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
 				mousePos.set(event.getX(), event.getY());
@@ -299,8 +295,10 @@ public class Window extends Application {
 	public void reset() {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
+
 		trailPane.getChildren().clear();
 		deselectPlanet();
+
 		updatePlanets(Main.sim.getPlanets());
 	}
 
@@ -322,8 +320,9 @@ public class Window extends Application {
 	 */
 	public void resetView() {
 		deselectPlanet();
+		stopResetTimeline = true;
 
-		KeyFrame returnToCenter = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
+		resetTimeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
 				// reset zoom
@@ -341,7 +340,6 @@ public class Window extends Application {
 					dx = 0;
 				else
 					dx /= 1.1;
-
 				if (Math.abs(dy) < 1.0)
 					dy = 0;
 				else
@@ -349,13 +347,9 @@ public class Window extends Application {
 
 				updateTrails();
 			}
-		});
-
-		resetTimeline = new Timeline(returnToCenter);
+		}));
 		resetTimeline.setCycleCount(Animation.INDEFINITE);
 		resetTimeline.play();
-
-		stopResetTimeline = true;
 	}
 
 	/**
@@ -395,7 +389,7 @@ public class Window extends Application {
 			selectedPlanet.deselect();
 		selectedPlanet = null;
 	}
-	
+
 	/**
 	 * does not work
 	 */

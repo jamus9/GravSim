@@ -5,6 +5,12 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import simulation.Main;
 
+/**
+ * The menu to open existing constellations.
+ * 
+ * @author Jan Muskalla
+ *
+ */
 public class OpenMenu extends Menu {
 
 	public OpenMenu() {

@@ -10,6 +10,7 @@ import window.Window;
  * Starts and restarts the simulation and window.
  * 
  * @author Jan Muskalla
+ * 
  */
 public class Main extends Application {
 
@@ -32,8 +33,8 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		sim = new Simulation(StartConditions.getSolarSystem());
 		win = new Window();
-		sim.run();
 		win.start(primaryStage);
+		sim.run();
 	}
 
 	/**
