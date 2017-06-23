@@ -297,8 +297,13 @@ public class StartConditions {
 		return new Constellation("Random Moons", planets, 1.9e-6, 1);
 	}
 	
+	/**
+	 * returns a random typical asteroid
+	 * 
+	 * @return the random Planet
+	 */
 	public static Planet randomAsteroid() {
-		// typical asteroid
+		// typical asteroid density in kg/m^3
 		double density = 2000;
 		double mass = Utils.getRandomInInervall(10e4, 10e20);
 		return new Planet(0, 0, 0, 0, mass, density);
