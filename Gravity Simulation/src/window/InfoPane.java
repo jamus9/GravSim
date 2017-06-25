@@ -117,9 +117,9 @@ public class InfoPane extends Pane {
 	}
 
 	public void relocateTimeButtons() {
-		deccButton.relocate(Main.win.getX() - 110, 27);
-		reButton.relocate(Main.win.getX() - 70, 27);
-		accButton.relocate(Main.win.getX() - 38, 27);
+		deccButton.relocate(Main.win.getWidth() - 110, 27);
+		reButton.relocate(Main.win.getWidth() - 70, 27);
+		accButton.relocate(Main.win.getWidth() - 38, 27);
 	}
 
 }

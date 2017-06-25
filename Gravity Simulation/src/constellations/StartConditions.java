@@ -110,7 +110,7 @@ public class StartConditions {
 		Planet[] planets = { sun.clone(), merkur.clone(), venus.clone(), earth.clone(), mars.clone(), jupiter.clone(),
 				saturn.clone(), uranus.clone(), neptun.clone() };
 
-		return new Constellation("Solar System", planets, 2e-9, 200);
+		return new Constellation("Solar System", planets, 1.4e-9, 200);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class StartConditions {
 
 		Planet[] planets = { jupiter.clone(), io.clone(), europa.clone(), ganymede.clone(), callisto.clone() };
 
-		return new Constellation("Jupiter System", planets, 2e-7, 3);
+		return new Constellation("Jupiter System", planets, 1.5e-7, 3);
 	}
 
 	/**

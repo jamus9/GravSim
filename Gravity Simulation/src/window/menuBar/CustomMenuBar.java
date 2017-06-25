@@ -42,9 +42,6 @@ public class CustomMenuBar extends MenuBar {
 		MenuItem restartItem = new MenuItem("Restart");
 		restartItem.setOnAction(actionEvent -> Main.restart());
 
-		MenuItem resetViewItem = new MenuItem("Reset View");
-		resetViewItem.setOnAction(actionEven -> win.resetView());
-
 		MenuItem helpItem = new MenuItem("Help");
 		helpItem.setOnAction(ActionEvent -> win.openHelpWindow());
 
@@ -52,7 +49,7 @@ public class CustomMenuBar extends MenuBar {
 		exitItem.setOnAction(ActionEvent -> Platform.exit());
 
 		Menu simulationMenu = new Menu("Simulation");
-		simulationMenu.getItems().addAll(restartItem, resetViewItem, helpItem, exitItem);
+		simulationMenu.getItems().addAll(restartItem, helpItem, exitItem);
 
 		/*
 		 * settings menu

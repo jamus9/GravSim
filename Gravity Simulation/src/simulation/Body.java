@@ -7,9 +7,7 @@ public interface Body {
 
 	public void updateObjects();
 
-	public Planet clone();
-
-	public boolean equals(Planet p);
+	public Body clone();
 
 	public void setPos(Vec2D pos);
 
@@ -22,9 +20,7 @@ public interface Body {
 	public Vec2D getPos();
 
 	public Vec2D getVel();
-	
+
 	public Circle getCircle();
-	
-	public int getID();
 
 }

@@ -21,25 +21,20 @@ import javafx.scene.layout.Pane;
  * 
  */
 public class Planet implements Body {
-	private static int globalID = 1;
 
-	// identification
-	private int id;
+	/** planet properties */
+	private Vec2D pos, vel, acc;
+	private double radius, mass;
 
-	// planet properties
-	private Vec2D pos;
-	private Vec2D vel;
-	private double radius;
-	private double mass;
-
-	// drawn objects
+	/** drawn objects */
 	private Circle circle;
-	private Line velocityLine;
+	private Line velocityLine, accelerationLine;
 	private Label label;
 
-	// the orbit lines
+	/** the trail lines */
 	private LinkedList<Line> trailLineList;
-	// the real coordinates of the orbit
+
+	/** the real coordinates of the trail */
 	private LinkedList<Vec2D> trailPointsList;
 
 	/**
@@ -56,7 +51,6 @@ public class Planet implements Body {
 	 * @param name
 	 */
 	public Planet(double xp, double yp, double xv, double yv, double mass, double radius, Color color, String name) {
-		id = globalID++;
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		this.mass = mass;
@@ -65,7 +59,7 @@ public class Planet implements Body {
 	}
 
 	/**
-	 * Creates a new Planet with mass, radius, color and name.
+	 * Creates a new Planet with only mass, radius, color and name.
 	 * 
 	 * @param mass
 	 * @param radius
@@ -77,7 +71,8 @@ public class Planet implements Body {
 	}
 
 	/**
-	 * Creates a new Planet with position, velocity and mass.
+	 * Creates an anonymous Planet with position, velocity and mass (with
+	 * density).
 	 * 
 	 * @param xp
 	 * @param yp
@@ -86,7 +81,6 @@ public class Planet implements Body {
 	 * @param radius
 	 */
 	public Planet(double xp, double yp, double xv, double yv, double mass, double density) {
-		id = globalID++;
 		this.pos = new Vec2D(xp, yp);
 		this.vel = new Vec2D(xv, yv);
 		setMass(mass, density);
@@ -94,25 +88,31 @@ public class Planet implements Body {
 	}
 
 	/**
-	 * Initializes the circle, vector, label and orbit.
+	 * Initializes the circle, vectors, label and trail.
 	 * 
 	 * @param color
 	 * @param name
 	 */
 	private void initializeObjects(Color color, String name) {
+		label = new Label(name);
+
 		circle = new Circle();
 		circle.setFill(color);
 		circle.setStroke(Color.BLACK);
-
-		label = new Label(name);
 
 		velocityLine = new Line();
 		velocityLine.setStroke(Color.GREEN);
 		velocityLine.setVisible(false);
 
+		accelerationLine = new Line();
+		accelerationLine.setStroke(Color.BLUE);
+		accelerationLine.setVisible(false);
+		acc = new Vec2D();
+
 		trailLineList = new LinkedList<Line>();
 		trailPointsList = new LinkedList<Vec2D>();
 
+		// first position of the first trail
 		savePosition();
 	}
 
@@ -122,24 +122,34 @@ public class Planet implements Body {
 	 */
 	public void updateObjects() {
 		Vec2D tp = Main.win.transform(pos);
+		double circleRadius = Main.sim.getScale() * Main.win.getZoom() * radius;
 
 		// update circle
 		circle.setCenterX(tp.getX());
 		circle.setCenterY(tp.getY());
-		circle.setRadius(getCircleRadius());
+		circle.setRadius(circleRadius);
 
-		// update vector
+		// update vectors
 		if (Main.win.isVectors()) {
-			double scaleFactor = Main.sim.getScale() * Main.win.getZoom() * 100000.0;
+
+			// velocity
+			double scaleFactor = Main.sim.getScale() * Main.win.getZoom() * 10e4;
 			velocityLine.setStartX(tp.getX());
 			velocityLine.setStartY(tp.getY());
-			velocityLine.setEndX(vel.getX() * scaleFactor + tp.getX());
-			velocityLine.setEndY(-vel.getY() * scaleFactor + tp.getY());
+			velocityLine.setEndX(tp.getX() + vel.getX() * scaleFactor);
+			velocityLine.setEndY(tp.getY() - vel.getY() * scaleFactor);
+
+			// acceleration
+			double scaleFactor2 = Main.sim.getScale() * Main.win.getZoom() * 10e9;
+			accelerationLine.setStartX(tp.getX());
+			accelerationLine.setStartY(tp.getY());
+			accelerationLine.setEndX(tp.getX() + acc.getX() * scaleFactor2);
+			accelerationLine.setEndY(tp.getY() - acc.getY() * scaleFactor2);
 		}
 
 		// update label
 		if (Main.win.isLabels()) {
-			double offset = getCircleRadius() + 5;
+			double offset = circleRadius + 5;
 			label.relocate(tp.getX() + offset, tp.getY());
 		}
 
@@ -147,7 +157,10 @@ public class Planet implements Body {
 		if (Main.win.isTrails()) {
 			Vec2D tplast = Main.win.transform(trailPointsList.getLast());
 
+			// only draw new line if planet moved 3 pixel
 			if (tp.sub(tplast).norm() > 3) {
+
+				// delete last
 				if (trailLineList.size() > 500) {
 					Line line = trailLineList.getFirst();
 					((Pane) line.getParent()).getChildren().remove(line);
@@ -155,6 +168,7 @@ public class Planet implements Body {
 					trailPointsList.removeFirst();
 				}
 
+				// the new line
 				Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
 				line.setStroke(Color.RED);
 
@@ -166,14 +180,10 @@ public class Planet implements Body {
 				trailLineList.add(line);
 				Main.win.addTrail(line);
 
+				// save position for the next line start
 				savePosition();
 			}
 		}
-	}
-
-	/** returns the scaled radius of the circle */
-	private double getCircleRadius() {
-		return Main.sim.getScale() * Main.win.getZoom() * radius;
 	}
 
 	/** Translate all Lines in orbitLineList with help of orbitPoints. */
@@ -184,6 +194,7 @@ public class Planet implements Body {
 		for (int i = 0; i < trailLineList.size(); i++) {
 			line = trailLineList.get(i);
 
+			// get the original position of the trail and use the current transform
 			newStart = Main.win.transform(trailPointsList.get(i));
 			newEnd = Main.win.transform(trailPointsList.get(i + 1));
 
@@ -215,16 +226,14 @@ public class Planet implements Body {
 		trailPointsList.add(pos.clone());
 	}
 
+	/** a selected planet has a white border */
 	public void select() {
 		circle.setStroke(Color.WHITE);
 	}
 
+	/** a deselected planet has a black border */
 	public void deselect() {
 		circle.setStroke(Color.BLACK);
-	}
-
-	public boolean equals(Planet p) {
-		return getID() == p.getID();
 	}
 
 	public void setPos(Vec2D pos) {
@@ -235,6 +244,10 @@ public class Planet implements Body {
 		pos = new Vec2D(x, y);
 	}
 
+	public Vec2D getPos() {
+		return pos;
+	}
+
 	public void setVel(Vec2D vel) {
 		this.vel = vel;
 	}
@@ -243,12 +256,24 @@ public class Planet implements Body {
 		vel = new Vec2D(x, y);
 	}
 
-	public void setVelocityLineVisibility(boolean b) {
-		velocityLine.setVisible(b);
+	public Vec2D getVel() {
+		return vel;
 	}
 
-	public void setLabelVisibility(boolean b) {
-		label.setVisible(b);
+	public void setAcc(Vec2D acc) {
+		this.acc = acc;
+	}
+
+	public void setAcc(double x, double y) {
+		acc = new Vec2D(x, y);
+	}
+
+	public Vec2D getAcc() {
+		return acc;
+	}
+
+	public void addAcc(Vec2D v) {
+		acc = acc.add(v);
 	}
 
 	/** sets the mass and the radius of the planet with with a given density */
@@ -257,36 +282,24 @@ public class Planet implements Body {
 		this.radius = Math.pow(3 * mass / (4 * Math.PI * density), 1d / 3);
 	}
 
-	public void setColor(Color col) {
-		this.circle.setFill(col);
-	}
-
-	public Vec2D getPos() {
-		return pos;
-	}
-
-	public Vec2D getVel() {
-		return vel;
-	}
-
 	public double getMass() {
 		return mass;
+	}
+
+	public double getDensity() {
+		return mass / ((4d / 3) * Math.PI * Math.pow(radius, 3));
 	}
 
 	public double getRadius() {
 		return radius;
 	}
 
-	public double getDensity() {
-		return mass / ((4d / 3) * Math.PI * radius * radius * radius);
-	}
-
 	public Circle getCircle() {
 		return circle;
 	}
 
-	public Line getVelocityLine() {
-		return velocityLine;
+	public void setColor(Color col) {
+		this.circle.setFill(col);
 	}
 
 	public Label getLabel() {
@@ -297,12 +310,25 @@ public class Planet implements Body {
 		return label.getText();
 	}
 
-	public int getID() {
-		return id;
+	public Line getVelocityLine() {
+		return velocityLine;
 	}
 
-	public LinkedList<Line> getOrbitLineList() {
+	public Line getAccelerationLine() {
+		return accelerationLine;
+	}
+
+	public LinkedList<Line> getTrailLineList() {
 		return trailLineList;
+	}
+
+	public void setLabelVisibility(boolean b) {
+		label.setVisible(b);
+	}
+
+	public void setVectorLinesVisibility(boolean b) {
+		velocityLine.setVisible(b);
+		accelerationLine.setVisible(b);
 	}
 
 }

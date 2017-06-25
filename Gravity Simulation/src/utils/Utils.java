@@ -12,7 +12,7 @@ import window.Window;
  *
  */
 public class Utils {
-	
+
 	public static final double GRAV_CONST = 6.67408e-11;
 
 	/**
@@ -24,8 +24,6 @@ public class Utils {
 	 * @return the most massive planet
 	 */
 	public static Planet getBiggest(Planet... planets) {
-		if (planets.length == 0)
-			return null;
 		Planet biggest = planets[0];
 		for (Planet p : planets)
 			if (p.getMass() > biggest.getMass())
@@ -42,8 +40,6 @@ public class Utils {
 	 * @return the least massive planet
 	 */
 	public static Planet getSmallest(Planet... planets) {
-		if (planets.length == 0)
-			return null;
 		Planet smallest = planets[0];
 		for (Planet p : planets)
 			if (p.getMass() <= smallest.getMass())
@@ -65,7 +61,7 @@ public class Utils {
 		LinkedList<Planet> planetsInView = new LinkedList<Planet>();
 
 		Vec2D topLeft = win.transfromBack(new Vec2D(0, 0));
-		Vec2D bottomRight = win.transfromBack(new Vec2D(win.getX(), win.getY()));
+		Vec2D bottomRight = win.transfromBack(new Vec2D(win.getWidth(), win.getHeight()));
 
 		double x1 = topLeft.getX();
 		double x2 = bottomRight.getX();
@@ -91,17 +87,15 @@ public class Utils {
 	 * @return the orbital velocity as a vector
 	 */
 	public static Vec2D orbVel(Planet planet, Vec2D position) {
-		// verbindungsvektor
+
+		// connection vector
 		Vec2D r = planet.getPos().sub(position);
 
-		// nach kreuzprodukt senkrechter vektor zu r
+		// normal vector to r
 		Vec2D velDirection = new Vec2D(r.getY(), -r.getX());
 
-		// normieren
-		velDirection = velDirection.mult(1.0 / velDirection.norm());
-
-		// anpassen
-		return velDirection.mult(orbSpeed(planet, r.norm())).add(planet.getVel());
+		// norm and multiply with orbital speed
+		return velDirection.getDir().mult(orbSpeed(planet, r.norm())).add(planet.getVel());
 	}
 
 	/**

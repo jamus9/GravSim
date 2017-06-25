@@ -19,6 +19,11 @@ public class Vec2D {
 		this(0, 0);
 	}
 	
+	public void set(double x, double y) {
+		this.x = x;
+		this.y = y;
+	}
+
 	public double getX() {
 		return x;
 	}
@@ -42,9 +47,9 @@ public class Vec2D {
 	public double norm() {
 		return Math.sqrt(x * x + y * y);
 	}
-
-	public void print() {
-		System.out.println(x + " " + y);
+	
+	public Vec2D getDir() {
+		return this.mult(1.0 / this.norm());
 	}
 
 	public boolean isEqual(Vec2D vec) {
@@ -54,11 +59,6 @@ public class Vec2D {
 	@Override
 	public Vec2D clone() {
 		return new Vec2D(x, y);
-	}
-	
-	public void set(double x, double y) {
-		this.x = x;
-		this.y = y;
 	}
 	
 }

@@ -42,14 +42,13 @@ public class Window extends Application {
 
 	/** coordinates for zoom and translation */
 	private double zoom;
-	private double dx, dy;
-	private double tempdx, tempdy;
+	private double dx, dy, tempdx, tempdy;
 	private double mouseX, mouseY;
 
-	/** the current mouse position */
+	/** the current mouse position for adding planets*/
 	Vec2D mousePos;
 
-	/** the currently selected planet */
+	/** the selected planet */
 	private Planet selectedPlanet;
 
 	/** the next planet that will be added */
@@ -63,16 +62,16 @@ public class Window extends Application {
 
 	/** the scene of the window */
 	private Scene scene;
-	
+
 	/** pane for all trails */
 	private Pane trailPane;
-	
-	/** pane for all circles, vectors, labels */
+
+	/** pane for all circles, vectors and labels */
 	private Pane planetPane;
-	
+
 	/** pane for all information */
 	private InfoPane infoPane;
-	
+
 	/** the menu bar */
 	private CustomMenuBar menuBar;
 
@@ -130,6 +129,25 @@ public class Window extends Application {
 		primaryStage.show();
 	}
 
+	/** Sets the view to default values. */
+	public void reset() {
+		zoom = 1;
+		dx = dy = tempdx = tempdy = 0;
+	
+		trailPane.getChildren().clear();
+		deselectPlanet();
+	
+		updatePlanets();
+	}
+
+	/** updates all planet objects (circles, vectors, labels) */
+	public void updatePlanets() {
+		planetPane.getChildren().clear();
+		for (Planet p : Main.sim.getPlanets())
+			planetPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getCircle(), p.getLabel());
+	
+	}
+
 	/**
 	 * The main window time line. 60 times per second updates all drawn objects
 	 * and adjusts the view.
@@ -160,12 +178,6 @@ public class Window extends Application {
 
 				// update info
 				infoPane.updateInfo();
-
-				// return to the center after a reset of the window
-				if (stopResetTimeline && zoom == 1 && dx == 0 && dy == 0) {
-					resetTimeline.stop();
-					stopResetTimeline = false;
-				}
 			}
 		}));
 		timeline.setCycleCount(Animation.INDEFINITE);
@@ -255,9 +267,8 @@ public class Window extends Application {
 					resetView();
 
 				// add new planet
-				if (event.isSecondaryButtonDown()) {
+				if (event.isSecondaryButtonDown())
 					addNextPlanet();
-				}
 
 				event.consume();
 			}
@@ -291,38 +302,16 @@ public class Window extends Application {
 		});
 	}
 
-	/** Sets the view to default values. */
-	public void reset() {
-		zoom = 1;
-		dx = dy = tempdx = tempdy = 0;
-
-		trailPane.getChildren().clear();
-		deselectPlanet();
-
-		updatePlanets(Main.sim.getPlanets());
-	}
-
-	/** updates all planet objects (circles, vectors, labels) */
-	public void updatePlanets(Planet[] planets) {
-		planetPane.getChildren().clear();
-		for (Planet p : planets)
-			planetPane.getChildren().addAll(p.getVelocityLine(), p.getCircle(), p.getLabel());
-
-	}
-
-	private Timeline resetTimeline;
-	private boolean stopResetTimeline = false;
-
 	/**
 	 * Starts a time line to reset scale and translation of the view. The time
 	 * line is stopped in the main window time line if the view is reseted.
 	 * Deselects the selected planet.
 	 */
-	public void resetView() {
+	private void resetView() {
 		deselectPlanet();
-		stopResetTimeline = true;
 
-		resetTimeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
+		Timeline resetTimeline = new Timeline();
+		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
 				// reset zoom
@@ -346,8 +335,12 @@ public class Window extends Application {
 					dy /= 1.1;
 
 				updateTrails();
+				
+				if (zoom == 1 && dx == 0 && dy == 0)
+					resetTimeline.stop();
 			}
-		}));
+		});
+		resetTimeline.getKeyFrames().add(kf);
 		resetTimeline.setCycleCount(Animation.INDEFINITE);
 		resetTimeline.play();
 	}
@@ -372,8 +365,42 @@ public class Window extends Application {
 		}
 	}
 
+	/** adds a planet to the simulation */
+	private void addNextPlanet() {
+		Planet newPlanet = nextAddedPlanet.clone();
+	
+		// position
+		newPlanet.setPos(transfromBack(mousePos));
+	
+		// velocity
+		if (!orbitMode || Main.sim.getPlanets().length == 0) {
+			newPlanet.setVel(0, 0);
+		} else {
+			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
+			newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
+		}
+	
+		// set new trail start
+		newPlanet.deleteTrail();
+		newPlanet.savePosition();
+	
+		// add the planet
+		Main.sim.addNewPlanet(newPlanet);
+		updatePlanets();
+	}
+
 	/**
-	 * Selects a planet and updates the info label
+	 * Translates all Orbits to the new right position if the orbits are
+	 * visible.
+	 */
+	private void updateTrails() {
+		if (trails)
+			for (Planet planet : Main.sim.getPlanets())
+				planet.updateTrail();
+	}
+
+	/**
+	 * selects a planet and updates the info label
 	 * 
 	 * @param planet
 	 */
@@ -388,37 +415,6 @@ public class Window extends Application {
 		if (selectedPlanet != null)
 			selectedPlanet.deselect();
 		selectedPlanet = null;
-	}
-
-	/**
-	 * does not work
-	 */
-	private void addNextPlanet() {
-		Planet newPlanet = nextAddedPlanet.clone();
-
-		// position
-		newPlanet.setPos(transfromBack(mousePos));
-
-		// velocity
-		if (!orbitMode || Main.sim.getPlanets().length == 0) {
-			newPlanet.setVel(0, 0);
-		} else {
-			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
-			newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
-		}
-
-		// add
-		Main.sim.addNewPlanet(newPlanet);
-	}
-
-	/**
-	 * Translates all Orbits to the new right position if the orbits are
-	 * visible.
-	 */
-	private void updateTrails() {
-		if (trails)
-			for (Planet planet : Main.sim.getPlanets())
-				planet.updateTrail();
 	}
 
 	/**
@@ -460,7 +456,7 @@ public class Window extends Application {
 	public void changeVectorsVisibility() {
 		vectors = !vectors;
 		for (Planet p : Main.sim.getPlanets())
-			p.setVelocityLineVisibility(vectors);
+			p.setVectorLinesVisibility(vectors);
 		menuBar.updateCMIs();
 	}
 
@@ -481,10 +477,9 @@ public class Window extends Application {
 
 	/** opens the help window */
 	public void openHelpWindow() {
-		Stage stage = new Stage();
-		HelpWindow hw = new HelpWindow();
+		HelpWindow helpWin = new HelpWindow();
 		try {
-			hw.start(stage);
+			helpWin.start(new Stage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -497,8 +492,8 @@ public class Window extends Application {
 	 * @return the transformed vector
 	 */
 	public Vec2D transfromBack(Vec2D vector) {
-		double x = ((vector.getX() - getX() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
-		double y = -((vector.getY() - getY() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
+		double x = ((vector.getX() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
+		double y = -((vector.getY() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
 		return new Vec2D(x, y);
 	}
 
@@ -509,18 +504,18 @@ public class Window extends Application {
 	 * @return the transformed vector
 	 */
 	public Vec2D transform(Vec2D vector) {
-		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getX() / 2.0;
-		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getY() / 2.0;
+		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getWidth() / 2.0;
+		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getHeight() / 2.0;
 		return new Vec2D(x, y);
 	}
 
 	/** returns the width of the window */
-	public double getX() {
+	public double getWidth() {
 		return scene.getWidth();
 	}
 
 	/** returns the height of the window */
-	public double getY() {
+	public double getHeight() {
 		return scene.getHeight();
 	}
 
