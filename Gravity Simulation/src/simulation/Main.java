@@ -31,7 +31,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(StartConditions.getSolarSystem());
+		sim = new Simulation(StartConditions.getParticleTest());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();

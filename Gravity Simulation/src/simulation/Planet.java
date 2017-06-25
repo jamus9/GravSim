@@ -50,9 +50,10 @@ public class Planet implements Body {
 	 * @param color
 	 * @param name
 	 */
-	public Planet(double xp, double yp, double xv, double yv, double mass, double radius, Color color, String name) {
-		this.pos = new Vec2D(xp, yp);
-		this.vel = new Vec2D(xv, yv);
+	public Planet(double posX, double posY, double velX, double velY, double mass, double radius, Color color,
+			String name) {
+		this.pos = new Vec2D(posX, posY);
+		this.vel = new Vec2D(velX, velY);
 		this.mass = mass;
 		this.radius = radius;
 		initializeObjects(color, name);
@@ -80,9 +81,9 @@ public class Planet implements Body {
 	 * @param yv
 	 * @param radius
 	 */
-	public Planet(double xp, double yp, double xv, double yv, double mass, double density) {
-		this.pos = new Vec2D(xp, yp);
-		this.vel = new Vec2D(xv, yv);
+	public Planet(double posX, double posY, double velX, double velY, double mass, double density) {
+		this.pos = new Vec2D(posX, posY);
+		this.vel = new Vec2D(velX, velY);
 		setMass(mass, density);
 		initializeObjects(Color.BLACK, "");
 	}
@@ -194,7 +195,8 @@ public class Planet implements Body {
 		for (int i = 0; i < trailLineList.size(); i++) {
 			line = trailLineList.get(i);
 
-			// get the original position of the trail and use the current transform
+			// get the original position of the trail and use the current
+			// transform
 			newStart = Main.win.transform(trailPointsList.get(i));
 			newEnd = Main.win.transform(trailPointsList.get(i + 1));
 
@@ -260,12 +262,12 @@ public class Planet implements Body {
 		return vel;
 	}
 
-	public void setAcc(Vec2D acc) {
-		this.acc = acc;
-	}
+//	public void setAcc(Vec2D acc) {
+//		this.acc = acc;
+//	}
 
-	public void setAcc(double x, double y) {
-		acc = new Vec2D(x, y);
+	public void resetAcc() {
+		acc = new Vec2D();
 	}
 
 	public Vec2D getAcc() {

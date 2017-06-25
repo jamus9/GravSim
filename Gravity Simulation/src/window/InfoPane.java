@@ -53,7 +53,7 @@ public class InfoPane extends Pane {
 
 		accButton = new Button(">>");
 		accButton.setOnAction(actionEvent -> Main.sim.multTime(2));
-		
+
 		relocateTimeButtons();
 
 		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitModeLabel, infoLabel, deccButton, accButton, reButton);
@@ -96,7 +96,7 @@ public class InfoPane extends Pane {
 					+ Math.round(selPl.getRadius() / 1000.0) + " km\nVelocity: " + (int) selPl.getVel().norm() + " m/s"
 					+ "\nTime: x" + (int) (Main.sim.getTime() * Simulation.SPS));
 		} else {
-			infoLabel.setText(Main.sim.getConstellation().getName() + "\nObjects: " + Main.sim.getPlanets().length
+			infoLabel.setText(Main.sim.getConstellation().getName() + "\nObjects: " + Main.sim.getNumberOfObjects()
 					+ "\nTime: x" + (int) (Main.sim.getTime() * Simulation.SPS));
 		}
 	}

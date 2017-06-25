@@ -1,6 +1,7 @@
 package constellations;
 
 import javafx.scene.paint.Color;
+import simulation.Particle;
 import simulation.Planet;
 import utils.Utils;
 import utils.Vec2D;
@@ -37,11 +38,11 @@ public class StartConditions {
 
 	public static Planet sun = new Planet(sunMass, sunRad, Color.YELLOW, "Sun"),
 
-			merkur = new Planet(merkurMass, merkurRad, Color.rgb(212,201,156), "Merkur"),
+			merkur = new Planet(merkurMass, merkurRad, Color.rgb(212, 201, 156), "Merkur"),
 
 			venus = new Planet(venusMass, venusRad, Color.BEIGE, "Venus"),
 
-			earth = new Planet(earthMass, earthRad, Color.rgb(79,76,176), "Earth"),
+			earth = new Planet(earthMass, earthRad, Color.rgb(79, 76, 176), "Earth"),
 			moon = new Planet(moonMass, moonRad, Color.GRAY, "Moon"),
 
 			mars = new Planet(marsMass, marsRad, Color.RED, "Mars"),
@@ -56,9 +57,9 @@ public class StartConditions {
 
 			saturn = new Planet(saturnMass, saturnRad, Color.rgb(216, 202, 157), "Saturn"),
 
-			uranus = new Planet(uranusMass, uranusRad, Color.rgb(225,238,238), "Uranus"),
+			uranus = new Planet(uranusMass, uranusRad, Color.rgb(225, 238, 238), "Uranus"),
 
-			neptun = new Planet(neptunMass, neptunRad, Color.rgb(63,84,186), "Neptun"),
+			neptun = new Planet(neptunMass, neptunRad, Color.rgb(63, 84, 186), "Neptun"),
 
 			blackHole = new Planet(blackHoleMass, blackHoleRad, Color.BLACK, "Black Hole");
 
@@ -267,7 +268,7 @@ public class StartConditions {
 	 * a number of random moons in orbit around the earth
 	 */
 	public static Constellation getRandomMoons() {
-		int number = 40;
+		int number = 60;
 		double moonDistance = 384.4e6;
 
 		earth.setPos(0, 0);
@@ -279,7 +280,7 @@ public class StartConditions {
 		double radius, x, y;
 		Vec2D pos;
 		for (int i = 1; i < number; i++) {
-			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance*0.5);
+			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance * 0.5);
 
 			y = Utils.plusMinus() * Math.random() * radius;
 			x = Utils.plusMinus() * Math.sqrt(radius * radius - y * y);
@@ -296,7 +297,40 @@ public class StartConditions {
 
 		return new Constellation("Random Moons", planets, 1.9e-6, 1);
 	}
-	
+
+	/**
+	 * particle test
+	 */
+	public static Constellation getParticleTest() {
+		int number = 1000;
+		double moonDistance = 384.4e6;
+
+		earth.setPos(0, 0);
+		earth.setVel(0, 0);
+
+		Planet[] planets = new Planet[] { earth.clone() };
+		Particle[] particles = new Particle[number];
+
+		double radius, x, y;
+		Vec2D pos;
+		for (int i = 0; i < number; i++) {
+			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance * 0.2);
+
+			y = Utils.plusMinus() * Math.random() * radius;
+			x = Utils.plusMinus() * Math.sqrt(radius * radius - y * y);
+			pos = new Vec2D(x, y);
+
+			Particle par = new Particle();
+
+			par.setPos(pos);
+			par.setVel(Utils.orbVel(earth, pos));
+
+			particles[i] = par.clone();
+		}
+
+		return new Constellation("Particles Test", planets, particles, 1.9e-6, 1);
+	}
+
 	/**
 	 * returns a random typical asteroid
 	 * 

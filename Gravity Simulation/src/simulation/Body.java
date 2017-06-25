@@ -13,13 +13,19 @@ public interface Body {
 
 	public void setPos(double x, double y);
 
+	public Vec2D getPos();
+
 	public void setVel(Vec2D vel);
 
 	public void setVel(double x, double y);
 
-	public Vec2D getPos();
-
 	public Vec2D getVel();
+	
+	public void resetAcc();
+	
+	public void addAcc(Vec2D vec);
+	
+	public Vec2D getAcc();
 
 	public Circle getCircle();
 

@@ -22,6 +22,7 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
+import simulation.Particle;
 import simulation.Planet;
 import utils.Utils;
 import utils.Vec2D;
@@ -45,7 +46,7 @@ public class Window extends Application {
 	private double dx, dy, tempdx, tempdy;
 	private double mouseX, mouseY;
 
-	/** the current mouse position for adding planets*/
+	/** the current mouse position for adding planets */
 	Vec2D mousePos;
 
 	/** the selected planet */
@@ -133,19 +134,22 @@ public class Window extends Application {
 	public void reset() {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
-	
+
 		trailPane.getChildren().clear();
 		deselectPlanet();
-	
+
 		updatePlanets();
 	}
 
 	/** updates all planet objects (circles, vectors, labels) */
 	public void updatePlanets() {
 		planetPane.getChildren().clear();
+
 		for (Planet p : Main.sim.getPlanets())
 			planetPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getCircle(), p.getLabel());
-	
+
+		for (Particle par : Main.sim.getParticles())
+			planetPane.getChildren().add(par.getCircle());
 	}
 
 	/**
@@ -175,6 +179,9 @@ public class Window extends Application {
 				// update all drawn objects
 				for (Planet planet : Main.sim.getPlanets())
 					planet.updateObjects();
+
+				for (Particle particle : Main.sim.getParticles())
+					particle.updateObjects();
 
 				// update info
 				infoPane.updateInfo();
@@ -335,7 +342,7 @@ public class Window extends Application {
 					dy /= 1.1;
 
 				updateTrails();
-				
+
 				if (zoom == 1 && dx == 0 && dy == 0)
 					resetTimeline.stop();
 			}
@@ -368,10 +375,10 @@ public class Window extends Application {
 	/** adds a planet to the simulation */
 	private void addNextPlanet() {
 		Planet newPlanet = nextAddedPlanet.clone();
-	
+
 		// position
 		newPlanet.setPos(transfromBack(mousePos));
-	
+
 		// velocity
 		if (!orbitMode || Main.sim.getPlanets().length == 0) {
 			newPlanet.setVel(0, 0);
@@ -379,11 +386,11 @@ public class Window extends Application {
 			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
 			newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
 		}
-	
+
 		// set new trail start
 		newPlanet.deleteTrail();
 		newPlanet.savePosition();
-	
+
 		// add the planet
 		Main.sim.addNewPlanet(newPlanet);
 		updatePlanets();

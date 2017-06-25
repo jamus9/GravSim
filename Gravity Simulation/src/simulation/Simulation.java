@@ -20,7 +20,7 @@ import utils.Vec2D;
 public class Simulation {
 
 	/** simulations per second */
-	public static final double SPS = 6000;
+	public static final double SPS = 2000;
 
 	/** the current constellation with start conditions */
 	private final Constellation constellation;
@@ -33,6 +33,9 @@ public class Simulation {
 
 	/** all planets of the current simulation are saved here */
 	private Planet[] planets;
+
+	/** all particles of the current simulation */
+	private Particle[] particles;
 
 	/** the time line in which all calculations happen */
 	public Timeline timeline;
@@ -58,22 +61,42 @@ public class Simulation {
 		planets = new Planet[constellation.numberOfPlanets()];
 		for (int i = 0; i < planets.length; i++)
 			planets[i] = constellation.getPlanet(i).clone();
+
+		// copy the particles of the new constellation in the local array
+		particles = new Particle[constellation.numberOfParticles()];
+		for (int i = 0; i < particles.length; i++)
+			particles[i] = constellation.getParticle(i).clone();
 	}
 
 	/**
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	public void run() {
-		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent event) {
-				movePlanets();
-				checkForCollisions();
-				spsCounter++;
-				secondsCounter += time;
-			}
-		}));
-		timeline.setCycleCount(Animation.INDEFINITE);
-		timeline.play();
+		if (particles.length == 0) {
+			timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent event) {
+					movePlanets();
+					checkForPlanetCollisions();
+					spsCounter++;
+					secondsCounter += time;
+				}
+			}));
+			timeline.setCycleCount(Animation.INDEFINITE);
+			timeline.play();
+		} else {
+			timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent event) {
+					movePlanets();
+					moveParticles();
+					checkForPlanetCollisions();
+					checkForParticlePlanetCollisions();
+					spsCounter++;
+					secondsCounter += time;
+				}
+			}));
+			timeline.setCycleCount(Animation.INDEFINITE);
+			timeline.play();
+		}
 	}
 
 	/**
@@ -84,9 +107,6 @@ public class Simulation {
 		Vec2D r, v, a;
 
 		for (int i = 0; i < planets.length; i++) {
-
-			// reset acceleration
-			planets[i].setAcc(0, 0);
 			for (int j = 0; j < planets.length; j++) {
 				if (i != j) {
 
@@ -110,20 +130,60 @@ public class Simulation {
 
 			// r + v*t + 1/2*a*t^2
 			p.setPos(p.getPos().add(v.mult(time)).add(a.mult(time * time * 0.5)));
+
+			// reset acceleration
+			p.resetAcc();
 		}
 	}
 
-	/**
-	 * Checks all planets for collisions and calls collide if necessary
-	 */
-	private void checkForCollisions() {
+	private void moveParticles() {
+		Vec2D r, v, a;
+
+		for (Particle par : particles) {
+			for (Planet pla : planets) {
+
+				// direction of the acceleration vector
+				r = (pla.getPos()).sub(par.getPos());
+
+				// add all acceleration vectors for one planet
+				// r * G * m / |r|^3
+				par.addAcc(r.mult(Utils.GRAV_CONST * pla.getMass() / Math.pow(r.norm(), 3)));
+			}
+
+			// change the position of all particles with the calculated vectors
+			v = par.getVel();
+			a = par.getAcc();
+
+			// v + a*t
+			par.setVel(v.add(a.mult(time)));
+
+			// r + v*t + 1/2*a*t^2
+			par.setPos(par.getPos().add(v.mult(time)).add(a.mult(time * time * 0.5)));
+
+			// reset acceleration
+			par.resetAcc();
+		}
+	}
+
+	/** Checks all planets for collisions */
+	private void checkForPlanetCollisions() {
 		Planet p1, p2;
 		for (int i = 0; i < planets.length - 1; i++) {
 			for (int j = i + 1; j < planets.length; j++) {
 				p1 = planets[i];
 				p2 = planets[j];
 				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius())
-					collide(p1, p2);
+					collidePlanets(p1, p2);
+			}
+		}
+	}
+
+	/** checks all particles for collisions with planets */
+	private void checkForParticlePlanetCollisions() {
+		for (Particle par : particles) {
+			for (Planet pla : planets) {
+				if (par.getPos().sub(pla.getPos()).norm() < pla.getRadius())
+					collideParticlePlanet(pla, par);
 			}
 		}
 	}
@@ -137,7 +197,7 @@ public class Simulation {
 	 * @param index2
 	 *            the index of the collided planet 2
 	 */
-	private void collide(Planet p1, Planet p2) {
+	private void collidePlanets(Planet p1, Planet p2) {
 
 		// get the bigger planet
 		Planet bigP = Utils.getBiggest(p1, p2);
@@ -165,6 +225,24 @@ public class Simulation {
 
 		// set the new planets array and update the window
 		planets = newPlanets;
+		Main.win.updatePlanets();
+	}
+
+	/**
+	 * deletes the collided particle from the array
+	 * 
+	 * @param pla
+	 * @param par
+	 */
+	private void collideParticlePlanet(Planet pla, Particle par) {
+		Particle[] newParticles = new Particle[particles.length - 1];
+		for (int i = 0, j = 0; i < newParticles.length; i++) {
+			if (par.equals(particles[j]))
+				j++;
+			newParticles[i] = particles[j++];
+		}
+
+		particles = newParticles;
 		Main.win.updatePlanets();
 	}
 
@@ -254,7 +332,15 @@ public class Simulation {
 		return planets;
 	}
 
+	public Particle[] getParticles() {
+		return particles;
+	}
+
 	public double getScale() {
 		return scale;
+	}
+
+	public int getNumberOfObjects() {
+		return planets.length + particles.length;
 	}
 }
