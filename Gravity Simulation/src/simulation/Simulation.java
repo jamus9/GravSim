@@ -72,101 +72,84 @@ public class Simulation {
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	public void run() {
-		if (particles.length == 0) {
-			timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
-				public void handle(ActionEvent event) {
-					movePlanets();
-					checkForPlanetCollisions();
-					spsCounter++;
-					secondsCounter += time;
-				}
-			}));
-			timeline.setCycleCount(Animation.INDEFINITE);
-			timeline.play();
-		} else {
-			timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
-				public void handle(ActionEvent event) {
-					movePlanets();
-					moveParticles();
-					checkForPlanetCollisions();
-					checkForParticlePlanetCollisions();
-					spsCounter++;
-					secondsCounter += time;
-				}
-			}));
-			timeline.setCycleCount(Animation.INDEFINITE);
-			timeline.play();
+		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				moveBodies();
+				checkForCollisions();
+				spsCounter++;
+				secondsCounter += time;
+			}
+		}));
+		timeline.setCycleCount(Animation.INDEFINITE);
+		timeline.play();
+	}
+
+	/**
+	 * Calculate the sum of all acceleration vectors for each body at the same
+	 * simulation time and then moves all bodies one time step.
+	 */
+	private void moveBodies() {
+		// add all acceleration vectors in one time step
+		for (int i = 0; i < planets.length; i++)
+			for (int j = 0; j < planets.length; j++)
+				if (i != j)
+					planets[i].addAcc(getAccVec(planets[i], planets[j]));
+
+		// update all planets
+		for (Planet planet : planets)
+			updateBodyProps(planet);
+
+		// add all acceleration vectors in one time step
+		for (Particle particle : particles) {
+			for (Planet planet : planets)
+				particle.addAcc(getAccVec(particle, planet));
+
+			// update all particles
+			updateBodyProps(particle);
 		}
 	}
 
 	/**
-	 * Calculate the sum of all acceleration vectors for each planet at the same
-	 * simulation time and then moves all current planets one time step.
+	 * returns the acceleration vector for a body in reference to a planet
+	 * 
+	 * @param body
+	 * @param planet
+	 * @return the acceleration vector
 	 */
-	private void movePlanets() {
-		Vec2D r, v, a;
+	private Vec2D getAccVec(Body body, Planet planet) {
 
-		for (int i = 0; i < planets.length; i++) {
-			for (int j = 0; j < planets.length; j++) {
-				if (i != j) {
+		// direction of the acceleration vector
+		Vec2D r = (planet.getPos()).sub(body.getPos());
 
-					// direction of the acceleration vector
-					r = (planets[j].getPos()).sub(planets[i].getPos());
-
-					// add all acceleration vectors for one planet
-					// r * G * m / |r|^3
-					planets[i].addAcc(r.mult(Utils.GRAV_CONST * planets[j].getMass() / Math.pow(r.norm(), 3)));
-				}
-			}
-		}
-
-		// change the position of all planets with the calculated vectors
-		for (Planet p : planets) {
-			v = p.getVel();
-			a = p.getAcc();
-
-			// v + a*t
-			p.setVel(v.add(a.mult(time)));
-
-			// r + v*t + 1/2*a*t^2
-			p.setPos(p.getPos().add(v.mult(time)).add(a.mult(time * time * 0.5)));
-
-			// reset acceleration
-			p.resetAcc();
-		}
+		// r * G * m / |r|^3
+		return r.mult(Utils.GRAV_CONST * planet.getMass() / Math.pow(r.norm(), 3));
 	}
 
-	private void moveParticles() {
-		Vec2D r, v, a;
+	/**
+	 * Updates the position and velocity of a body with its calculated
+	 * acceleration vector. The acceleration vector gets resetted for the next
+	 * calculation
+	 * 
+	 * @param body
+	 */
+	private void updateBodyProps(Body body) {
+		Vec2D v = body.getVel();
+		Vec2D a = body.getAcc();
 
-		for (Particle par : particles) {
-			for (Planet pla : planets) {
+		// v + a*t
+		body.setVel(v.add(a.mult(time)));
 
-				// direction of the acceleration vector
-				r = (pla.getPos()).sub(par.getPos());
+		// r + v*t + 1/2*a*t^2
+		body.setPos(body.getPos().add(v.mult(time)).add(a.mult(time * time * 0.5)));
 
-				// add all acceleration vectors for one planet
-				// r * G * m / |r|^3
-				par.addAcc(r.mult(Utils.GRAV_CONST * pla.getMass() / Math.pow(r.norm(), 3)));
-			}
-
-			// change the position of all particles with the calculated vectors
-			v = par.getVel();
-			a = par.getAcc();
-
-			// v + a*t
-			par.setVel(v.add(a.mult(time)));
-
-			// r + v*t + 1/2*a*t^2
-			par.setPos(par.getPos().add(v.mult(time)).add(a.mult(time * time * 0.5)));
-
-			// reset acceleration
-			par.resetAcc();
-		}
+		// reset acceleration
+		body.resetAcc();
 	}
 
-	/** Checks all planets for collisions */
-	private void checkForPlanetCollisions() {
+	/** Checks all bodies for collisions */
+	private void checkForCollisions() {
+
+		// planets (collide with each other)
 		Planet p1, p2;
 		for (int i = 0; i < planets.length - 1; i++) {
 			for (int j = i + 1; j < planets.length; j++) {
@@ -176,16 +159,13 @@ public class Simulation {
 					collidePlanets(p1, p2);
 			}
 		}
-	}
 
-	/** checks all particles for collisions with planets */
-	private void checkForParticlePlanetCollisions() {
-		for (Particle par : particles) {
-			for (Planet pla : planets) {
+		// particles (don't collide with each other)
+		for (Particle par : particles)
+			for (Planet pla : planets)
 				if (par.getPos().sub(pla.getPos()).norm() < pla.getRadius())
 					collideParticlePlanet(pla, par);
-			}
-		}
+
 	}
 
 	/**
@@ -212,11 +192,9 @@ public class Simulation {
 		if (selPl != null && selPl.equals(smallP))
 			Main.win.selectPlanet(bigP);
 
-		// delete the trail of the small planet
-		smallP.deleteTrail();
-
 		// copy all planets in the new planets array except the smaller one
 		Planet[] newPlanets = new Planet[planets.length - 1];
+
 		for (int i = 0, j = 0; i < newPlanets.length; i++) {
 			if (smallP.equals(planets[j]))
 				j++;
@@ -225,7 +203,9 @@ public class Simulation {
 
 		// set the new planets array and update the window
 		planets = newPlanets;
-		Main.win.updatePlanets();
+
+		// delete the small planet
+		smallP.delete();
 	}
 
 	/**
@@ -236,6 +216,7 @@ public class Simulation {
 	 */
 	private void collideParticlePlanet(Planet pla, Particle par) {
 		Particle[] newParticles = new Particle[particles.length - 1];
+
 		for (int i = 0, j = 0; i < newParticles.length; i++) {
 			if (par.equals(particles[j]))
 				j++;
@@ -243,7 +224,8 @@ public class Simulation {
 		}
 
 		particles = newParticles;
-		Main.win.updatePlanets();
+
+		par.delete();
 	}
 
 	/**

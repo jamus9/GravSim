@@ -1,5 +1,6 @@
 package simulation;
 
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import utils.Vec2D;
 
@@ -99,6 +100,11 @@ public class Particle implements Body {
 	@Override
 	public Circle getCircle() {
 		return circle;
+	}
+
+	@Override
+	public void delete() {
+		((Pane) circle.getParent()).getChildren().remove(circle);
 	}
 
 }

@@ -21,9 +21,11 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import simulation.Body;
 import simulation.Main;
 import simulation.Particle;
 import simulation.Planet;
+import simulation.Simulation;
 import utils.Utils;
 import utils.Vec2D;
 import window.menuBar.CustomMenuBar;
@@ -68,7 +70,7 @@ public class Window extends Application {
 	private Pane trailPane;
 
 	/** pane for all circles, vectors and labels */
-	private Pane planetPane;
+	private Pane bodyPane;
 
 	/** pane for all information */
 	private InfoPane infoPane;
@@ -76,12 +78,15 @@ public class Window extends Application {
 	/** the menu bar */
 	private CustomMenuBar menuBar;
 
+	public Window() {
+
+	}
+
 	/**
 	 * Starts the window for the simulation.
 	 * 
 	 * @param primaryStage
 	 */
-	@Override
 	public void start(Stage primaryStage) {
 
 		// scene and root
@@ -96,13 +101,13 @@ public class Window extends Application {
 
 		// add panes and menu to root
 		trailPane = new Pane();
-		planetPane = new Pane();
+		bodyPane = new Pane();
 		infoPane = new InfoPane();
 		menuBar = new CustomMenuBar(primaryStage, this);
-		root.getChildren().addAll(trailPane, planetPane, infoPane, menuBar);
+		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar);
 
 		// initialize all values to default and load the planet objects
-		reset();
+		resetAndLoad(Main.sim);
 
 		trails = true;
 		labels = true;
@@ -130,26 +135,35 @@ public class Window extends Application {
 		primaryStage.show();
 	}
 
-	/** Sets the view to default values. */
-	public void reset() {
+	/**
+	 * Sets the view to default values, clears trails and bodies and loads all
+	 * new bodies from the simulation
+	 */
+	public void resetAndLoad(Simulation sim) {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
 
 		trailPane.getChildren().clear();
 		deselectPlanet();
 
-		updatePlanets();
+		bodyPane.getChildren().clear();
+		for (Planet p : sim.getPlanets())
+			addBodyToWindow(p);
+		for (Particle p : sim.getParticles())
+			addBodyToWindow(p);
 	}
 
-	/** updates all planet objects (circles, vectors, labels) */
-	public void updatePlanets() {
-		planetPane.getChildren().clear();
-
-		for (Planet p : Main.sim.getPlanets())
-			planetPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getCircle(), p.getLabel());
-
-		for (Particle par : Main.sim.getParticles())
-			planetPane.getChildren().add(par.getCircle());
+	/**
+	 * adds all objects of a body to the bodyPane
+	 * 
+	 * @param body
+	 */
+	private void addBodyToWindow(Body body) {
+		if (body.getClass() == Planet.class)
+			bodyPane.getChildren().addAll(((Planet) body).getVelocityLine(), ((Planet) body).getAccelerationLine(),
+					body.getCircle(), ((Planet) body).getLabel());
+		else
+			bodyPane.getChildren().add(body.getCircle());
 	}
 
 	/**
@@ -266,8 +280,10 @@ public class Window extends Application {
 				mouseY = event.getY();
 
 				// select planet
-				if (event.isPrimaryButtonDown())
+				if (event.isPrimaryButtonDown()) {
+					deselectPlanet();
 					checkForSelectedPlanet(mouseX, mouseY);
+				}
 
 				// reset view
 				if (event.isMiddleButtonDown())
@@ -317,7 +333,7 @@ public class Window extends Application {
 	private void resetView() {
 		deselectPlanet();
 
-		Timeline resetTimeline = new Timeline();
+		Timeline timeline = new Timeline();
 		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
@@ -344,12 +360,33 @@ public class Window extends Application {
 				updateTrails();
 
 				if (zoom == 1 && dx == 0 && dy == 0)
-					resetTimeline.stop();
+					timeline.stop();
 			}
 		});
-		resetTimeline.getKeyFrames().add(kf);
-		resetTimeline.setCycleCount(Animation.INDEFINITE);
-		resetTimeline.play();
+		timeline.getKeyFrames().add(kf);
+		timeline.setCycleCount(Animation.INDEFINITE);
+		timeline.play();
+	}
+
+	private void panToBody() {
+		Timeline timeline = new Timeline();
+		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				
+//				dx += selectedPlanet.getPos().getX() - selectedPlanet.getPos().getX() * 1.05);
+				
+				
+				updateTrails();
+
+				if (zoom == 1) {
+					timeline.stop();
+					Boolean follow = true;
+				}
+			}
+		});
+		timeline.getKeyFrames().add(kf);
+		timeline.setCycleCount(Animation.INDEFINITE);
+		timeline.play();
 	}
 
 	/**
@@ -359,7 +396,6 @@ public class Window extends Application {
 	 * If a planet is clicked, highlight it and set the variables to follow it.
 	 */
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
-		deselectPlanet();
 		Circle circle;
 		Vec2D mouse, center;
 		for (Planet planet : Main.sim.getPlanets()) {
@@ -384,7 +420,7 @@ public class Window extends Application {
 			newPlanet.setVel(0, 0);
 		} else {
 			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
-			newPlanet.setVel(Utils.orbVel(biggest, newPlanet.getPos()));
+			newPlanet.setVel(Utils.getOrbitalVelocity(biggest, newPlanet.getPos()));
 		}
 
 		// set new trail start
@@ -393,7 +429,8 @@ public class Window extends Application {
 
 		// add the planet
 		Main.sim.addNewPlanet(newPlanet);
-		updatePlanets();
+
+		addBodyToWindow(newPlanet);
 	}
 
 	/**

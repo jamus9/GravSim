@@ -28,5 +28,7 @@ public interface Body {
 	public Vec2D getAcc();
 
 	public Circle getCircle();
+	
+	public void delete();
 
 }

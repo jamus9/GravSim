@@ -16,6 +16,24 @@ public class Utils {
 	public static final double GRAV_CONST = 6.67408e-11;
 
 	/**
+	 * to do
+	 * 
+	 * @param center
+	 * @param rMin
+	 * @param rMax
+	 * @return
+	 */
+	public static Vec2D getRandomOrbitPosition(Vec2D center, double rMin, double rMax) {
+		double angle = getRandomInInervall(0, 2 * Math.PI);
+		double radius = getRandomInInervall(rMin, rMax);
+
+		double x = radius * Math.cos(angle);
+		double y = radius * Math.sin(angle);
+
+		return (new Vec2D(x, y)).add(center);
+	}
+
+	/**
 	 * returns the most massive planet from a collection of planets
 	 * 
 	 * if they have the same mass return the first one
@@ -86,7 +104,7 @@ public class Utils {
 	 * @param position
 	 * @return the orbital velocity as a vector
 	 */
-	public static Vec2D orbVel(Planet planet, Vec2D position) {
+	public static Vec2D getOrbitalVelocity(Planet planet, Vec2D position) {
 
 		// connection vector
 		Vec2D r = planet.getPos().sub(position);
@@ -166,7 +184,7 @@ public class Utils {
 	 * @return random double
 	 */
 	public static double getRandomInInervall(double min, double max) {
-		return min + (int) (Math.random() * ((max - min) + 1));
+		return min + (Math.random() * (max - min));
 	}
 
 	/**

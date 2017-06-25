@@ -332,5 +332,11 @@ public class Planet implements Body {
 		velocityLine.setVisible(b);
 		accelerationLine.setVisible(b);
 	}
+	
+	public void delete() {
+		deleteTrail();
+		((Pane) circle.getParent()).getChildren().remove(circle);
+		((Pane) label.getParent()).getChildren().remove(label);
+	}
 
 }

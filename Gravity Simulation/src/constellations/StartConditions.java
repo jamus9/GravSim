@@ -4,7 +4,6 @@ import javafx.scene.paint.Color;
 import simulation.Particle;
 import simulation.Planet;
 import utils.Utils;
-import utils.Vec2D;
 
 /**
  * A class that creates start conditions (constellations) for the simulation.
@@ -141,10 +140,10 @@ public class StartConditions {
 		mars.setVel(0, 0);
 
 		phobos.setPos(phobosDistance, 0);
-		phobos.setVel(Utils.orbVel(mars, phobos.getPos()));
+		phobos.setVel(Utils.getOrbitalVelocity(mars, phobos.getPos()));
 
 		deimos.setPos(-deimosDistance, 0);
-		deimos.setVel(Utils.orbVel(mars, deimos.getPos()));
+		deimos.setVel(Utils.getOrbitalVelocity(mars, deimos.getPos()));
 
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
 
@@ -164,16 +163,16 @@ public class StartConditions {
 		jupiter.setVel(0, 0);
 
 		io.setPos(0, ioDis);
-		io.setVel(Utils.orbVel(jupiter, io.getPos()));
+		io.setVel(Utils.getOrbitalVelocity(jupiter, io.getPos()));
 
 		europa.setPos(0, -europaDis);
-		europa.setVel(Utils.orbVel(jupiter, europa.getPos()));
+		europa.setVel(Utils.getOrbitalVelocity(jupiter, europa.getPos()));
 
 		ganymede.setPos(0, ganymadeDis);
-		ganymede.setVel(Utils.orbVel(jupiter, ganymede.getPos()));
+		ganymede.setVel(Utils.getOrbitalVelocity(jupiter, ganymede.getPos()));
 
 		callisto.setPos(0, -callistoDis);
-		callisto.setVel(Utils.orbVel(jupiter, callisto.getPos()));
+		callisto.setVel(Utils.getOrbitalVelocity(jupiter, callisto.getPos()));
 
 		Planet[] planets = { jupiter.clone(), io.clone(), europa.clone(), ganymede.clone(), callisto.clone() };
 
@@ -277,19 +276,11 @@ public class StartConditions {
 		Planet[] planets = new Planet[number];
 		planets[0] = earth.clone();
 
-		double radius, x, y;
-		Vec2D pos;
 		for (int i = 1; i < number; i++) {
-			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance * 0.5);
-
-			y = Utils.plusMinus() * Math.random() * radius;
-			x = Utils.plusMinus() * Math.sqrt(radius * radius - y * y);
-			pos = new Vec2D(x, y);
-
 			Planet randomMoon = randomMoon();
 
-			randomMoon.setPos(pos);
-			randomMoon.setVel(Utils.orbVel(earth, pos));
+			randomMoon.setPos(Utils.getRandomOrbitPosition(earth.getPos(), moonDistance * 0.1, moonDistance * 0.5));
+			randomMoon.setVel(Utils.getOrbitalVelocity(earth, randomMoon.getPos()));
 			randomMoon.setColor(Utils.getRandomColor());
 
 			planets[i] = randomMoon.clone();
@@ -297,38 +288,40 @@ public class StartConditions {
 
 		return new Constellation("Random Moons", planets, 1.9e-6, 1);
 	}
-
+	
 	/**
-	 * particle test
+	 * Saturn with rings
 	 */
-	public static Constellation getParticleTest() {
-		int number = 1000;
-		double moonDistance = 384.4e6;
+	public static Constellation getSaturnWithRings() {
+		saturn.setPos(0, 0);
+		saturn.setVel(0, 0);
+		
+		Planet[] planets = new Planet[] { saturn.clone() };
+		Particle[] particles = getRing(saturn, 1500, 135e6, 200e6);
 
-		earth.setPos(0, 0);
-		earth.setVel(0, 0);
-
-		Planet[] planets = new Planet[] { earth.clone() };
+		return new Constellation("Particles Test", planets, particles, 1.2e-6, 1);
+	}
+	
+	/** returns a ring around a planet made of a given number of particles
+	 * 
+	 * @param planet
+	 * @param number
+	 * @param innerRadius
+	 * @param outerRadius
+	 * @return
+	 */
+	private static Particle[] getRing(Planet planet, int number, double innerRadius, double outerRadius) {
 		Particle[] particles = new Particle[number];
-
-		double radius, x, y;
-		Vec2D pos;
-		for (int i = 0; i < number; i++) {
-			radius = Utils.getRandomInInervall(moonDistance * 0.1, moonDistance * 0.2);
-
-			y = Utils.plusMinus() * Math.random() * radius;
-			x = Utils.plusMinus() * Math.sqrt(radius * radius - y * y);
-			pos = new Vec2D(x, y);
-
+		for (int i = 0; i < particles.length; i++) {
 			Particle par = new Particle();
 
-			par.setPos(pos);
-			par.setVel(Utils.orbVel(earth, pos));
+			par.setPos(Utils.getRandomOrbitPosition(saturn.getPos(), innerRadius, outerRadius));
+			par.setVel(Utils.getOrbitalVelocity(saturn, par.getPos()));
 
 			particles[i] = par.clone();
 		}
-
-		return new Constellation("Particles Test", planets, particles, 1.9e-6, 1);
+		
+		return particles;
 	}
 
 	/**

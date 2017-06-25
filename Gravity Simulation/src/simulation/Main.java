@@ -31,7 +31,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(StartConditions.getParticleTest());
+		sim = new Simulation(StartConditions.getSaturnWithRings());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();
@@ -46,7 +46,7 @@ public class Main extends Application {
 		sim.stop();
 		sim = new Simulation(newConstellation);
 		sim.run();
-		win.reset();
+		win.resetAndLoad(sim);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class Main extends Application {
 		sim.stop();
 		sim = new Simulation(sim.getConstellation());
 		sim.run();
-		win.reset();
+		win.resetAndLoad(sim);
 	}
 
 }
