@@ -27,7 +27,7 @@ public class HelpWindow extends Application {
 		helpLabel.setText(
 				  "Restart			R\n"
 				+ "Reset view		E\n"
-				+ "Pause			P\n"
+				+ "Pause			Space or P\n"
 				+ "Accelerate time	.\n"
 				+ "Decelerate time	,\n"
 				+ "Reset time		-\n"

@@ -6,7 +6,7 @@ import javafx.scene.control.MenuItem;
 import simulation.Main;
 
 /**
- * The menu to open existing constellations.
+ * The menu to open existing constellations from start conditions.
  * 
  * @author Jan Muskalla
  *
@@ -27,6 +27,9 @@ public class OpenMenu extends Menu {
 
 		MenuItem jupiterSystemItem = new MenuItem("Jupiter System");
 		jupiterSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getJupiterSystem()));
+		
+		MenuItem saturnRingItem = new MenuItem("Saturn with Rings");
+		saturnRingItem.setOnAction(actionEvent -> Main.restart(StartConditions.getSaturnWithRings()));
 
 		MenuItem randomMoonsItem = new MenuItem("Random Moons");
 		randomMoonsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomMoons()));
@@ -46,7 +49,7 @@ public class OpenMenu extends Menu {
 		MenuItem emptyItem = new MenuItem(StartConditions.empty.getName());
 		emptyItem.setOnAction(actionEvent -> Main.restart(StartConditions.empty));
 
-		this.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterSystemItem, randomMoonsItem,
+		this.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterSystemItem, saturnRingItem, randomMoonsItem,
 				randomPlanetsItem, jupiterFlybyItem, earthMarsCollisionItem, sym8Item, emptyItem);
 	}
 }

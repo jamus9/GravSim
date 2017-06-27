@@ -2,6 +2,7 @@ package utils;
 
 import java.util.LinkedList;
 import javafx.scene.paint.Color;
+import simulation.Body;
 import simulation.Planet;
 import window.Window;
 
@@ -14,24 +15,6 @@ import window.Window;
 public class Utils {
 
 	public static final double GRAV_CONST = 6.67408e-11;
-
-	/**
-	 * to do
-	 * 
-	 * @param center
-	 * @param rMin
-	 * @param rMax
-	 * @return
-	 */
-	public static Vec2D getRandomOrbitPosition(Vec2D center, double rMin, double rMax) {
-		double angle = getRandomInInervall(0, 2 * Math.PI);
-		double radius = getRandomInInervall(rMin, rMax);
-
-		double x = radius * Math.cos(angle);
-		double y = radius * Math.sin(angle);
-
-		return (new Vec2D(x, y)).add(center);
-	}
 
 	/**
 	 * returns the most massive planet from a collection of planets
@@ -98,22 +81,40 @@ public class Utils {
 	}
 
 	/**
+	 * to do
+	 * 
+	 * @param center
+	 * @param rMin
+	 * @param rMax
+	 * @return
+	 */
+	public static Vec2D getRandomOrbitPosition(Planet parent, double rMin, double rMax) {
+		double angle = getRandomInInervall(0, 2 * Math.PI);
+		double radius = getRandomInInervall(rMin, rMax);
+	
+		double x = radius * Math.cos(angle);
+		double y = radius * Math.sin(angle);
+	
+		return (new Vec2D(x, y)).add(parent.getPos());
+	}
+
+	/**
 	 * returns the orbital velocity as a vector in a position around a planet
 	 * 
-	 * @param planet
+	 * @param parent
 	 * @param position
 	 * @return the orbital velocity as a vector
 	 */
-	public static Vec2D getOrbitalVelocity(Planet planet, Vec2D position) {
+	public static Vec2D getOrbitalVelocity(Planet parent, Body body) {
 
 		// connection vector
-		Vec2D r = planet.getPos().sub(position);
+		Vec2D r = parent.getPos().sub(body.getPos());
 
 		// normal vector to r
 		Vec2D velDirection = new Vec2D(r.getY(), -r.getX());
 
 		// norm and multiply with orbital speed
-		return velDirection.getDir().mult(orbSpeed(planet, r.norm())).add(planet.getVel());
+		return velDirection.getDir().mult(orbSpeed(parent, r.norm())).add(parent.getVel());
 	}
 
 	/**

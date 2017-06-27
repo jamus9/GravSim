@@ -54,6 +54,8 @@ public class Window extends Application {
 	/** the selected planet */
 	private Planet selectedPlanet;
 
+	private boolean follow;
+
 	/** the next planet that will be added */
 	private Planet nextAddedPlanet;
 
@@ -78,8 +80,21 @@ public class Window extends Application {
 	/** the menu bar */
 	private CustomMenuBar menuBar;
 
+	/**
+	 * creates a new window with and initialized local variables
+	 */
 	public Window() {
+		trails = true;
+		labels = true;
+		vectors = false;
 
+		follow = false;
+
+		nextAddedPlanet = StartConditions.moon.clone();
+		orbitMode = true;
+		
+		mousePos = new Vec2D();
+		winWasChanged = true;
 	}
 
 	/**
@@ -91,7 +106,9 @@ public class Window extends Application {
 
 		// scene and root
 		Group root = new Group();
-		scene = new Scene(root, 1200, 700, Color.LIGHTBLUE);
+		// light blue 173,216,230
+		// 3 tints down current
+		scene = new Scene(root, 1200, 700, Color.rgb(213,235,242));
 		setSceneEvents(scene);
 
 		// stage
@@ -103,23 +120,26 @@ public class Window extends Application {
 		trailPane = new Pane();
 		bodyPane = new Pane();
 		infoPane = new InfoPane();
-		menuBar = new CustomMenuBar(primaryStage, this);
+		menuBar = new CustomMenuBar(primaryStage);
 		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar);
 
 		// initialize all values to default and load the planet objects
 		resetAndLoad(Main.sim);
 
-		trails = true;
-		labels = true;
-		vectors = false;
-
-		nextAddedPlanet = StartConditions.moon.clone();
-		orbitMode = true;
+//		trails = true;
+//		labels = true;
+//		vectors = false;
+//
+//		follow = false;
+//
+//		nextAddedPlanet = StartConditions.moon.clone();
+//		orbitMode = true;
 		infoPane.setOrbitMode(orbitMode);
 
-		mousePos = new Vec2D();
-		winWasChanged = true;
 		menuBar.updateCMIs();
+
+//		mousePos = new Vec2D();
+//		winWasChanged = true;
 
 		// starts the updating time line
 		runTimeLine();
@@ -145,6 +165,7 @@ public class Window extends Application {
 
 		trailPane.getChildren().clear();
 		deselectPlanet();
+		follow = false;
 
 		bodyPane.getChildren().clear();
 		for (Planet p : sim.getPlanets())
@@ -182,23 +203,23 @@ public class Window extends Application {
 				}
 
 				// follow a planet
-				if (selectedPlanet != null) {
-					double scale = Main.sim.getScale();
-					Vec2D pos = selectedPlanet.getPos();
-					dx = scale * -pos.getX();
-					dy = scale * pos.getY();
+				if (follow) {
+					Vec2D pos = selectedPlanet.getPos().mult(Main.sim.getScale());
+					dx = -pos.getX();
+					dy = pos.getY();
 					updateTrails();
 				}
 
 				// update all drawn objects
 				for (Planet planet : Main.sim.getPlanets())
 					planet.updateObjects();
-
 				for (Particle particle : Main.sim.getParticles())
 					particle.updateObjects();
 
 				// update info
 				infoPane.updateInfo();
+				
+				bodyPane.requestFocus();
 			}
 		}));
 		timeline.setCycleCount(Animation.INDEFINITE);
@@ -242,7 +263,7 @@ public class Window extends Application {
 					Main.sim.multTime(0.5);
 				if (key == KeyCode.MINUS)
 					Main.sim.resetTime();
-				if (key == KeyCode.P)
+				if (key == KeyCode.P || key == KeyCode.SPACE)
 					Main.sim.setPause(!Main.sim.isPaused());
 
 				// adding planets
@@ -368,19 +389,38 @@ public class Window extends Application {
 		timeline.play();
 	}
 
+	private double pancounter;
+
+	/**
+	 * moves the view to the selected body after it is selected
+	 */
 	private void panToBody() {
+
+		// save current position
+		double posx = dx;
+		double posy = dy;
+		pancounter = 0;
+
 		Timeline timeline = new Timeline();
 		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-				
-//				dx += selectedPlanet.getPos().getX() - selectedPlanet.getPos().getX() * 1.05);
-				
-				
-				updateTrails();
 
-				if (zoom == 1) {
+				// pan finished -> stop
+				if (pancounter >= 1) {
 					timeline.stop();
-					Boolean follow = true;
+					follow = true;
+				}
+
+				if (selectedPlanet == null) {
+					timeline.stop();
+				} else {
+					Vec2D pos = selectedPlanet.getPos().mult(Main.sim.getScale());
+
+					// pancounter from 0 -> 1
+					dx = posx * (1 - pancounter) + -pos.getX() * pancounter;
+					dy = posy * (1 - pancounter) + pos.getY() * pancounter;
+					pancounter += 0.05;
+					updateTrails();
 				}
 			}
 		});
@@ -420,7 +460,7 @@ public class Window extends Application {
 			newPlanet.setVel(0, 0);
 		} else {
 			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
-			newPlanet.setVel(Utils.getOrbitalVelocity(biggest, newPlanet.getPos()));
+			newPlanet.setVel(Utils.getOrbitalVelocity(biggest, newPlanet));
 		}
 
 		// set new trail start
@@ -452,10 +492,12 @@ public class Window extends Application {
 		deselectPlanet();
 		selectedPlanet = planet;
 		planet.select();
+		panToBody();
 	}
 
 	/** Deselects the selected planet and updates the info label. */
 	public void deselectPlanet() {
+		follow = false;
 		if (selectedPlanet != null)
 			selectedPlanet.deselect();
 		selectedPlanet = null;

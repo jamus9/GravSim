@@ -56,7 +56,7 @@ public class InfoPane extends Pane {
 
 		relocateTimeButtons();
 
-		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitModeLabel, infoLabel, deccButton, accButton, reButton);
+		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitModeLabel, infoLabel, reButton, deccButton, accButton);
 	}
 
 	int[] spsArray = new int[60];
@@ -69,23 +69,22 @@ public class InfoPane extends Pane {
 
 		if (!Main.sim.isPaused()) {
 
-			for (int i = 0; i < spsArray.length; i++) {
-				if (spsArray[i] == 0) {
-					spsArray[i] = Main.sim.getSpsCounter() * 60;
-					Main.sim.resetSpsCounter();
-					break;
-				}
-			}
-
-			if (spsArray[spsArray.length - 1] != 0) {
-				double added = 0;
-				for (int i : spsArray)
-					added += i;
-				spsFinal = (int) (added / spsArray.length);
-				spsArray = new int[spsArray.length];
-			}
-
-			spsLabel.setText("Steps/Sec: " + spsFinal);
+//			for (int i = 0; i < spsArray.length; i++) {
+//				if (spsArray[i] == 0) {
+//					spsArray[i] = Main.sim.getSpsCounter() * 60;
+//					Main.sim.resetSpsCounter();
+//					break;
+//				}
+//			}
+//			if (spsArray[spsArray.length - 1] != 0) {
+//				double added = 0;
+//				for (int i : spsArray)
+//					added += i;
+//				spsFinal = (int) (added / spsArray.length);
+//				spsArray = new int[spsArray.length];
+//			}
+//			spsLabel.setText("Steps/Sec: " + spsFinal);
+			
 			pastTimeLabel.setText(Utils.getTimeString(Main.sim.getSecondsCounter()));
 		}
 
@@ -117,9 +116,10 @@ public class InfoPane extends Pane {
 	}
 
 	public void relocateTimeButtons() {
-		deccButton.relocate(Main.win.getWidth() - 110, 27);
-		reButton.relocate(Main.win.getWidth() - 70, 27);
-		accButton.relocate(Main.win.getWidth() - 38, 27);
+		int y = 30;
+		deccButton.relocate(Main.win.getWidth() - 110, y);
+		reButton.relocate(Main.win.getWidth() - 70, y);
+		accButton.relocate(Main.win.getWidth() - 38, y);
 	}
 
 }

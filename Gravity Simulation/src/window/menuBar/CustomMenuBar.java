@@ -7,7 +7,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import simulation.Main;
-import window.Window;
 
 /**
  * Implements the menu bar for the main window.
@@ -24,17 +23,14 @@ public class CustomMenuBar extends MenuBar {
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vectors");
 	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
 
-	Window win;
-
 	/**
 	 * Creates the menu bar.
 	 * 
 	 * @param primaryStage
 	 */
-	public CustomMenuBar(Stage primaryStage, Window win) {
+	public CustomMenuBar(Stage primaryStage) {
 		super();
 		prefWidthProperty().bind(primaryStage.widthProperty());
-		this.win = win;
 
 		/*
 		 * simulation menu
@@ -43,7 +39,7 @@ public class CustomMenuBar extends MenuBar {
 		restartItem.setOnAction(actionEvent -> Main.restart());
 
 		MenuItem helpItem = new MenuItem("Help");
-		helpItem.setOnAction(ActionEvent -> win.openHelpWindow());
+		helpItem.setOnAction(ActionEvent -> Main.win.openHelpWindow());
 
 		MenuItem exitItem = new MenuItem("Exit");
 		exitItem.setOnAction(ActionEvent -> Platform.exit());
@@ -54,7 +50,7 @@ public class CustomMenuBar extends MenuBar {
 		/*
 		 * settings menu
 		 */
-		orbitModeCMI.setOnAction(actionEvent -> win.changeOrbitMode());
+		orbitModeCMI.setOnAction(actionEvent -> Main.win.changeOrbitMode());
 
 		Menu settingsMenu = new Menu("Settings");
 		settingsMenu.getItems().addAll(orbitModeCMI);
@@ -62,17 +58,17 @@ public class CustomMenuBar extends MenuBar {
 		/*
 		 * view menu
 		 */
-		trailsCMI.setOnAction(actionEvent -> win.changeTrailsVisibility());
-		labelsCMI.setOnAction(actionEvent -> win.changeLabelsVisibility());
-		infoCMI.setOnAction(ActionEvent -> win.changeInfoVisibility());
-		vectorsCMI.setOnAction(actionEvent -> win.changeVectorsVisibility());
+		trailsCMI.setOnAction(actionEvent -> Main.win.changeTrailsVisibility());
+		labelsCMI.setOnAction(actionEvent -> Main.win.changeLabelsVisibility());
+		infoCMI.setOnAction(ActionEvent -> Main.win.changeInfoVisibility());
+		vectorsCMI.setOnAction(actionEvent -> Main.win.changeVectorsVisibility());
 
 		Menu viewMenu = new Menu("View");
 		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, vectorsCMI);
 
 		// open and add menu
 		OpenMenu openMenu = new OpenMenu();
-		AddMenu addMenu = new AddMenu(win);
+		AddMenu addMenu = new AddMenu();
 
 		// add all menus to the menu bar
 		this.getMenus().addAll(simulationMenu, settingsMenu, viewMenu, openMenu, addMenu);
@@ -82,11 +78,11 @@ public class CustomMenuBar extends MenuBar {
 	 * Updates the check menu items in the menu "settings".
 	 */
 	public void updateCMIs() {
-		trailsCMI.setSelected(win.isTrails());
-		labelsCMI.setSelected(win.isLabels());
-		vectorsCMI.setSelected(win.isVectors());
-		infoCMI.setSelected(win.isInfoVisible());
-		orbitModeCMI.setSelected(win.isOrbitMode());
+		trailsCMI.setSelected(Main.win.isTrails());
+		labelsCMI.setSelected(Main.win.isLabels());
+		vectorsCMI.setSelected(Main.win.isVectors());
+		infoCMI.setSelected(Main.win.isInfoVisible());
+		orbitModeCMI.setSelected(Main.win.isOrbitMode());
 	}
 
 }

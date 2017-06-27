@@ -31,7 +31,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(StartConditions.getSaturnWithRings());
+		sim = new Simulation(StartConditions.getParLine());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();

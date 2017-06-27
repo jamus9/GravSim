@@ -338,5 +338,10 @@ public class Planet implements Body {
 		((Pane) circle.getParent()).getChildren().remove(circle);
 		((Pane) label.getParent()).getChildren().remove(label);
 	}
+	
+	public void setZero() {
+		pos = new Vec2D();
+		vel = new Vec2D();
+	}
 
 }

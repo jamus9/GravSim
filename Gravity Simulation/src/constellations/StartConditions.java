@@ -62,6 +62,8 @@ public class StartConditions {
 
 			blackHole = new Planet(blackHoleMass, blackHoleRad, Color.BLACK, "Black Hole");
 
+	private static double moonDistance = 384.4e6;
+
 	/**
 	 * an empty constellation, have fun
 	 */
@@ -117,8 +119,6 @@ public class StartConditions {
 	 * The Earth-Moon System
 	 */
 	public static Constellation getEarthSystem() {
-		double moonDistance = 384.4e6;
-
 		earth.setPos(0, 0);
 		earth.setVel(0, Utils.momComp(earthMass, moonMass, -Utils.orbSpeed(earth, moonDistance)));
 
@@ -136,14 +136,13 @@ public class StartConditions {
 		double phobosDistance = 9378e3;
 		double deimosDistance = 23459e3;
 
-		mars.setPos(0, 0);
-		mars.setVel(0, 0);
+		mars.setZero();
 
 		phobos.setPos(phobosDistance, 0);
-		phobos.setVel(Utils.getOrbitalVelocity(mars, phobos.getPos()));
+		phobos.setVel(Utils.getOrbitalVelocity(mars, phobos));
 
 		deimos.setPos(-deimosDistance, 0);
-		deimos.setVel(Utils.getOrbitalVelocity(mars, deimos.getPos()));
+		deimos.setVel(Utils.getOrbitalVelocity(mars, deimos));
 
 		Planet[] planets = { mars.clone(), phobos.clone(), deimos.clone() };
 
@@ -159,20 +158,19 @@ public class StartConditions {
 		double ganymadeDis = 1070.4e6;
 		double callistoDis = 1882.7e6;
 
-		jupiter.setPos(0, 0);
-		jupiter.setVel(0, 0);
+		jupiter.setZero();
 
 		io.setPos(0, ioDis);
-		io.setVel(Utils.getOrbitalVelocity(jupiter, io.getPos()));
+		io.setVel(Utils.getOrbitalVelocity(jupiter, io));
 
 		europa.setPos(0, -europaDis);
-		europa.setVel(Utils.getOrbitalVelocity(jupiter, europa.getPos()));
+		europa.setVel(Utils.getOrbitalVelocity(jupiter, europa));
 
 		ganymede.setPos(0, ganymadeDis);
-		ganymede.setVel(Utils.getOrbitalVelocity(jupiter, ganymede.getPos()));
+		ganymede.setVel(Utils.getOrbitalVelocity(jupiter, ganymede));
 
 		callisto.setPos(0, -callistoDis);
-		callisto.setVel(Utils.getOrbitalVelocity(jupiter, callisto.getPos()));
+		callisto.setVel(Utils.getOrbitalVelocity(jupiter, callisto));
 
 		Planet[] planets = { jupiter.clone(), io.clone(), europa.clone(), ganymede.clone(), callisto.clone() };
 
@@ -186,8 +184,7 @@ public class StartConditions {
 		Planet ast1 = new Planet(-133708e3 * 17, -133708e3 * 4, 10000, 0, 100, 1, Color.GRAY, "Asteroid");
 		Planet ast2 = new Planet(-133708e3 * 17, -133708e3 * 8, 10000, 0, 100, 1, Color.GRAY, "Asteroid");
 
-		jupiter.setPos(0, 0);
-		jupiter.setVel(0, 0);
+		jupiter.setZero();
 
 		return new Constellation("Jupiter Flyby", new Planet[] { ast1, ast2, jupiter.clone() }, 3e-7, 3);
 	}
@@ -200,6 +197,7 @@ public class StartConditions {
 		double vel = 0.0135;
 		double mass = 5e9;
 		int density = 2000;
+
 		Planet p1 = new Planet(dis, 0, 0, vel, mass, density);
 		Planet p2 = new Planet(-dis, 0, 0, -vel, mass, density);
 		Planet p3 = new Planet(0, dis, -vel, 0, mass, density);
@@ -211,7 +209,6 @@ public class StartConditions {
 		Planet p8 = new Planet(dis, -dis, vel, vel, mass, density);
 
 		Planet[] planets = { p1, p2, p3, p4, p5, p6, p7, p8 };
-
 		return new Constellation("Symmetrical 8", planets, 0.05, 10);
 	}
 
@@ -252,9 +249,7 @@ public class StartConditions {
 			double y = Utils.plusMinus() * Math.random() * 5e7 * 7;
 
 			p.setPos(x, y);
-
-			p.setVel(Utils.plusMinus() * Math.random() * 1000, Utils.plusMinus() * Math.random() * 1000);
-
+			p.setVel(Utils.plusMinus() * Math.random() * 5000, Utils.plusMinus() * Math.random() * 5000);
 			p.setColor(Utils.getRandomColor());
 
 			planets[i] = p;
@@ -268,10 +263,8 @@ public class StartConditions {
 	 */
 	public static Constellation getRandomMoons() {
 		int number = 60;
-		double moonDistance = 384.4e6;
 
-		earth.setPos(0, 0);
-		earth.setVel(0, 0);
+		earth.setZero();
 
 		Planet[] planets = new Planet[number];
 		planets[0] = earth.clone();
@@ -279,8 +272,8 @@ public class StartConditions {
 		for (int i = 1; i < number; i++) {
 			Planet randomMoon = randomMoon();
 
-			randomMoon.setPos(Utils.getRandomOrbitPosition(earth.getPos(), moonDistance * 0.1, moonDistance * 0.5));
-			randomMoon.setVel(Utils.getOrbitalVelocity(earth, randomMoon.getPos()));
+			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, moonDistance * 0.1, moonDistance * 0.5));
+			randomMoon.setVel(Utils.getOrbitalVelocity(earth, randomMoon));
 			randomMoon.setColor(Utils.getRandomColor());
 
 			planets[i] = randomMoon.clone();
@@ -288,21 +281,60 @@ public class StartConditions {
 
 		return new Constellation("Random Moons", planets, 1.9e-6, 1);
 	}
-	
+
 	/**
 	 * Saturn with rings
 	 */
 	public static Constellation getSaturnWithRings() {
-		saturn.setPos(0, 0);
-		saturn.setVel(0, 0);
-		
-		Planet[] planets = new Planet[] { saturn.clone() };
-		Particle[] particles = getRing(saturn, 1500, 135e6, 200e6);
+		saturn.setZero();
 
-		return new Constellation("Particles Test", planets, particles, 1.2e-6, 1);
+		double rMin = 135e6;
+		double rMax = 200e6;
+		Particle[] particles = getRing(saturn, 1500, rMin, rMax);
+
+		Planet[] planets = new Planet[] { saturn.clone() };
+
+		return new Constellation("Saturn with Rings", planets, particles, 1.2e-6, 2);
 	}
-	
-	/** returns a ring around a planet made of a given number of particles
+
+	/**
+	 * Saturn with rings encounters an uranus
+	 */
+	public static Constellation getSaturnUranusEncounter() {
+		saturn.setZero();
+
+		double rMin = 135e6;
+		double rMax = 200e6;
+		Particle[] particles = getRing(saturn, 1500, rMin, rMax);
+
+		uranus.setPos(-rMax * 4, -rMin * 3);
+		uranus.setVel(15000, 0);
+
+		Planet[] planets = new Planet[] { saturn.clone(), uranus.clone() };
+
+		return new Constellation("Particles Test", planets, particles, 0.7e-6, 4);
+	}
+
+	public static Constellation getParLine() {
+		earth.setZero();
+		Particle[] particles = new Particle[1500];
+
+		Particle particle;
+		for (int i = 0; i < particles.length; i++) {
+			particle = new Particle();
+
+			particle.setPos(-moonDistance/2d, i * 2d * moonDistance / 1500d - moonDistance);
+			particle.setVel(1000, 0);
+
+			particles[i] = particle;
+		}
+
+		Planet[] planets = new Planet[] { earth.clone() };
+		return new Constellation("Particles Test", planets, particles, 0.7e-6, 20);
+	}
+
+	/**
+	 * returns a ring around a planet made of a given number of particles
 	 * 
 	 * @param planet
 	 * @param number
@@ -312,15 +344,16 @@ public class StartConditions {
 	 */
 	private static Particle[] getRing(Planet planet, int number, double innerRadius, double outerRadius) {
 		Particle[] particles = new Particle[number];
+		Particle particle;
 		for (int i = 0; i < particles.length; i++) {
-			Particle par = new Particle();
+			particle = new Particle();
 
-			par.setPos(Utils.getRandomOrbitPosition(saturn.getPos(), innerRadius, outerRadius));
-			par.setVel(Utils.getOrbitalVelocity(saturn, par.getPos()));
+			particle.setPos(Utils.getRandomOrbitPosition(saturn, innerRadius, outerRadius));
+			particle.setVel(Utils.getOrbitalVelocity(saturn, particle));
 
-			particles[i] = par.clone();
+			particles[i] = particle.clone();
 		}
-		
+
 		return particles;
 	}
 
@@ -329,7 +362,8 @@ public class StartConditions {
 	 * 
 	 * @return the random Planet
 	 */
-	public static Planet randomAsteroid() {
+	@SuppressWarnings("unused")
+	private static Planet randomAsteroid() {
 		// typical asteroid density in kg/m^3
 		double density = 2000;
 		double mass = Utils.getRandomInInervall(10e4, 10e20);
@@ -341,9 +375,9 @@ public class StartConditions {
 	 * 
 	 * @return the random Planet
 	 */
-	public static Planet randomMoon() {
-		double density = moonMass / ((4 / 3) * Math.PI * Math.pow(moonRad, 3));
-		double mass = Utils.getRandomInInervall(moonMass / 3, moonMass);
+	private static Planet randomMoon() {
+		double density = moon.getDensity();
+		double mass = Utils.getRandomInInervall(moonMass / 10, moonMass);
 		return new Planet(0, 0, 0, 0, mass, density);
 	}
 
@@ -352,8 +386,8 @@ public class StartConditions {
 	 * 
 	 * @return the random Planet
 	 */
-	public static Planet randomPlanet() {
-		double density = earthMass / ((4 / 3) * Math.PI * Math.pow(earthRad, 3));
+	private static Planet randomPlanet() {
+		double density = earth.getDensity();
 		double mass = Utils.getRandomInInervall(merkurMass, earthMass * 2);
 		return new Planet(0, 0, 0, 0, mass, density);
 	}
@@ -363,8 +397,9 @@ public class StartConditions {
 	 * 
 	 * @return the random Planet
 	 */
-	public static Planet randomGasGiant() {
-		double density = uranusMass / ((4 / 3) * Math.PI * Math.pow(uranusRad, 3));
+	@SuppressWarnings("unused")
+	private static Planet randomGasGiant() {
+		double density = uranus.getDensity();
 		double mass = Utils.getRandomInInervall(uranusMass, jupiterMass);
 		return new Planet(0, 0, 0, 0, mass, density);
 	}
