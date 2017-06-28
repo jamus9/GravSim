@@ -4,6 +4,7 @@ import javafx.scene.paint.Color;
 import simulation.Particle;
 import simulation.Planet;
 import utils.Utils;
+import utils.Vec2D;
 
 /**
  * A class that creates start conditions (constellations) for the simulation.
@@ -317,19 +318,9 @@ public class StartConditions {
 
 	public static Constellation getParLine() {
 		earth.setZero();
-		Particle[] particles = new Particle[1500];
-
-		Particle particle;
-		for (int i = 0; i < particles.length; i++) {
-			particle = new Particle();
-
-			particle.setPos(-moonDistance/2d, i * 2d * moonDistance / 1500d - moonDistance);
-			particle.setVel(1000, 0);
-
-			particles[i] = particle;
-		}
-
 		Planet[] planets = new Planet[] { earth.clone() };
+		Particle[] particles = getVerticalLine(new Vec2D(-moonDistance / 2.0, 0), new Vec2D(1000, 0), moonDistance * 2,
+				1000);
 		return new Constellation("Particles Test", planets, particles, 0.7e-6, 20);
 	}
 
@@ -352,6 +343,32 @@ public class StartConditions {
 			particle.setVel(Utils.getOrbitalVelocity(saturn, particle));
 
 			particles[i] = particle.clone();
+		}
+
+		return particles;
+	}
+
+	/**
+	 * returns a vertical line of a number of particles with a given position,
+	 * velocity and length
+	 * 
+	 * @param pos
+	 * @param vel
+	 * @param lenght
+	 * @param number
+	 * @return
+	 */
+	private static Particle[] getVerticalLine(Vec2D pos, Vec2D vel, double lenght, int number) {
+		Particle[] particles = new Particle[number];
+
+		Particle particle;
+		for (int i = 0; i < particles.length; i++) {
+			particle = new Particle();
+
+			particle.setPos(pos.getX(), i * lenght / number - lenght / 2.0 + pos.getY());
+			particle.setVel(1000, 0);
+
+			particles[i] = particle;
 		}
 
 		return particles;

@@ -114,7 +114,7 @@ public class Window extends Application {
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-		// primaryStage.setMaximized(true);
+		primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
