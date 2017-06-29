@@ -1,7 +1,4 @@
-package constellations;
-
-import simulation.Particle;
-import simulation.Planet;
+package bodies;
 
 /**
  * Implements a Constellation with an array of planets, a scale, time and name.

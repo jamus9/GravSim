@@ -1,7 +1,7 @@
 package simulation;
 
-import constellations.Constellation;
-import constellations.StartConditions;
+import bodies.Constellation;
+import constellations.Constellations;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import window.Window;
@@ -31,7 +31,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(StartConditions.getParLine());
+		sim = new Simulation(Constellations.saturnUranusEncounter());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();

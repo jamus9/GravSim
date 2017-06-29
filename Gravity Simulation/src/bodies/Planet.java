@@ -1,4 +1,4 @@
-package simulation;
+package bodies;
 
 import java.util.LinkedList;
 
@@ -8,6 +8,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
+import simulation.Main;
+import utils.Utils;
 import utils.Vec2D;
 import javafx.scene.layout.Pane;
 
@@ -311,6 +313,10 @@ public class Planet implements Body {
 	public String getName() {
 		return label.getText();
 	}
+	
+	public void setName(String str) {
+		label.setText(str);
+	}
 
 	public Line getVelocityLine() {
 		return velocityLine;
@@ -342,6 +348,10 @@ public class Planet implements Body {
 	public void setZero() {
 		pos = new Vec2D();
 		vel = new Vec2D();
+	}
+	
+	public void setOrbitalVel(Planet parent) {
+		setVel(Utils.getOrbitalVelocity(parent, this));
 	}
 
 }

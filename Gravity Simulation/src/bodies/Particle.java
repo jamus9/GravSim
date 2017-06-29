@@ -1,7 +1,8 @@
-package simulation;
+package bodies;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import simulation.Main;
 import utils.Vec2D;
 
 /**

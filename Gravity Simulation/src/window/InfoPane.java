@@ -1,11 +1,11 @@
 package window;
 
+import bodies.Planet;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import simulation.Main;
-import simulation.Planet;
 import simulation.Simulation;
 import utils.Utils;
 
@@ -69,21 +69,21 @@ public class InfoPane extends Pane {
 
 		if (!Main.sim.isPaused()) {
 
-//			for (int i = 0; i < spsArray.length; i++) {
-//				if (spsArray[i] == 0) {
-//					spsArray[i] = Main.sim.getSpsCounter() * 60;
-//					Main.sim.resetSpsCounter();
-//					break;
-//				}
-//			}
-//			if (spsArray[spsArray.length - 1] != 0) {
-//				double added = 0;
-//				for (int i : spsArray)
-//					added += i;
-//				spsFinal = (int) (added / spsArray.length);
-//				spsArray = new int[spsArray.length];
-//			}
-//			spsLabel.setText("Steps/Sec: " + spsFinal);
+			for (int i = 0; i < spsArray.length; i++) {
+				if (spsArray[i] == 0) {
+					spsArray[i] = Main.sim.getSpsCounter() * 60;
+					Main.sim.resetSpsCounter();
+					break;
+				}
+			}
+			if (spsArray[spsArray.length - 1] != 0) {
+				double added = 0;
+				for (int i : spsArray)
+					added += i;
+				spsFinal = (int) (added / spsArray.length);
+				spsArray = new int[spsArray.length];
+			}
+			spsLabel.setText("Steps/Sec: " + spsFinal);
 			
 			pastTimeLabel.setText(Utils.getTimeString(Main.sim.getSecondsCounter()));
 		}

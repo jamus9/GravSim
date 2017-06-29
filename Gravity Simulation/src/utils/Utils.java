@@ -1,9 +1,11 @@
 package utils;
 
 import java.util.LinkedList;
+
+import bodies.Body;
+import bodies.Particle;
+import bodies.Planet;
 import javafx.scene.paint.Color;
-import simulation.Body;
-import simulation.Planet;
 import window.Window;
 
 /**
@@ -195,6 +197,30 @@ public class Utils {
 	 */
 	public static Color getRandomColor() {
 		return Color.color(Math.random(), Math.random(), Math.random());
+	}
+	
+	/**
+	 * concatenates two arrays
+	 * 
+	 * @param array1
+	 * @param array2
+	 * @return the new array
+	 */
+	public static Body[] concat(Body array1[], Body array2[]) {
+		int le1 = array1.length;
+		int le2 = array2.length;
+
+		Body con[] = new Particle[le1 + le2];
+
+		// copy the first array in the first half
+		for (int i = 0; i < le1; i++)
+			con[i] = array1[i];
+
+		// copy the second array in the second half
+		for (int i = le1; i < le2 + le1; i++)
+			con[i] = array2[i - le1];
+
+		return con;
 	}
 
 }

@@ -1,6 +1,9 @@
 package simulation;
 
-import constellations.Constellation;
+import bodies.Body;
+import bodies.Constellation;
+import bodies.Particle;
+import bodies.Planet;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -66,13 +69,15 @@ public class Simulation {
 		particles = new Particle[constellation.numberOfParticles()];
 		for (int i = 0; i < particles.length; i++)
 			particles[i] = constellation.getParticle(i).clone();
+
+		timeline = new Timeline();
 	}
 
 	/**
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	public void run() {
-		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
+		timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				moveBodies();
 				checkForCollisions();

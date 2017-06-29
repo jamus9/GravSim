@@ -1,6 +1,9 @@
 package window;
 
-import constellations.StartConditions;
+import bodies.Body;
+import bodies.Particle;
+import bodies.Planet;
+import constellations.Planets;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -21,10 +24,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import simulation.Body;
 import simulation.Main;
-import simulation.Particle;
-import simulation.Planet;
 import simulation.Simulation;
 import utils.Utils;
 import utils.Vec2D;
@@ -90,9 +90,9 @@ public class Window extends Application {
 
 		follow = false;
 
-		nextAddedPlanet = StartConditions.moon.clone();
+		nextAddedPlanet = Planets.getMoon();
 		orbitMode = true;
-		
+
 		mousePos = new Vec2D();
 		winWasChanged = true;
 	}
@@ -108,38 +108,29 @@ public class Window extends Application {
 		Group root = new Group();
 		// light blue 173,216,230
 		// 3 tints down current
-		scene = new Scene(root, 1200, 700, Color.rgb(213,235,242));
+		scene = new Scene(root, 1200, 700, Color.rgb(213, 235, 242));
 		setSceneEvents(scene);
 
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-		primaryStage.setMaximized(true);
+//		 primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
+
 		bodyPane = new Pane();
+
 		infoPane = new InfoPane();
+		infoPane.setOrbitMode(orbitMode);
+
 		menuBar = new CustomMenuBar(primaryStage);
+		menuBar.updateCMIs();
+
 		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar);
 
 		// initialize all values to default and load the planet objects
 		resetAndLoad(Main.sim);
-
-//		trails = true;
-//		labels = true;
-//		vectors = false;
-//
-//		follow = false;
-//
-//		nextAddedPlanet = StartConditions.moon.clone();
-//		orbitMode = true;
-		infoPane.setOrbitMode(orbitMode);
-
-		menuBar.updateCMIs();
-
-//		mousePos = new Vec2D();
-//		winWasChanged = true;
 
 		// starts the updating time line
 		runTimeLine();
@@ -218,7 +209,7 @@ public class Window extends Application {
 
 				// update info
 				infoPane.updateInfo();
-				
+
 				bodyPane.requestFocus();
 			}
 		}));

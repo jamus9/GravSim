@@ -1,6 +1,7 @@
 package window.menuBar;
 
-import constellations.StartConditions;
+import bodies.Constellation;
+import constellations.Constellations;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import simulation.Main;
@@ -15,41 +16,31 @@ public class OpenMenu extends Menu {
 
 	public OpenMenu() {
 		super("Open");
-		
-		MenuItem earthSystemItem = new MenuItem("Earth System");
-		earthSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getEarthSystem()));
 
-		MenuItem solarSystemItem = new MenuItem("Solar System");
-		solarSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getSolarSystem()));
+		newMenu(Constellations.solarSystem());
+		newMenu(Constellations.earthSystem());
+		newMenu(Constellations.marsSystem());
+		newMenu(Constellations.jupiterSystem());
 
-		MenuItem marsSystemItem = new MenuItem("Mars System");
-		marsSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getMarsSystem()));
+		newMenu(Constellations.saturnWithRings());
+		newMenu(Constellations.saturnUranusEncounter());
 
-		MenuItem jupiterSystemItem = new MenuItem("Jupiter System");
-		jupiterSystemItem.setOnAction(actionEvent -> Main.restart(StartConditions.getJupiterSystem()));
-		
-		MenuItem saturnRingItem = new MenuItem("Saturn with Rings");
-		saturnRingItem.setOnAction(actionEvent -> Main.restart(StartConditions.getSaturnWithRings()));
+		newMenu(Constellations.randomMoons());
+		newMenu(Constellations.randomPlanets());
 
-		MenuItem randomMoonsItem = new MenuItem("Random Moons");
-		randomMoonsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomMoons()));
+		newMenu(Constellations.jupiterFlyby());
+		newMenu(Constellations.earthMarsCollision());
+		newMenu(Constellations.binaryStar());
+		newMenu(Constellations.binaryWithRings());
 
-		MenuItem randomPlanetsItem = new MenuItem("Random Planets");
-		randomPlanetsItem.setOnAction(actionEvent -> Main.restart(StartConditions.getRandomPlanets()));
-
-		MenuItem jupiterFlybyItem = new MenuItem("Jupiter Flyby");
-		jupiterFlybyItem.setOnAction(actionEvent -> Main.restart(StartConditions.getJupiterFlyby()));
-
-		MenuItem earthMarsCollisionItem = new MenuItem("Earth-Mars Collision");
-		earthMarsCollisionItem.setOnAction(actionEvent -> Main.restart(StartConditions.getEarthMarsCollision()));
-
-		MenuItem sym8Item = new MenuItem("Symmetrical 8");
-		sym8Item.setOnAction(actionEvent -> Main.restart(StartConditions.getSym8()));
-
-		MenuItem emptyItem = new MenuItem(StartConditions.empty.getName());
-		emptyItem.setOnAction(actionEvent -> Main.restart(StartConditions.empty));
-
-		this.getItems().addAll(solarSystemItem, earthSystemItem, marsSystemItem, jupiterSystemItem, saturnRingItem, randomMoonsItem,
-				randomPlanetsItem, jupiterFlybyItem, earthMarsCollisionItem, sym8Item, emptyItem);
+		newMenu(Constellations.sym8());
+		newMenu(Constellations.empty);
 	}
+
+	private void newMenu(Constellation con) {
+		MenuItem temp = new MenuItem(con.getName());
+		temp.setOnAction(actionEvent -> Main.restart(con));
+		this.getItems().add(temp);
+	}
+
 }
