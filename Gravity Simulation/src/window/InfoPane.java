@@ -29,31 +29,34 @@ public class InfoPane extends Pane {
 	 */
 	public InfoPane() {
 		super();
+		
+		int y = 16;
 
 		spsLabel = new Label();
 		spsLabel.relocate(3, 25);
 		spsLabel.setTextFill(Color.BLACK);
 
 		pastTimeLabel = new Label();
-		pastTimeLabel.relocate(3, 40);
+		pastTimeLabel.relocate(3, spsLabel.getLayoutY() + y);
 		pastTimeLabel.setTextFill(Color.BLACK);
 
 		orbitModeLabel = new Label();
-		orbitModeLabel.relocate(3, 55);
+		orbitModeLabel.relocate(3, pastTimeLabel.getLayoutY() + y);
 
 		infoLabel = new Label();
-		infoLabel.relocate(3, 85);
+		infoLabel.relocate(3, orbitModeLabel.getLayoutY() + y*2);
 		infoLabel.setTextFill(Color.BLACK);
 
 		deccButton = new Button("<<");
 		deccButton.setOnAction(actionEvent -> Main.sim.multTime(0.5));
 
-		reButton = new Button("O");
+		reButton = new Button("R");
 		reButton.setOnAction(actionEvent -> Main.sim.resetTime());
 
 		accButton = new Button(">>");
 		accButton.setOnAction(actionEvent -> Main.sim.multTime(2));
 
+		// put button at correct position
 		relocateTimeButtons();
 
 		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitModeLabel, infoLabel, reButton, deccButton, accButton);
@@ -69,6 +72,7 @@ public class InfoPane extends Pane {
 
 		if (!Main.sim.isPaused()) {
 
+			// sps 1s average calculator
 			for (int i = 0; i < spsArray.length; i++) {
 				if (spsArray[i] == 0) {
 					spsArray[i] = Main.sim.getSpsCounter() * 60;
@@ -84,29 +88,35 @@ public class InfoPane extends Pane {
 				spsArray = new int[spsArray.length];
 			}
 			spsLabel.setText("Steps/Sec: " + spsFinal);
-			
+
+			// past simulation time
 			pastTimeLabel.setText(Utils.getTimeString(Main.sim.getSecondsCounter()));
 		}
+		
+		// general information
+		String infoText = Main.sim.getConstellation().getName() + "\nObjects: " + Main.sim.getNumberOfObjects()
+		+ "\nTime: x" + ((int) (Main.sim.getTime() * Simulation.getSps()));
 
+		// info about selected planet
 		Planet selPl = Main.win.getSelectedPlanet();
-
 		if (selPl != null) {
-			infoLabel.setText(selPl.getName() + "\nMass: " + selPl.getMass() + " kg\nRadius: "
-					+ Math.round(selPl.getRadius() / 1000.0) + " km\nVelocity: " + (int) selPl.getVel().norm() + " m/s"
-					+ "\nTime: x" + (int) (Main.sim.getTime() * Simulation.SPS));
-		} else {
-			infoLabel.setText(Main.sim.getConstellation().getName() + "\nObjects: " + Main.sim.getNumberOfObjects()
-					+ "\nTime: x" + (int) (Main.sim.getTime() * Simulation.SPS));
+			String name = selPl.getName() + "\n";
+			String mass = "Mass: " + selPl.getMass() + " kg\n";
+			String rad = "Radius: " + Math.round(selPl.getRadius() / 1000.0) + " km\n";
+			String vel = "Velocity: " + (int) selPl.getVel().norm() + " m/s" + "\n";
+			infoText += "\n\n" + name + mass + rad + vel;
 		}
+		
+		infoLabel.setText(infoText);
 	}
 
 	/**
 	 * updates the orbit mode label
 	 * 
-	 * @param b
+	 * @param boo
 	 */
-	public void setOrbitMode(boolean b) {
-		if (b) {
+	public void setOrbitMode(boolean boo) {
+		if (boo) {
 			orbitModeLabel.setText("Orbit Mode: On");
 			orbitModeLabel.setTextFill(Color.BLACK);
 		} else {

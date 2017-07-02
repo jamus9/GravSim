@@ -15,8 +15,6 @@ import utils.Vec2D;
  */
 public class Constellations {
 
-	private static double moonDistance = 384.4e6;
-
 	/**
 	 * an empty constellation, have fun
 	 */
@@ -26,15 +24,6 @@ public class Constellations {
 	 * The Solar System with the sun and the 9 planets
 	 */
 	public static Constellation solarSystem() {
-		double merkurDis = 57.909e9;
-		double venusDis = 108.16e9;
-		double earthDis = 149.6e9;
-		double marsDis = 227.99e9;
-		double jupiterDis = 778.23e9;
-		double saturnDis = 1433.5e9;
-		double uranusDis = 2872.4e9;
-		double neptunDis = 4498.4e9;
-
 		Planet sun = Planets.getSun();
 		Planet merkur = Planets.getMerkur();
 		Planet venus = Planets.getVenus();
@@ -45,33 +34,38 @@ public class Constellations {
 		Planet uranus = Planets.getUranus();
 		Planet neptun = Planets.getNeptun();
 
-		merkur.setPos(merkurDis, 0);
+		merkur.setPos(Planets.merkurDis, 0);
 		merkur.setOrbitalVel(sun);
 
-		venus.setPos(-venusDis, 0);
+		venus.setPos(-Planets.venusDis, 0);
 		venus.setOrbitalVel(sun);
 
-		earth.setPos(0, earthDis);
+		earth.setPos(0, Planets.earthDis);
 		earth.setOrbitalVel(sun);
 
-		mars.setPos(marsDis, 0);
+		mars.setPos(Planets.marsDis, 0);
 		mars.setOrbitalVel(sun);
 
-		jupiter.setPos(-jupiterDis, 0);
+		jupiter.setPos(-Planets.jupiterDis, 0);
 		jupiter.setOrbitalVel(sun);
 
-		saturn.setPos(saturnDis, 0);
+		saturn.setPos(Planets.saturnDis, 0);
 		saturn.setOrbitalVel(sun);
 
-		uranus.setPos(0, uranusDis);
+		uranus.setPos(0, Planets.uranusDis);
 		uranus.setOrbitalVel(sun);
 
-		neptun.setPos(0, -neptunDis);
+		neptun.setPos(0, -Planets.neptunDis);
 		neptun.setOrbitalVel(sun);
 
 		Planet[] planets = { sun, merkur, venus, earth, mars, jupiter, saturn, uranus, neptun };
 
-		return new Constellation("Solar System", planets, 1.4e-9, 200);
+		// asteroid belt between mars and jupiter
+		double rMin = Planets.AU * 2.3;
+		double rMax = Planets.AU * 3.3;
+		Particle[] particles = Particles.getRing(sun, 100, rMin, rMax);
+
+		return new Constellation("Solar System", planets, particles, 4e-10, 300);
 	}
 
 	/**
@@ -82,10 +76,11 @@ public class Constellations {
 		Planet moon = Planets.getMoon();
 
 		earth.setPos(0, 0);
-		earth.setVel(0, Utils.momComp(Planets.earthMass, Planets.moonMass, -Utils.orbSpeed(earth, moonDistance)));
 
-		moon.setPos(-moonDistance, 0);
+		moon.setPos(-Planets.moonDis, 0);
 		moon.setOrbitalVel(earth);
+
+		earth.setVel(0, Utils.momComp(Planets.earthMass, Planets.moonMass, -moon.getVel().norm()));
 
 		Planet[] planets = { earth, moon };
 
@@ -115,7 +110,7 @@ public class Constellations {
 	}
 
 	/**
-	 * The Jupiter System with the four Galilean moons
+	 * The Jupiter system with the four Galilean moons
 	 */
 	public static Constellation jupiterSystem() {
 		double ioDis = 421.7e6;
@@ -143,7 +138,59 @@ public class Constellations {
 
 		Planet[] planets = { jupiter, io, europa, ganymede, callisto };
 
-		return new Constellation("Jupiter System", planets, 1.5e-7, 3);
+		double rMin = 92e6;
+		double rMax = 122e6;
+		Particle[] particles = Particles.getRing(jupiter, 100, rMin, rMax);
+
+		return new Constellation("Jupiter System", planets, particles, 1.7e-7, 1);
+	}
+
+	/**
+	 * Saturn system
+	 */
+	public static Constellation saturnSystem() {
+		int sps = 2000;
+
+		double encDis = 238100e3;
+		double tethysDis = 294700e3;
+		double dioneDis = 377400e3;
+		double rheaDis = 527100e3;
+		double titanDis = 1221900e3;
+		double iaDis = 3560800e3;
+
+		Planet saturn = Planets.getSaturn();
+		Planet enceladus = Planets.getEnceladus();
+		Planet tethys = Planets.getTethys();
+		Planet dione = Planets.getDione();
+		Planet rhea = Planets.getRhea();
+		Planet titan = Planets.getTitan();
+		Planet iapetus = Planets.getIapetus();
+
+		enceladus.setPos(encDis, 0);
+		enceladus.setOrbitalVel(saturn);
+
+		tethys.setPos(-tethysDis, 0);
+		tethys.setOrbitalVel(saturn);
+
+		dione.setPos(0, dioneDis);
+		dione.setOrbitalVel(saturn);
+
+		rhea.setPos(0, -rheaDis);
+		rhea.setOrbitalVel(saturn);
+
+		titan.setPos(titanDis, 0);
+		titan.setOrbitalVel(saturn);
+
+		iapetus.setPos(-iaDis, 0);
+		iapetus.setOrbitalVel(saturn);
+
+		Planet[] planets = new Planet[] { saturn, enceladus, tethys, dione, rhea, titan, iapetus };
+
+		double rMin = 135e6;
+		double rMax = 200e6;
+		Particle[] particles = Particles.getRing(saturn, 500, rMin, rMax);
+
+		return new Constellation("Saturn System", planets, particles, 4e-7, 3, sps);
 	}
 
 	/**
@@ -210,6 +257,7 @@ public class Constellations {
 	 */
 	public static Constellation randomMoons() {
 		int number = 60;
+		int sps = 2000;
 
 		Planet earth = Planets.getEarth();
 
@@ -219,14 +267,14 @@ public class Constellations {
 		for (int i = 1; i < number; i++) {
 			Planet randomMoon = Planets.getRandomMoon();
 
-			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, moonDistance * 0.1, moonDistance * 0.5));
+			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, Planets.moonDis * 0.1, Planets.moonDis));
 			randomMoon.setVel(Utils.getOrbitalVelocity(earth, randomMoon));
 			randomMoon.setColor(Utils.getRandomColor());
 
 			planets[i] = randomMoon;
 		}
 
-		return new Constellation("Random Moons", planets, 1.9e-6, 4);
+		return new Constellation("Random Moons", planets, 8e-7, 4, sps);
 	}
 
 	/**
@@ -253,24 +301,10 @@ public class Constellations {
 	}
 
 	/**
-	 * Saturn with ring system
-	 */
-	public static Constellation saturnWithRings() {
-		Planet saturn = Planets.getSaturn();
-
-		double rMin = 135e6;
-		double rMax = 200e6;
-		Particle[] particles = Particles.getRing(saturn, 1500, rMin, rMax);
-
-		Planet[] planets = new Planet[] { saturn };
-
-		return new Constellation("Saturn with Rings", planets, particles, 1.2e-6, 1);
-	}
-
-	/**
-	 * Saturn with rings encounters an uranus
+	 * Saturn with rings encounters uranus
 	 */
 	public static Constellation saturnUranusEncounter() {
+		int sps = 2000;
 		Planet saturn = Planets.getSaturn();
 		Planet uranus = Planets.getUranus();
 
@@ -283,7 +317,7 @@ public class Constellations {
 
 		Planet[] planets = new Planet[] { saturn, uranus };
 
-		return new Constellation("Saturn Uranus Encounter", planets, particles, 0.7e-6, 4);
+		return new Constellation("Saturn Uranus Encounter", planets, particles, 0.7e-6, 4, sps);
 	}
 
 	/**
@@ -294,8 +328,8 @@ public class Constellations {
 
 		Planet[] planets = new Planet[] { earth };
 
-		Particle[] particles = Particles.getVerticalLine(new Vec2D(-moonDistance / 2.0, 0), new Vec2D(1000, 0),
-				moonDistance * 2, 1000);
+		Particle[] particles = Particles.getVerticalLine(new Vec2D(-Planets.moonDis / 2.0, 0), new Vec2D(1000, 0),
+				Planets.moonDis * 2, 1000);
 
 		return new Constellation("Particle Line", planets, particles, 0.7e-6, 20);
 	}
@@ -335,8 +369,12 @@ public class Constellations {
 		return new Constellation("Binary Star", planets, 1e-8, 10);
 	}
 
+	/**
+	 * Two Saturn with rings in orbit around each other
+	 */
 	public static Constellation binaryWithRings() {
-		double rad = moonDistance * 2;
+		int sps = 2000;
+		double rad = Planets.moonDis * 2;
 		Planet p1 = Planets.getSaturn();
 		Planet p2 = Planets.getSaturn();
 
@@ -357,7 +395,35 @@ public class Constellations {
 
 		Planet[] planets = new Planet[] { p1, p2 };
 
-		return new Constellation("Binary with rings", planets, particlesAll, 5e-7, 10);
+		return new Constellation("Binary with rings", planets, particlesAll, 5e-7, 10, sps);
+	}
+
+	/**
+	 * Earth flying through 2500 particles
+	 */
+	public static Constellation flyThroughParticleField() {
+		int sps = 1000;
+
+		Planet earth = Planets.getEarth();
+		earth.setPos(-Planets.moonDis * 3, 0);
+		earth.setVel(1000, 0);
+
+		Planet[] planets = new Planet[] { earth };
+
+		Particle[] particles = Particles.getField(Planets.moonDis * 2, Planets.moonDis * 2,
+				new Vec2D(-Planets.moonDis, 0));
+
+		return new Constellation("Particle Field", planets, particles, 5e-7, 50, sps);
+	}
+
+	/**
+	 * Earth in the center of 2500 particles
+	 */
+	public static Constellation particleField() {
+		Planet[] planets = new Planet[] { Planets.getEarth() };
+		Particle[] particles = Particles.getField(Planets.moonDis, Planets.moonDis, new Vec2D());
+
+		return new Constellation("Particle Field", planets, particles, 1.5e-6, 5, 1000);
 	}
 
 }

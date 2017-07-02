@@ -1,5 +1,7 @@
 package constellations;
 
+import java.util.ArrayList;
+
 import bodies.Particle;
 import bodies.Planet;
 import utils.Utils;
@@ -61,6 +63,34 @@ public class Particles {
 		}
 
 		return particles;
+	}
+
+	/**
+	 * 1600 particles
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Particle[] getField(double x, double y, Vec2D center) {
+		int n = 50;
+		double cx = center.getX();
+		double cy = center.getY();
+
+		ArrayList<Particle> particles = new ArrayList<Particle>();
+
+		Particle particle;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				particle = new Particle();
+
+				particle.setPos(-(x / 2) + (i * x / n) + cx, -(y / 2) + (j * y / n) + cy);
+
+				particles.add(particle);
+			}
+		}
+
+		return particles.toArray(new Particle[particles.size()]);
 	}
 
 }

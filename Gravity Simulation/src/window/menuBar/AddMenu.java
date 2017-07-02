@@ -30,7 +30,8 @@ public class AddMenu extends Menu {
 		newMenu(Planets.getSaturn());
 		newMenu(Planets.getUranus());
 		newMenu(Planets.getNeptun());
-		newMenu(Planets.getBlackhole());
+		newMenu(Planets.getSagittariusA());
+		newMenu(Planets.getBetelgeuse());
 	}
 	
 	private void newMenu(Planet p) {

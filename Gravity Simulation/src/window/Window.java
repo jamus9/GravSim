@@ -106,19 +106,17 @@ public class Window extends Application {
 
 		// scene and root
 		Group root = new Group();
-		// light blue 173,216,230
-		// 3 tints down current
-		scene = new Scene(root, 1200, 700, Color.rgb(213, 235, 242));
+		// light blue 3 tints down
+		scene = new Scene(root, 1244, 700, Color.rgb(213, 235, 242));
 		setSceneEvents(scene);
 
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-//		 primaryStage.setMaximized(true);
+		// primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
-
 		bodyPane = new Pane();
 
 		infoPane = new InfoPane();
@@ -159,10 +157,10 @@ public class Window extends Application {
 		follow = false;
 
 		bodyPane.getChildren().clear();
-		for (Planet p : sim.getPlanets())
-			addBodyToWindow(p);
-		for (Particle p : sim.getParticles())
-			addBodyToWindow(p);
+		for (Particle particle : sim.getParticles())
+			addBodyToWindow(particle);
+		for (Planet planet : sim.getPlanets())
+			addBodyToWindow(planet);
 	}
 
 	/**

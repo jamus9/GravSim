@@ -32,7 +32,7 @@ public class Particle implements Body {
 		this.pos = new Vec2D(posX, posY);
 		this.vel = new Vec2D(velX, velY);
 		this.acc = new Vec2D();
-		circle = new Circle(1);
+		circle = new Circle(0.6);
 	}
 
 	/** Creates a new particle */

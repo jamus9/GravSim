@@ -163,8 +163,8 @@ public class Planet implements Body {
 			// only draw new line if planet moved 3 pixel
 			if (tp.sub(tplast).norm() > 3) {
 
-				// delete last
-				if (trailLineList.size() > 500) {
+				// delete last if it is invisible
+				if (!trailLineList.isEmpty() && trailLineList.getFirst().getOpacity() == 0) {
 					Line line = trailLineList.getFirst();
 					((Pane) line.getParent()).getChildren().remove(line);
 					trailLineList.removeFirst();
@@ -175,7 +175,7 @@ public class Planet implements Body {
 				Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
 				line.setStroke(Color.RED);
 
-				FadeTransition ft = new FadeTransition(Duration.seconds(10), line);
+				FadeTransition ft = new FadeTransition(Duration.seconds(30), line);
 				ft.setFromValue(1.0);
 				ft.setToValue(0.0);
 				ft.play();

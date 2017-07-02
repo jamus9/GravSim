@@ -23,7 +23,7 @@ import utils.Vec2D;
 public class Simulation {
 
 	/** simulations per second */
-	public static final double SPS = 2000;
+	private static double sps;
 
 	/** the current constellation with start conditions */
 	private final Constellation constellation;
@@ -59,6 +59,7 @@ public class Simulation {
 		this.constellation = constellation;
 		time = constellation.getTime();
 		scale = constellation.getScale();
+		sps = constellation.getSps();
 
 		// copy the planets of the new constellation in the local array
 		planets = new Planet[constellation.numberOfPlanets()];
@@ -77,14 +78,16 @@ public class Simulation {
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	public void run() {
-		timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1.0 / SPS), new EventHandler<ActionEvent>() {
+		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / sps), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				moveBodies();
 				checkForCollisions();
 				spsCounter++;
 				secondsCounter += time;
 			}
-		}));
+		});
+		
+		timeline.getKeyFrames().add(kf);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
 	}
@@ -329,5 +332,9 @@ public class Simulation {
 
 	public int getNumberOfObjects() {
 		return planets.length + particles.length;
+	}
+
+	public static double getSps() {
+		return sps;
 	}
 }
