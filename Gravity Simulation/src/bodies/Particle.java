@@ -1,6 +1,7 @@
 package bodies;
 
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import simulation.Main;
 import utils.Vec2D;
@@ -33,6 +34,7 @@ public class Particle implements Body {
 		this.vel = new Vec2D(velX, velY);
 		this.acc = new Vec2D();
 		circle = new Circle(0.6);
+		circle.setFill(Color.WHITE);
 	}
 
 	/** Creates a new particle */

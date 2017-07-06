@@ -58,7 +58,7 @@ public class Utils {
 	 * @param x2
 	 * @param y1
 	 * @param y2
-	 * @return the biggest planet
+	 * @return the most massive planet
 	 */
 	public static Planet getBiggestInView(Window win, Planet... planets) {
 		LinkedList<Planet> planetsInView = new LinkedList<Planet>();
@@ -83,21 +83,18 @@ public class Utils {
 	}
 
 	/**
-	 * to do
+	 * return a random position vector inside a disk around a planet
 	 * 
-	 * @param center
+	 * @param parent
 	 * @param rMin
 	 * @param rMax
-	 * @return
+	 * @return the random position vector
 	 */
 	public static Vec2D getRandomOrbitPosition(Planet parent, double rMin, double rMax) {
 		double angle = getRandomInInervall(0, 2 * Math.PI);
 		double radius = getRandomInInervall(rMin, rMax);
-	
-		double x = radius * Math.cos(angle);
-		double y = radius * Math.sin(angle);
-	
-		return (new Vec2D(x, y)).add(parent.getPos());
+
+		return (new Vec2D(new PolarVec2D(radius, angle))).add(parent.getPos());
 	}
 
 	/**
@@ -107,7 +104,7 @@ public class Utils {
 	 * @param position
 	 * @return the orbital velocity as a vector
 	 */
-	public static Vec2D getOrbitalVelocity(Planet parent, Body body) {
+	public static Vec2D getOrbitalVelocityCircular(Planet parent, Body body) {
 
 		// connection vector
 		Vec2D r = parent.getPos().sub(body.getPos());
@@ -116,18 +113,50 @@ public class Utils {
 		Vec2D velDirection = new Vec2D(r.getY(), -r.getX());
 
 		// norm and multiply with orbital speed
-		return velDirection.getDir().mult(orbSpeed(parent, r.norm())).add(parent.getVel());
+		return velDirection.getDir().mult(orbSpeedCircular(parent, r.norm())).add(parent.getVel());
 	}
 
 	/**
-	 * returns the orbital speed of a planet
+	 * returns the orbital velocity as a vector in a position around a planet
+	 * 
+	 * @param parent
+	 * @param position
+	 * @return the orbital velocity as a vector
+	 */
+	public static Vec2D getOrbitalVelocityElliptical(Planet parent, Body body, double sma) {
+	
+		// connection vector
+		Vec2D r = parent.getPos().sub(body.getPos());
+	
+		// normal vector to r
+		Vec2D velDirection = new Vec2D(r.getY(), -r.getX());
+	
+		// norm and multiply with orbital speed
+		return velDirection.getDir().mult(orbSpeedElliptical(parent, r.norm(), sma)).add(parent.getVel());
+	}
+
+	/**
+	 * returns the orbital speed of a planet in a circular orbit
 	 * 
 	 * @param planet
 	 * @param distance
 	 * @return orbital speed as a double
 	 */
-	public static double orbSpeed(Planet planet, double distance) {
+	public static double orbSpeedCircular(Planet planet, double distance) {
 		return Math.sqrt(GRAV_CONST * planet.getMass() / distance);
+	}
+
+	/**
+	 * returns the orbital speed of a planet in an elliptical orbit
+	 * 
+	 * @param parent
+	 * @param sma
+	 *            the semi major axis of the orbit
+	 * @param distance
+	 * @return orbital speed as a double
+	 */
+	public static double orbSpeedElliptical(Planet parent, double distance, double sma) {
+		return Math.sqrt(GRAV_CONST * parent.getMass() * (2 / distance - 1 / sma));
 	}
 
 	/**
@@ -176,7 +205,10 @@ public class Utils {
 	 * @return 1 or -1
 	 */
 	public static double plusMinus() {
-		return Math.signum(Math.random() - 0.5);
+		if (Math.random() - 0.5 < 0)
+			return -1;
+		else
+			return 1;
 	}
 
 	/**
@@ -191,36 +223,35 @@ public class Utils {
 	}
 
 	/**
-	 * returns a random rgb-color
+	 * returns a random RGB-color
 	 * 
 	 * @return a color
 	 */
 	public static Color getRandomColor() {
 		return Color.color(Math.random(), Math.random(), Math.random());
 	}
-	
+
 	/**
-	 * concatenates two arrays
+	 * concatenates two particle arrays
 	 * 
 	 * @param array1
 	 * @param array2
 	 * @return the new array
 	 */
-	public static Body[] concat(Body array1[], Body array2[]) {
-		int le1 = array1.length;
-		int le2 = array2.length;
-
-		Body con[] = new Particle[le1 + le2];
+	public static Particle[] concatParticles(Particle array1[], Particle array2[]) {
+		int l1 = array1.length;
+		int l2 = array2.length;
+		Particle concat[] = new Particle[l1 + l2];
 
 		// copy the first array in the first half
-		for (int i = 0; i < le1; i++)
-			con[i] = array1[i];
+		for (int i = 0; i < l1; i++)
+			concat[i] = array1[i];
 
 		// copy the second array in the second half
-		for (int i = le1; i < le2 + le1; i++)
-			con[i] = array2[i - le1];
+		for (int i = 0; i < l2; i++)
+			concat[l1 + i] = array2[i];
 
-		return con;
+		return concat;
 	}
 
 }

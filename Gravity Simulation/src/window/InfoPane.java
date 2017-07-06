@@ -16,6 +16,8 @@ import utils.Utils;
  *
  */
 public class InfoPane extends Pane {
+	
+	private static Color color = Color.WHITE;
 
 	private Label spsLabel;
 	private Label pastTimeLabel;
@@ -34,18 +36,18 @@ public class InfoPane extends Pane {
 
 		spsLabel = new Label();
 		spsLabel.relocate(3, 25);
-		spsLabel.setTextFill(Color.BLACK);
+		spsLabel.setTextFill(color);
 
 		pastTimeLabel = new Label();
 		pastTimeLabel.relocate(3, spsLabel.getLayoutY() + y);
-		pastTimeLabel.setTextFill(Color.BLACK);
+		pastTimeLabel.setTextFill(color);
 
 		orbitModeLabel = new Label();
 		orbitModeLabel.relocate(3, pastTimeLabel.getLayoutY() + y);
 
 		infoLabel = new Label();
 		infoLabel.relocate(3, orbitModeLabel.getLayoutY() + y*2);
-		infoLabel.setTextFill(Color.BLACK);
+		infoLabel.setTextFill(color);
 
 		deccButton = new Button("<<");
 		deccButton.setOnAction(actionEvent -> Main.sim.multTime(0.5));
@@ -94,7 +96,7 @@ public class InfoPane extends Pane {
 		}
 		
 		// general information
-		String infoText = Main.sim.getConstellation().getName() + "\nObjects: " + Main.sim.getNumberOfObjects()
+		String infoText = Main.sim.getName() + "\nObjects: " + Main.sim.getNumberOfObjects()
 		+ "\nTime: x" + ((int) (Main.sim.getTime() * Simulation.getSps()));
 
 		// info about selected planet
@@ -118,7 +120,7 @@ public class InfoPane extends Pane {
 	public void setOrbitMode(boolean boo) {
 		if (boo) {
 			orbitModeLabel.setText("Orbit Mode: On");
-			orbitModeLabel.setTextFill(Color.BLACK);
+			orbitModeLabel.setTextFill(color);
 		} else {
 			orbitModeLabel.setText("Orbit Mode: Off");
 			orbitModeLabel.setTextFill(Color.RED);

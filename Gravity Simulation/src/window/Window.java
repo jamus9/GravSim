@@ -3,7 +3,6 @@ package window;
 import bodies.Body;
 import bodies.Particle;
 import bodies.Planet;
-import constellations.Planets;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -26,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
 import simulation.Simulation;
+import systems.Planets;
 import utils.Utils;
 import utils.Vec2D;
 import window.menuBar.CustomMenuBar;
@@ -42,6 +42,8 @@ public class Window extends Application {
 
 	/** flags for trails label and vectors */
 	private boolean trails, labels, vectors;
+
+	private double minSize;
 
 	/** coordinates for zoom and translation */
 	private double zoom;
@@ -88,6 +90,8 @@ public class Window extends Application {
 		labels = true;
 		vectors = false;
 
+		minSize = 2;
+
 		follow = false;
 
 		nextAddedPlanet = Planets.getMoon();
@@ -107,13 +111,13 @@ public class Window extends Application {
 		// scene and root
 		Group root = new Group();
 		// light blue 3 tints down
-		scene = new Scene(root, 1244, 700, Color.rgb(213, 235, 242));
+		scene = new Scene(root, 1244, 700, Color.BLACK);// Color.rgb(213, 235, 242));
 		setSceneEvents(scene);
 
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-		// primaryStage.setMaximized(true);
+		primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
@@ -145,8 +149,8 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Sets the view to default values, clears trails and bodies and loads all
-	 * new bodies from the simulation
+	 * Sets the view to default values, clears trails and bodies and loads all new
+	 * bodies from the simulation
 	 */
 	public void resetAndLoad(Simulation sim) {
 		zoom = 1;
@@ -156,6 +160,7 @@ public class Window extends Application {
 		deselectPlanet();
 		follow = false;
 
+		// clear the pane and add the new bodies
 		bodyPane.getChildren().clear();
 		for (Particle particle : sim.getParticles())
 			addBodyToWindow(particle);
@@ -169,16 +174,16 @@ public class Window extends Application {
 	 * @param body
 	 */
 	private void addBodyToWindow(Body body) {
-		if (body.getClass() == Planet.class)
-			bodyPane.getChildren().addAll(((Planet) body).getVelocityLine(), ((Planet) body).getAccelerationLine(),
-					body.getCircle(), ((Planet) body).getLabel());
-		else
+		if (body.getClass() == Planet.class) {
+			Planet p = (Planet) body;
+			bodyPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), body.getCircle(), p.getLabel());
+		} else
 			bodyPane.getChildren().add(body.getCircle());
 	}
 
 	/**
-	 * The main window time line. 60 times per second updates all drawn objects
-	 * and adjusts the view.
+	 * The main window time line. 60 times per second updates all drawn objects and
+	 * adjusts the view.
 	 */
 	private void runTimeLine() {
 		Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
@@ -280,9 +285,8 @@ public class Window extends Application {
 		});
 
 		/*
-		 * Select planets with primary mouse button, reset view with middle
-		 * mouse button and add new planet with right mouse button. Saves click
-		 * position.
+		 * Select planets with primary mouse button, reset view with middle mouse button
+		 * and add new planet with right mouse button. Saves click position.
 		 */
 		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
@@ -336,9 +340,9 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Starts a time line to reset scale and translation of the view. The time
-	 * line is stopped in the main window time line if the view is reseted.
-	 * Deselects the selected planet.
+	 * Starts a time line to reset scale and translation of the view. The time line
+	 * is stopped in the main window time line if the view is reseted. Deselects the
+	 * selected planet.
 	 */
 	private void resetView() {
 		deselectPlanet();
@@ -427,10 +431,12 @@ public class Window extends Application {
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
 		Circle circle;
 		Vec2D mouse, center;
+		
 		for (Planet planet : Main.sim.getPlanets()) {
 			circle = planet.getCircle();
 			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2D(mouseX, mouseY);
+			
 			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
 				selectPlanet(planet);
 			}
@@ -445,26 +451,20 @@ public class Window extends Application {
 		newPlanet.setPos(transfromBack(mousePos));
 
 		// velocity
-		if (!orbitMode || Main.sim.getPlanets().length == 0) {
+		if (!orbitMode || Main.sim.getPlanets().size() == 0) {
 			newPlanet.setVel(0, 0);
 		} else {
-			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets());
-			newPlanet.setVel(Utils.getOrbitalVelocity(biggest, newPlanet));
+			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets().toArray(new Planet[] {}));
+			newPlanet.setVel(Utils.getOrbitalVelocityCircular(biggest, newPlanet));
 		}
-
-		// set new trail start
-		newPlanet.deleteTrail();
-		newPlanet.savePosition();
 
 		// add the planet
 		Main.sim.addNewPlanet(newPlanet);
-
 		addBodyToWindow(newPlanet);
 	}
 
 	/**
-	 * Translates all Orbits to the new right position if the orbits are
-	 * visible.
+	 * Translates all Orbits to the new right position if the orbits are visible.
 	 */
 	private void updateTrails() {
 		if (trails)
@@ -496,9 +496,9 @@ public class Window extends Application {
 	 * Changes the visibility of the orbit for all planets and updates the check
 	 * menu item.
 	 * 
-	 * If the orbits are turned off, delete the orbit for all planets and clear
-	 * the orbit group. If the orbits are turned on, set the first position of
-	 * the orbit for all planets.
+	 * If the orbits are turned off, delete the orbit for all planets and clear the
+	 * orbit group. If the orbits are turned on, set the first position of the orbit
+	 * for all planets.
 	 */
 	public void changeTrailsVisibility() {
 		if (trails) {
@@ -525,8 +525,8 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Changes the visibility of the velocity vector for all planets and updates
-	 * the check menu item.
+	 * Changes the visibility of the velocity vector for all planets and updates the
+	 * check menu item.
 	 */
 	public void changeVectorsVisibility() {
 		vectors = !vectors;
@@ -536,8 +536,8 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Changes the visibility of the information group and updates the check
-	 * menu item.
+	 * Changes the visibility of the information group and updates the check menu
+	 * item.
 	 */
 	public void changeInfoVisibility() {
 		infoPane.setVisible(!infoPane.isVisible());
@@ -628,6 +628,10 @@ public class Window extends Application {
 
 	public boolean isInfoVisible() {
 		return infoPane.isVisible();
+	}
+
+	public double getMinSize() {
+		return minSize;
 	}
 
 }

@@ -1,15 +1,17 @@
 package bodies;
 
+import java.util.ArrayList;
+
 /**
- * Implements a Constellation with an array of planets, a scale, time and name.
+ * Implements a System with an array of planets, a scale, time and name.
  * 
  * @author Jan Muskalla
  * 
  */
-public class Constellation {
+public class System {
 
-	private Planet[] planetArray;
-	private Particle[] particleArray;
+	private ArrayList<Planet> planetArray;
+	private ArrayList<Particle> particleArray;
 	private double scale;
 	private double time;
 	private String name;
@@ -27,8 +29,8 @@ public class Constellation {
 	 * @param scale
 	 * @param time
 	 */
-	public Constellation(String name, Planet[] planetArray, Particle[] particleArray, double scale, double time,
-			int sps) {
+	public System(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
+			double time, int sps) {
 		this.name = name;
 		this.planetArray = planetArray;
 		this.particleArray = particleArray;
@@ -47,7 +49,8 @@ public class Constellation {
 	 * @param scale
 	 * @param time
 	 */
-	public Constellation(String name, Planet[] planetArray, Particle[] particleArray, double scale, double time) {
+	public System(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
+			double time) {
 		this(name, planetArray, particleArray, scale, time, defaultSps);
 	}
 
@@ -59,8 +62,8 @@ public class Constellation {
 	 * @param scale
 	 * @param time
 	 */
-	public Constellation(String name, Planet[] planetArray, double scale, double time, int sps) {
-		this(name, planetArray, new Particle[0], scale, time, sps);
+	public System(String name, ArrayList<Planet> planetArray, double scale, double time, int sps) {
+		this(name, planetArray, new ArrayList<Particle>(), scale, time, sps);
 	}
 
 	/**
@@ -71,36 +74,36 @@ public class Constellation {
 	 * @param scale
 	 * @param time
 	 */
-	public Constellation(String name, Planet[] planetArray, double scale, double time) {
-		this(name, planetArray, new Particle[0], scale, time, defaultSps);
+	public System(String name, ArrayList<Planet> planetArray, double scale, double time) {
+		this(name, planetArray, new ArrayList<Particle>(), scale, time, defaultSps);
 	}
 
 	public int numberOfPlanets() {
-		return planetArray.length;
+		return planetArray.size();
 	}
 
 	public int numberOfParticles() {
-		return particleArray.length;
+		return particleArray.size();
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public Planet[] getPlanetArray() {
+	public ArrayList<Planet> getPlanetArray() {
 		return planetArray;
 	}
 
 	public Planet getPlanet(int i) {
-		return planetArray[i];
+		return planetArray.get(i);
 	}
 
-	public Particle[] getParticleArray() {
+	public ArrayList<Particle> getParticleArray() {
 		return particleArray;
 	}
 
 	public Particle getParticle(int i) {
-		return particleArray[i];
+		return particleArray.get(i);
 	}
 
 	public double getScale() {
@@ -113,6 +116,18 @@ public class Constellation {
 
 	public double getSps() {
 		return sps;
+	}
+
+	public System clone() {
+		ArrayList<Planet> planetArrayNew = new ArrayList<>();
+		for (Planet p : planetArray)
+			planetArrayNew.add(p.clone());
+
+		ArrayList<Particle> particleArrayNew = new ArrayList<>();
+		for (Particle p : particleArray)
+			particleArrayNew.add(p.clone());
+
+		return new System(this.name, planetArrayNew, particleArrayNew, this.scale, this.time, this.sps);
 	}
 
 }

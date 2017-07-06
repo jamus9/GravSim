@@ -1,4 +1,4 @@
-package constellations;
+package systems;
 
 import java.util.ArrayList;
 
@@ -25,17 +25,17 @@ public class Particles {
 	 * @param number
 	 * @return
 	 */
-	public static Particle[] getVerticalLine(Vec2D pos, Vec2D vel, double lenght, int number) {
-		Particle[] particles = new Particle[number];
+	public static ArrayList<Particle> getVerticalLine(Vec2D pos, Vec2D vel, double lenght, int number) {
+		ArrayList<Particle> particles = new ArrayList<Particle>();
 
 		Particle particle;
-		for (int i = 0; i < particles.length; i++) {
+		for (int i = 0; i < particles.size(); i++) {
 			particle = new Particle();
 
 			particle.setPos(pos.getX(), i * lenght / number - lenght / 2.0 + pos.getY());
 			particle.setVel(1000, 0);
 
-			particles[i] = particle;
+			particles.add(particle);
 		}
 
 		return particles;
@@ -50,16 +50,17 @@ public class Particles {
 	 * @param outerRadius
 	 * @return
 	 */
-	public static Particle[] getRing(Planet planet, int number, double innerRadius, double outerRadius) {
-		Particle[] particles = new Particle[number];
+	public static ArrayList<Particle> getRing(Planet planet, int number, double innerRadius, double outerRadius) {
+		ArrayList<Particle> particles = new ArrayList<Particle>();
+		
 		Particle particle;
-		for (int i = 0; i < particles.length; i++) {
+		for (int i = 0; i < number; i++) {
 			particle = new Particle();
 
 			particle.setPos(Utils.getRandomOrbitPosition(planet, innerRadius, outerRadius));
-			particle.setVel(Utils.getOrbitalVelocity(planet, particle));
+			particle.setVel(Utils.getOrbitalVelocityCircular(planet, particle));
 
-			particles[i] = particle.clone();
+			particles.add(particle);
 		}
 
 		return particles;
@@ -72,7 +73,7 @@ public class Particles {
 	 * @param y
 	 * @return
 	 */
-	public static Particle[] getField(double x, double y, Vec2D center) {
+	public static ArrayList<Particle> getField(double x, double y, Vec2D center) {
 		int n = 50;
 		double cx = center.getX();
 		double cy = center.getY();
@@ -90,7 +91,7 @@ public class Particles {
 			}
 		}
 
-		return particles.toArray(new Particle[particles.size()]);
+		return particles;
 	}
 
 }

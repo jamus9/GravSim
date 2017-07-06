@@ -14,6 +14,15 @@ public class Vec2D {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public Vec2D(Vec2D v) {
+		this.x = v.x;
+		this.y = v.y;
+	}
+	
+	public Vec2D(PolarVec2D pv) {
+		this(pv.toVec2D());
+	}
 
 	public Vec2D() {
 		this(0, 0);
@@ -50,15 +59,6 @@ public class Vec2D {
 	
 	public Vec2D getDir() {
 		return this.mult(1.0 / this.norm());
-	}
-
-	public boolean isEqual(Vec2D vec) {
-		return (vec.getX() == x && vec.getY() == y);
-	}
-
-	@Override
-	public Vec2D clone() {
-		return new Vec2D(x, y);
 	}
 	
 }

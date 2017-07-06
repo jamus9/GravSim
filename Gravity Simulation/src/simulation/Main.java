@@ -1,9 +1,9 @@
 package simulation;
 
-import bodies.Constellation;
-import constellations.Constellations;
+import bodies.System;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import systems.Systems;
 import window.Window;
 
 /**
@@ -26,23 +26,23 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts the first simulation with the default constellation and opens the
+	 * Starts the first simulation with the default system and opens the
 	 * main window.
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(Constellations.particleField());
+		sim = new Simulation(Systems.solarSystem());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();
 	}
 
 	/**
-	 * Starts a new simulation with a given constellation in a default window.
+	 * Starts a new simulation with a given system in a default window.
 	 * 
 	 * @param newConstellation
 	 */
-	public static void restart(Constellation newConstellation) {
+	public static void restart(System newConstellation) {
 		sim.stop();
 		sim = new Simulation(newConstellation);
 		sim.run();
@@ -50,12 +50,12 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts a new simulation with the current constellation in a default
+	 * Starts a new simulation with the current system in a default
 	 * window.
 	 */
 	public static void restart() {
 		sim.stop();
-		sim = new Simulation(sim.getConstellation());
+		sim = new Simulation(sim.getSystem());
 		sim.run();
 		win.resetAndLoad(sim);
 	}

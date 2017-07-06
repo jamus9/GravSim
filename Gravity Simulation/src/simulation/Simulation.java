@@ -1,7 +1,9 @@
 package simulation;
 
+import java.util.ArrayList;
+
 import bodies.Body;
-import bodies.Constellation;
+import bodies.System;
 import bodies.Particle;
 import bodies.Planet;
 import javafx.animation.Animation;
@@ -15,7 +17,7 @@ import utils.Vec2D;
 
 /**
  * Simulates the movement of the planets and handles the current planets and
- * constellation.
+ * system.
  * 
  * @author Jan Muskalla
  * 
@@ -25,8 +27,10 @@ public class Simulation {
 	/** simulations per second */
 	private static double sps;
 
-	/** the current constellation with start conditions */
-	private final Constellation constellation;
+	/** the current system with start conditions */
+	private final System system;
+	
+	private final String name;
 
 	/** scale of the simulation */
 	private final double scale;
@@ -35,10 +39,10 @@ public class Simulation {
 	private double time;
 
 	/** all planets of the current simulation are saved here */
-	private Planet[] planets;
+	private ArrayList<Planet> planets;
 
 	/** all particles of the current simulation */
-	private Particle[] particles;
+	private ArrayList<Particle> particles;
 
 	/** the time line in which all calculations happen */
 	public Timeline timeline;
@@ -48,28 +52,28 @@ public class Simulation {
 	private double secondsCounter;
 
 	/**
-	 * Creates a new simulation with a given constellation.
+	 * Creates a new simulation with a given system.
 	 * 
-	 * @param constellation
+	 * @param system
 	 */
-	public Simulation(Constellation constellation) {
+	public Simulation(System constellation) {
 		spsCounter = 0;
 		secondsCounter = 0;
 
-		this.constellation = constellation;
+		this.system = constellation.clone();
+		name = constellation.getName();
 		time = constellation.getTime();
 		scale = constellation.getScale();
 		sps = constellation.getSps();
 
-		// copy the planets of the new constellation in the local array
-		planets = new Planet[constellation.numberOfPlanets()];
-		for (int i = 0; i < planets.length; i++)
-			planets[i] = constellation.getPlanet(i).clone();
+		// copy the planets of the new system in the local array and save the
+		// first position for trails
+		planets = constellation.getPlanetArray();
+		for (Planet p : planets)
+			p.savePosition();
 
-		// copy the particles of the new constellation in the local array
-		particles = new Particle[constellation.numberOfParticles()];
-		for (int i = 0; i < particles.length; i++)
-			particles[i] = constellation.getParticle(i).clone();
+		// copy the particles of the new system in the local array
+		particles = constellation.getParticleArray();
 
 		timeline = new Timeline();
 	}
@@ -86,7 +90,7 @@ public class Simulation {
 				secondsCounter += time;
 			}
 		});
-		
+
 		timeline.getKeyFrames().add(kf);
 		timeline.setCycleCount(Animation.INDEFINITE);
 		timeline.play();
@@ -97,11 +101,12 @@ public class Simulation {
 	 * simulation time and then moves all bodies one time step.
 	 */
 	private void moveBodies() {
+
 		// add all acceleration vectors in one time step
-		for (int i = 0; i < planets.length; i++)
-			for (int j = 0; j < planets.length; j++)
-				if (i != j)
-					planets[i].addAcc(getAccVec(planets[i], planets[j]));
+		for (Planet p1 : planets)
+			for (Planet p2 : planets)
+				if (p1 != p2)
+					p1.addAcc(getAccVec(p1, p2));
 
 		// update all planets
 		for (Planet planet : planets)
@@ -134,9 +139,8 @@ public class Simulation {
 	}
 
 	/**
-	 * Updates the position and velocity of a body with its calculated
-	 * acceleration vector. The acceleration vector gets resetted for the next
-	 * calculation
+	 * Updates the position and velocity of a body with its calculated acceleration
+	 * vector. The acceleration vector gets resetted for the next calculation
 	 * 
 	 * @param body
 	 */
@@ -154,86 +158,67 @@ public class Simulation {
 		body.resetAcc();
 	}
 
-	/** Checks all bodies for collisions */
+	/** Checks all bodies for collisions and removes all collided ones */
 	private void checkForCollisions() {
+		ArrayList<Body> toRemove = new ArrayList<Body>();
 
 		// planets (collide with each other)
-		Planet p1, p2;
-		for (int i = 0; i < planets.length - 1; i++) {
-			for (int j = i + 1; j < planets.length; j++) {
-				p1 = planets[i];
-				p2 = planets[j];
-				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius())
-					collidePlanets(p1, p2);
+		Planet p1, p2, bigP, smallP;
+		for (int i = 0; i < planets.size(); i++) {
+			p1 = planets.get(i);
+
+			for (int j = i + 1; j < planets.size(); j++) {
+				p2 = planets.get(j);
+
+				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius()) {
+					bigP = Utils.getBiggest(p1, p2);
+					smallP = Utils.getSmallest(p1, p2);
+					collidePlanets(bigP, smallP);
+					toRemove.add(smallP);
+				}
 			}
+
+			// particles (don't collide with each other)
+			for (Particle particle : particles)
+				if (particle.getPos().sub(p1.getPos()).norm() < p1.getRadius())
+					toRemove.add(particle);
 		}
 
-		// particles (don't collide with each other)
-		for (Particle par : particles)
-			for (Planet pla : planets)
-				if (par.getPos().sub(pla.getPos()).norm() < pla.getRadius())
-					collideParticlePlanet(pla, par);
-
+		for (Body body : toRemove)
+			removeBody(body);
 	}
 
 	/**
-	 * Collides two planets and creates a new array without the smaller collided
-	 * planet. The bigger collided planet gets changed after the collision.
+	 * Collides two planets and changes the bigger one after the collision.
 	 * 
-	 * @param index1
-	 *            the index of the collided planet 1
-	 * @param index2
-	 *            the index of the collided planet 2
+	 * @param bigP
+	 *            the bigger planet
+	 * @param smallP
+	 *            the smaller planet
 	 */
-	private void collidePlanets(Planet p1, Planet p2) {
-
-		// get the bigger planet
-		Planet bigP = Utils.getBiggest(p1, p2);
-		Planet smallP = Utils.getSmallest(p1, p2);
+	private void collidePlanets(Planet bigP, Planet smallP) {
 
 		// velocity, mass and radius of the new planet
-		bigP.setVel(getCollisionVel(p1, p2));
+		bigP.setVel(getCollisionVel(bigP, smallP));
 		bigP.setMass(bigP.getMass() + smallP.getMass(), bigP.getDensity());
 
 		// check selected planet
-		Planet selPl = Main.win.getSelectedPlanet();
-		if (selPl != null && selPl.equals(smallP))
+		Planet sp = Main.win.getSelectedPlanet();
+		if (sp != null && sp.equals(smallP))
 			Main.win.selectPlanet(bigP);
-
-		// copy all planets in the new planets array except the smaller one
-		Planet[] newPlanets = new Planet[planets.length - 1];
-
-		for (int i = 0, j = 0; i < newPlanets.length; i++) {
-			if (smallP.equals(planets[j]))
-				j++;
-			newPlanets[i] = planets[j++];
-		}
-
-		// set the new planets array and update the window
-		planets = newPlanets;
-
-		// delete the small planet
-		smallP.delete();
 	}
 
 	/**
-	 * deletes the collided particle from the array
+	 * deletes a body from the array and window
 	 * 
-	 * @param pla
-	 * @param par
+	 * @param body
 	 */
-	private void collideParticlePlanet(Planet pla, Particle par) {
-		Particle[] newParticles = new Particle[particles.length - 1];
-
-		for (int i = 0, j = 0; i < newParticles.length; i++) {
-			if (par.equals(particles[j]))
-				j++;
-			newParticles[i] = particles[j++];
-		}
-
-		particles = newParticles;
-
-		par.delete();
+	private void removeBody(Body body) {
+		if (body.getClass() == Planet.class)
+			planets.remove(body);
+		if (body.getClass() == Particle.class)
+			particles.remove(body);
+		body.delete();
 	}
 
 	/**
@@ -261,17 +246,8 @@ public class Simulation {
 	 *            the new planet
 	 */
 	public void addNewPlanet(Planet planet) {
-
-		// copy all planets in the new planets array
-		Planet[] newPlanets = new Planet[planets.length + 1];
-		for (int i = 0; i < planets.length; i++)
-			newPlanets[i] = planets[i];
-
-		// the new planet in the last position
-		newPlanets[newPlanets.length - 1] = planet;
-
-		// update the planets array and window
-		planets = newPlanets;
+		planet.savePosition();
+		planets.add(planet);
 	}
 
 	/** stops the simulation */
@@ -279,6 +255,7 @@ public class Simulation {
 		timeline.stop();
 	}
 
+	/** pauses the simulation */
 	public void setPause(boolean b) {
 		if (b)
 			timeline.pause();
@@ -299,7 +276,7 @@ public class Simulation {
 	}
 
 	public void resetTime() {
-		time = constellation.getTime();
+		time = system.getTime();
 	}
 
 	public int getSpsCounter() {
@@ -314,15 +291,15 @@ public class Simulation {
 		return secondsCounter;
 	}
 
-	public Constellation getConstellation() {
-		return constellation;
+	System getSystem() {
+		return system;
 	}
 
-	public Planet[] getPlanets() {
+	public ArrayList<Planet> getPlanets() {
 		return planets;
 	}
 
-	public Particle[] getParticles() {
+	public ArrayList<Particle> getParticles() {
 		return particles;
 	}
 
@@ -331,10 +308,14 @@ public class Simulation {
 	}
 
 	public int getNumberOfObjects() {
-		return planets.length + particles.length;
+		return planets.size() + particles.size();
 	}
 
 	public static double getSps() {
 		return sps;
+	}
+
+	public String getName() {
+		return name;
 	}
 }

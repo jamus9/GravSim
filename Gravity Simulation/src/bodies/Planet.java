@@ -4,14 +4,16 @@ import java.util.LinkedList;
 
 import javafx.animation.FadeTransition;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
 import simulation.Main;
+import utils.PolarVec2D;
 import utils.Utils;
 import utils.Vec2D;
-import javafx.scene.layout.Pane;
+import window.Window;
 
 /**
  * Implements a planet with position and velocity, radius, mass and a name. Each
@@ -40,8 +42,7 @@ public class Planet implements Body {
 	private LinkedList<Vec2D> trailPointsList;
 
 	/**
-	 * Creates a new Planet with position, velocity, mass, radius, color and
-	 * name.
+	 * Creates a new Planet with position, velocity, mass, radius, color and name.
 	 * 
 	 * @param xp
 	 * @param yp
@@ -74,8 +75,7 @@ public class Planet implements Body {
 	}
 
 	/**
-	 * Creates an anonymous Planet with position, velocity and mass (with
-	 * density).
+	 * Creates an anonymous Planet with position, velocity and mass (with density).
 	 * 
 	 * @param xp
 	 * @param yp
@@ -87,7 +87,7 @@ public class Planet implements Body {
 		this.pos = new Vec2D(posX, posY);
 		this.vel = new Vec2D(velX, velY);
 		setMass(mass, density);
-		initializeObjects(Color.BLACK, "");
+		initializeObjects(Color.WHITE, "");
 	}
 
 	/**
@@ -98,10 +98,13 @@ public class Planet implements Body {
 	 */
 	private void initializeObjects(Color color, String name) {
 		label = new Label(name);
+		label.setTextFill(Color.WHITE);
+		label.setScaleX(0.8);
+		label.setScaleY(0.8);
 
 		circle = new Circle();
 		circle.setFill(color);
-		circle.setStroke(Color.BLACK);
+		// circle.setStroke(Color.WHITE);
 
 		velocityLine = new Line();
 		velocityLine.setStroke(Color.GREEN);
@@ -114,36 +117,39 @@ public class Planet implements Body {
 
 		trailLineList = new LinkedList<Line>();
 		trailPointsList = new LinkedList<Vec2D>();
-
-		// first position of the first trail
-		savePosition();
 	}
 
 	/**
-	 * Updates the position and radius of the circle, the vector line, the label
-	 * and the trail of this planet.
+	 * Updates the position and radius of the circle, the vector line, the label and
+	 * the trail of this planet.
 	 */
 	public void updateObjects() {
-		Vec2D tp = Main.win.transform(pos);
-		double circleRadius = Main.sim.getScale() * Main.win.getZoom() * radius;
+		Window win = Main.win;
+		double scale = Main.sim.getScale();
+
+		Vec2D tp = win.transform(pos);
+		double circleRadius = scale * win.getZoom() * radius;
 
 		// update circle
 		circle.setCenterX(tp.getX());
 		circle.setCenterY(tp.getY());
-		circle.setRadius(circleRadius);
+		if (circleRadius < win.getMinSize())
+			circle.setRadius(win.getMinSize());
+		else
+			circle.setRadius(circleRadius);
 
 		// update vectors
-		if (Main.win.isVectors()) {
+		if (win.isVectors()) {
 
 			// velocity
-			double scaleFactor = Main.sim.getScale() * Main.win.getZoom() * 10e4;
+			double scaleFactor = scale * win.getZoom() * 10e4;
 			velocityLine.setStartX(tp.getX());
 			velocityLine.setStartY(tp.getY());
 			velocityLine.setEndX(tp.getX() + vel.getX() * scaleFactor);
 			velocityLine.setEndY(tp.getY() - vel.getY() * scaleFactor);
 
 			// acceleration
-			double scaleFactor2 = Main.sim.getScale() * Main.win.getZoom() * 10e9;
+			double scaleFactor2 = scale * win.getZoom() * 10e9;
 			accelerationLine.setStartX(tp.getX());
 			accelerationLine.setStartY(tp.getY());
 			accelerationLine.setEndX(tp.getX() + acc.getX() * scaleFactor2);
@@ -151,14 +157,14 @@ public class Planet implements Body {
 		}
 
 		// update label
-		if (Main.win.isLabels()) {
+		if (win.isLabels()) {
 			double offset = circleRadius + 5;
 			label.relocate(tp.getX() + offset, tp.getY());
 		}
 
 		// update trail
-		if (Main.win.isTrails()) {
-			Vec2D tplast = Main.win.transform(trailPointsList.getLast());
+		if (win.isTrails()) {
+			Vec2D tplast = win.transform(trailPointsList.getLast());
 
 			// only draw new line if planet moved 3 pixel
 			if (tp.sub(tplast).norm() > 3) {
@@ -173,7 +179,7 @@ public class Planet implements Body {
 
 				// the new line
 				Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
-				line.setStroke(Color.RED);
+				line.setStroke(Color.WHITE);
 
 				FadeTransition ft = new FadeTransition(Duration.seconds(30), line);
 				ft.setFromValue(1.0);
@@ -181,7 +187,7 @@ public class Planet implements Body {
 				ft.play();
 
 				trailLineList.add(line);
-				Main.win.addTrail(line);
+				win.addTrail(line);
 
 				// save position for the next line start
 				savePosition();
@@ -227,7 +233,7 @@ public class Planet implements Body {
 
 	/** saves the current position in the list orbitPoints */
 	public void savePosition() {
-		trailPointsList.add(pos.clone());
+		trailPointsList.add(new Vec2D(pos));
 	}
 
 	/** a selected planet has a white border */
@@ -237,11 +243,15 @@ public class Planet implements Body {
 
 	/** a deselected planet has a black border */
 	public void deselect() {
-		circle.setStroke(Color.BLACK);
+		circle.setStroke(null);
 	}
 
 	public void setPos(Vec2D pos) {
 		this.pos = pos;
+	}
+
+	public void setPos(PolarVec2D pos) {
+		this.pos = pos.toVec2D();
 	}
 
 	public void setPos(double x, double y) {
@@ -264,9 +274,9 @@ public class Planet implements Body {
 		return vel;
 	}
 
-//	public void setAcc(Vec2D acc) {
-//		this.acc = acc;
-//	}
+	// public void setAcc(Vec2D acc) {
+	// this.acc = acc;
+	// }
 
 	public void resetAcc() {
 		acc = new Vec2D();
@@ -313,7 +323,7 @@ public class Planet implements Body {
 	public String getName() {
 		return label.getText();
 	}
-	
+
 	public void setName(String str) {
 		label.setText(str);
 	}
@@ -338,20 +348,24 @@ public class Planet implements Body {
 		velocityLine.setVisible(b);
 		accelerationLine.setVisible(b);
 	}
-	
+
 	public void delete() {
 		deleteTrail();
 		((Pane) circle.getParent()).getChildren().remove(circle);
 		((Pane) label.getParent()).getChildren().remove(label);
 	}
-	
+
 	public void setZero() {
 		pos = new Vec2D();
 		vel = new Vec2D();
 	}
-	
+
 	public void setOrbitalVel(Planet parent) {
-		setVel(Utils.getOrbitalVelocity(parent, this));
+		setVel(Utils.getOrbitalVelocityCircular(parent, this));
+	}
+
+	public void setOrbitalVel(Planet parent, double sma) {
+		setVel(Utils.getOrbitalVelocityElliptical(parent, this, sma));
 	}
 
 }
