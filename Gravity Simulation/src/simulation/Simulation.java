@@ -1,7 +1,6 @@
 package simulation;
 
 import java.util.ArrayList;
-
 import bodies.Body;
 import bodies.System;
 import bodies.Particle;

@@ -7,6 +7,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import simulation.Main;
+import window.ViewSettings;
 
 /**
  * Implements the menu bar for the main window.
@@ -21,6 +22,9 @@ public class CustomMenuBar extends MenuBar {
 	private CheckMenuItem trailsCMI = new CheckMenuItem("Trails");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Labels");
 	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vectors");
+	private MenuItem darkThemeCMI = new MenuItem("Dark Theme");
+	private MenuItem lightThemeCMI = new MenuItem("Light Theme");
+	
 	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
 
 	/**
@@ -60,11 +64,13 @@ public class CustomMenuBar extends MenuBar {
 		 */
 		trailsCMI.setOnAction(actionEvent -> Main.win.changeTrailsVisibility());
 		labelsCMI.setOnAction(actionEvent -> Main.win.changeLabelsVisibility());
-		infoCMI.setOnAction(ActionEvent -> Main.win.changeInfoVisibility());
+		infoCMI.setOnAction(actionEvent -> Main.win.changeInfoVisibility());
 		vectorsCMI.setOnAction(actionEvent -> Main.win.changeVectorsVisibility());
+		darkThemeCMI.setOnAction(actionEvent -> ViewSettings.setDarkTheme());
+		lightThemeCMI.setOnAction(actionEvent -> ViewSettings.setLightTheme());
 
 		Menu viewMenu = new Menu("View");
-		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, vectorsCMI);
+		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, vectorsCMI, darkThemeCMI, lightThemeCMI);
 
 		// open and add menu
 		OpenMenu openMenu = new OpenMenu();

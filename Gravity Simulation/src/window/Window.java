@@ -18,7 +18,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
@@ -112,9 +111,7 @@ public class Window extends Application {
 
 		// scene and root
 		Group root = new Group();
-		// light blue 3 tints down: Color.rgb(213, 235, 242)
-		// dark blue: Color.rgb(13, 21, 45)
-		scene = new Scene(root, 1244, 700, Color.rgb(13, 21, 45));
+		scene = new Scene(root, 1244, 700, ViewSettings.background);
 		setSceneEvents(scene);
 
 		// stage
@@ -125,13 +122,9 @@ public class Window extends Application {
 		// add panes and menu to root
 		trailPane = new Pane();
 		bodyPane = new Pane();
-
 		infoPane = new InfoPane();
-//		infoPane.setOrbitMode(orbitMode);
-
 		menuBar = new CustomMenuBar(primaryStage);
 		menuBar.updateCMIs();
-
 		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar);
 
 		// initialize all values to default and load the planet objects
@@ -177,11 +170,12 @@ public class Window extends Application {
 	 * @param body
 	 */
 	private void addBodyToWindow(Body body) {
+		bodyPane.getChildren().add(body.getCircle());
+
 		if (body.getClass() == Planet.class) {
 			Planet p = (Planet) body;
-			bodyPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), body.getCircle(), p.getLabel());
-		} else
-			bodyPane.getChildren().add(body.getCircle());
+			bodyPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getLabel());
+		}
 	}
 
 	/**
@@ -359,9 +353,9 @@ public class Window extends Application {
 					zoom = 1;
 				else {
 					if (zoom < 1)
-						zoom *= 1.05;
+						zoom *= 1.1;
 					else
-						zoom /= 1.05;
+						zoom /= 1.1;
 				}
 
 				// reset translation
@@ -434,12 +428,12 @@ public class Window extends Application {
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
 		Circle circle;
 		Vec2D mouse, center;
-		
+
 		for (Planet planet : Main.sim.getPlanets()) {
 			circle = planet.getCircle();
 			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2D(mouseX, mouseY);
-			
+
 			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
 				selectPlanet(planet);
 			}
@@ -472,7 +466,7 @@ public class Window extends Application {
 	private void updateTrails() {
 		if (trails)
 			for (Planet planet : Main.sim.getPlanets())
-				planet.updateTrail();
+				planet.translateTrail();
 	}
 
 	/**
@@ -549,7 +543,7 @@ public class Window extends Application {
 
 	public void changeOrbitMode() {
 		orbitMode = !orbitMode;
-//		infoPane.setOrbitMode(orbitMode);
+		// infoPane.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
 	}
 
@@ -635,6 +629,14 @@ public class Window extends Application {
 
 	public double getMinSize() {
 		return minSize;
+	}
+
+	public void updateColors() {
+		scene.setFill(ViewSettings.background);
+		infoPane.updateTextColor(ViewSettings.textColor);
+		for (Planet p : Main.sim.getPlanets()) {
+			p.setLabelColor(ViewSettings.textColor);
+		}
 	}
 
 }

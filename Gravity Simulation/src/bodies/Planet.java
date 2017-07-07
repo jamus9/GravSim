@@ -13,6 +13,7 @@ import simulation.Main;
 import utils.PolarVec2D;
 import utils.Utils;
 import utils.Vec2D;
+import window.ViewSettings;
 import window.Window;
 
 /**
@@ -98,13 +99,12 @@ public class Planet implements Body {
 	 */
 	private void initializeObjects(Color color, String name) {
 		label = new Label(name);
-		label.setTextFill(Color.WHITE);
+		label.setTextFill(ViewSettings.textColor);
 		label.setScaleX(0.8);
 		label.setScaleY(0.8);
 
 		circle = new Circle();
 		circle.setFill(color);
-		// circle.setStroke(Color.WHITE);
 
 		velocityLine = new Line();
 		velocityLine.setStroke(Color.GREEN);
@@ -179,7 +179,7 @@ public class Planet implements Body {
 
 				// the new line
 				Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
-				line.setStroke(Color.WHITE);
+				line.setStroke(ViewSettings.trailColor);
 
 				FadeTransition ft = new FadeTransition(Duration.seconds(30), line);
 				ft.setFromValue(1.0);
@@ -196,7 +196,7 @@ public class Planet implements Body {
 	}
 
 	/** Translate all Lines in orbitLineList with help of orbitPoints. */
-	public void updateTrail() {
+	public void translateTrail() {
 		Vec2D newStart, newEnd;
 		Line line;
 
@@ -238,7 +238,7 @@ public class Planet implements Body {
 
 	/** a selected planet has a white border */
 	public void select() {
-		circle.setStroke(Color.WHITE);
+		circle.setStroke(ViewSettings.planetSelectionColor);
 	}
 
 	/** a deselected planet has a black border */
@@ -366,6 +366,10 @@ public class Planet implements Body {
 
 	public void setOrbitalVel(Planet parent, double sma) {
 		setVel(Utils.getOrbitalVelocityElliptical(parent, this, sma));
+	}
+	
+	public void setLabelColor(Color color) {
+		label.setTextFill(color);
 	}
 
 }

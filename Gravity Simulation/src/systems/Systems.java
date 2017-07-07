@@ -32,7 +32,7 @@ public class Systems {
 		double scale = 7e-10;
 		double time = 100;
 		// int sps = default;
-		
+
 		Planet sun = Planets.getSun();
 		Planet mercury = Planets.getMercury();
 		Planet venus = Planets.getVenus();
@@ -175,9 +175,10 @@ public class Systems {
 	 */
 	public static System saturnSystem() {
 		String name = "Saturn System";
-		double scale = 4e-7;
+		double scale = 6e-7;
 		double time = 3;
 		int sps = 2000;
+		int ringParticle = 500;
 
 		double encDis = 238100e3;
 		double tethysDis = 294700e3;
@@ -217,7 +218,7 @@ public class Systems {
 
 		double rMin = 135e6;
 		double rMax = 200e6;
-		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, 500, rMin, rMax);
+		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, ringParticle, rMin, rMax);
 
 		return new System(name, planets, particles, scale, time, sps);
 	}
@@ -345,7 +346,7 @@ public class Systems {
 
 		double rMin = 135e6;
 		double rMax = 200e6;
-		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, 2000, rMin, rMax);
+		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, 1500, rMin, rMax);
 
 		uranus.setPos(-rMax * 4, -rMin * 3);
 		uranus.setVel(15000, 0);
@@ -385,18 +386,18 @@ public class Systems {
 		sun1.setVel(0, -125000);
 		sun2.setVel(0, 125000);
 
-		Planet p1 = Planets.getJupiter();
+		Planet p1 = Planets.getMercury();
 		p1.setName("Planet 1");
 
-		Planet p2 = Planets.getJupiter();
+		Planet p2 = Planets.getMars();
 		p2.setName("Planet 2");
 
 		double merkurDis = 57.909e9;
 
-		p1.setPos(-merkurDis / 2, 0);
+		p1.setPos(-merkurDis / 3, 0);
 		p1.setOrbitalVel(new Planet(0, 0, 0, 0, sun1.getMass() + sun2.getMass(), 20000));
 
-		p2.setPos(merkurDis / 4, 0);
+		p2.setPos(merkurDis / 2, 0);
 		p2.setOrbitalVel(new Planet(0, 0, 0, 0, sun1.getMass() + sun2.getMass(), 20000));
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(sun1, sun2, p1, p2));
@@ -409,26 +410,23 @@ public class Systems {
 	 */
 	public static System binaryWithRings() {
 		int sps = 2000;
-		double rad = Planets.moonSma * 2;
+
 		Planet p1 = Planets.getSaturn();
 		Planet p2 = Planets.getSaturn();
 
-		p1.setPos(-rad, 0);
-		p2.setPos(rad, 0);
+		double rad = Planets.moonSma * 2;
+		p1.setPos(-rad, -rad / 2);
+		p2.setPos(rad, rad / 2);
 
-		double v = 2400;
+		double v = 5000;
+		p1.setVel(v, 0);
+		p2.setVel(-v, 0);
 
-		p1.setVel(0, -v);
-		p2.setVel(0, v);
-
+		ArrayList<Particle> particlesAll = new ArrayList<Particle>();
 		double rMin = 135e6;
 		double rMax = 200e6;
-		ArrayList<Particle> particles1 = ParticleArrays.getRing(p1, 500, rMin, rMax);
-		ArrayList<Particle> particles2 = ParticleArrays.getRing(p2, 500, rMin, rMax);
-
-		ArrayList<Particle> particlesAll = new ArrayList<Particle>(); // Utils.concatParticles(particles1, particles2);
-		particlesAll.addAll(particles1);
-		particlesAll.addAll(particles2);
+		particlesAll.addAll(ParticleArrays.getRing(p1, 500, rMin, rMax));
+		particlesAll.addAll(ParticleArrays.getRing(p2, 500, rMin, rMax));
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(p1, p2));
 

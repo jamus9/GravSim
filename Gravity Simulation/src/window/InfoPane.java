@@ -17,7 +17,7 @@ import utils.Utils;
  */
 public class InfoPane extends Pane {
 
-	private static Color textColor = Color.LIGHTGREY;
+//	private static Color textColor = Color.LIGHTGREY;
 
 	/** info label */
 	private Label spsLabel;
@@ -37,15 +37,15 @@ public class InfoPane extends Pane {
 
 		spsLabel = new Label();
 		spsLabel.relocate(3, 25);
-		spsLabel.setTextFill(textColor);
+		spsLabel.setTextFill(ViewSettings.textColor);
 
 		pastTimeLabel = new Label();
 		pastTimeLabel.relocate(3, spsLabel.getLayoutY() + y);
-		pastTimeLabel.setTextFill(textColor);
+		pastTimeLabel.setTextFill(ViewSettings.textColor);
 
 		infoLabel = new Label();
 		infoLabel.relocate(3, pastTimeLabel.getLayoutY() + y * 2);
-		infoLabel.setTextFill(textColor);
+		infoLabel.setTextFill(ViewSettings.textColor);
 
 		deccButton = new Button("<<");
 		deccButton.setOnAction(actionEvent -> Main.sim.multTime(0.5));
@@ -120,6 +120,12 @@ public class InfoPane extends Pane {
 		deccButton.relocate(Main.win.getWidth() - 110, y);
 		reButton.relocate(Main.win.getWidth() - 70, y);
 		accButton.relocate(Main.win.getWidth() - 38, y);
+	}
+	
+	void updateTextColor(Color c) {
+		spsLabel.setTextFill(c);
+		pastTimeLabel.setTextFill(c);
+		infoLabel.setTextFill(c);
 	}
 
 }
