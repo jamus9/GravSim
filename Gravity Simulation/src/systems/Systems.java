@@ -89,7 +89,7 @@ public class Systems {
 		// asteroid belt between mars and Jupiter
 		double rMin = Planets.AU * 2.3;
 		double rMax = Planets.AU * 3.3;
-		ArrayList<Particle> particles = Particles.getRing(sun, 100, rMin, rMax);
+		ArrayList<Particle> particles = ParticleArrays.getRing(sun, 100, rMin, rMax);
 
 		return new System(name, planets, particles, scale, time);
 	}
@@ -165,7 +165,7 @@ public class Systems {
 
 		double rMin = 92e6;
 		double rMax = 122e6;
-		ArrayList<Particle> particles = Particles.getRing(jupiter, 100, rMin, rMax);
+		ArrayList<Particle> particles = ParticleArrays.getRing(jupiter, 100, rMin, rMax);
 
 		return new System("Jupiter System", planets, particles, 1.7e-7, 1);
 	}
@@ -217,7 +217,7 @@ public class Systems {
 
 		double rMin = 135e6;
 		double rMax = 200e6;
-		ArrayList<Particle> particles = Particles.getRing(saturn, 500, rMin, rMax);
+		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, 500, rMin, rMax);
 
 		return new System(name, planets, particles, scale, time, sps);
 	}
@@ -303,6 +303,7 @@ public class Systems {
 			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, Planets.moonSma * 0.1, Planets.moonSma));
 			randomMoon.setVel(Utils.getOrbitalVelocityCircular(earth, randomMoon));
 			randomMoon.setColor(Utils.getRandomColor());
+			randomMoon.setName(Integer.toString(i));
 
 			planets.add(randomMoon);
 		}
@@ -314,7 +315,7 @@ public class Systems {
 	 * Random planets
 	 */
 	public static System randomPlanets() {
-		int number = 40;
+		int number = 60;
 		ArrayList<Planet> planets = new ArrayList<Planet>();
 
 		for (int i = 0; i < number; i++) {
@@ -326,11 +327,12 @@ public class Systems {
 			p.setPos(x, y);
 			p.setVel(Utils.plusMinus() * Math.random() * 5000, Utils.plusMinus() * Math.random() * 5000);
 			p.setColor(Utils.getRandomColor());
+			p.setName("P" + Integer.toString(i));
 
 			planets.add(p);
 		}
 
-		return new System("Random planets", planets, 7e-7, 1);
+		return new System("Random planets", planets, 7e-7, 1, 2000);
 	}
 
 	/**
@@ -343,7 +345,7 @@ public class Systems {
 
 		double rMin = 135e6;
 		double rMax = 200e6;
-		ArrayList<Particle> particles = Particles.getRing(saturn, 2000, rMin, rMax);
+		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, 2000, rMin, rMax);
 
 		uranus.setPos(-rMax * 4, -rMin * 3);
 		uranus.setVel(15000, 0);
@@ -361,7 +363,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth));
 
-		ArrayList<Particle> particles = Particles.getVerticalLine(new Vec2D(-Planets.moonSma / 2.0, 0),
+		ArrayList<Particle> particles = ParticleArrays.getVerticalLine(new Vec2D(-Planets.moonSma / 2.0, 0),
 				new Vec2D(1000, 0), Planets.moonSma * 2, 1000);
 
 		return new System("Particle line", planets, particles, 0.7e-6, 20);
@@ -421,8 +423,8 @@ public class Systems {
 
 		double rMin = 135e6;
 		double rMax = 200e6;
-		ArrayList<Particle> particles1 = Particles.getRing(p1, 500, rMin, rMax);
-		ArrayList<Particle> particles2 = Particles.getRing(p2, 500, rMin, rMax);
+		ArrayList<Particle> particles1 = ParticleArrays.getRing(p1, 500, rMin, rMax);
+		ArrayList<Particle> particles2 = ParticleArrays.getRing(p2, 500, rMin, rMax);
 
 		ArrayList<Particle> particlesAll = new ArrayList<Particle>(); // Utils.concatParticles(particles1, particles2);
 		particlesAll.addAll(particles1);
@@ -445,7 +447,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth));
 
-		ArrayList<Particle> particles = Particles.getField(Planets.moonSma * 2, Planets.moonSma * 2,
+		ArrayList<Particle> particles = ParticleArrays.getField(Planets.moonSma * 2, Planets.moonSma * 2,
 				new Vec2D(-Planets.moonSma, 0));
 
 		return new System("Earth flying through particles", planets, particles, 5e-7, 50, sps);
@@ -456,7 +458,7 @@ public class Systems {
 	 */
 	public static System particleField() {
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(Planets.getEarth()));
-		ArrayList<Particle> particles = Particles.getField(Planets.moonSma, Planets.moonSma, new Vec2D());
+		ArrayList<Particle> particles = ParticleArrays.getField(Planets.moonSma, Planets.moonSma, new Vec2D());
 		return new System("Earth in particle field", planets, particles, 1.5e-6, 5, 1000);
 	}
 

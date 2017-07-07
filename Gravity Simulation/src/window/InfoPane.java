@@ -16,14 +16,15 @@ import utils.Utils;
  *
  */
 public class InfoPane extends Pane {
-	
-	private static Color color = Color.WHITE;
 
+	private static Color textColor = Color.LIGHTGREY;
+
+	/** info label */
 	private Label spsLabel;
 	private Label pastTimeLabel;
-	private Label orbitModeLabel;
 	private Label infoLabel;
 
+	/** time control buttons */
 	Button deccButton, reButton, accButton;
 
 	/**
@@ -31,23 +32,20 @@ public class InfoPane extends Pane {
 	 */
 	public InfoPane() {
 		super();
-		
+
 		int y = 16;
 
 		spsLabel = new Label();
 		spsLabel.relocate(3, 25);
-		spsLabel.setTextFill(color);
+		spsLabel.setTextFill(textColor);
 
 		pastTimeLabel = new Label();
 		pastTimeLabel.relocate(3, spsLabel.getLayoutY() + y);
-		pastTimeLabel.setTextFill(color);
-
-		orbitModeLabel = new Label();
-		orbitModeLabel.relocate(3, pastTimeLabel.getLayoutY() + y);
+		pastTimeLabel.setTextFill(textColor);
 
 		infoLabel = new Label();
-		infoLabel.relocate(3, orbitModeLabel.getLayoutY() + y*2);
-		infoLabel.setTextFill(color);
+		infoLabel.relocate(3, pastTimeLabel.getLayoutY() + y * 2);
+		infoLabel.setTextFill(textColor);
 
 		deccButton = new Button("<<");
 		deccButton.setOnAction(actionEvent -> Main.sim.multTime(0.5));
@@ -61,7 +59,7 @@ public class InfoPane extends Pane {
 		// put button at correct position
 		relocateTimeButtons();
 
-		this.getChildren().addAll(spsLabel, pastTimeLabel, orbitModeLabel, infoLabel, reButton, deccButton, accButton);
+		this.getChildren().addAll(spsLabel, pastTimeLabel, infoLabel, reButton, deccButton, accButton);
 	}
 
 	int[] spsArray = new int[60];
@@ -72,6 +70,7 @@ public class InfoPane extends Pane {
 	 */
 	public void updateInfo() {
 
+		// time label
 		if (!Main.sim.isPaused()) {
 
 			// sps 1s average calculator
@@ -94,10 +93,10 @@ public class InfoPane extends Pane {
 			// past simulation time
 			pastTimeLabel.setText(Utils.getTimeString(Main.sim.getSecondsCounter()));
 		}
-		
+
 		// general information
-		String infoText = Main.sim.getName() + "\nObjects: " + Main.sim.getNumberOfObjects()
-		+ "\nTime: x" + ((int) (Main.sim.getTime() * Simulation.getSps()));
+		String infoText = Main.sim.getName() + "\nObjects: " + Main.sim.getNumberOfObjects() + "\nTime: x"
+				+ ((int) (Main.sim.getTime() * Simulation.getSps()));
 
 		// info about selected planet
 		Planet selPl = Main.win.getSelectedPlanet();
@@ -105,28 +104,17 @@ public class InfoPane extends Pane {
 			String name = selPl.getName() + "\n";
 			String mass = "Mass: " + selPl.getMass() + " kg\n";
 			String rad = "Radius: " + Math.round(selPl.getRadius() / 1000.0) + " km\n";
+			String dens = "Density: " + (int) selPl.getDensity() + " kg/m^3\n";
 			String vel = "Velocity: " + (int) selPl.getVel().norm() + " m/s" + "\n";
-			infoText += "\n\n" + name + mass + rad + vel;
+			infoText += "\n\n" + name + rad + mass + dens + vel;
 		}
-		
+
 		infoLabel.setText(infoText);
 	}
 
 	/**
-	 * updates the orbit mode label
-	 * 
-	 * @param boo
+	 * sets the time button to the correct position
 	 */
-	public void setOrbitMode(boolean boo) {
-		if (boo) {
-			orbitModeLabel.setText("Orbit Mode: On");
-			orbitModeLabel.setTextFill(color);
-		} else {
-			orbitModeLabel.setText("Orbit Mode: Off");
-			orbitModeLabel.setTextFill(Color.RED);
-		}
-	}
-
 	public void relocateTimeButtons() {
 		int y = 30;
 		deccButton.relocate(Main.win.getWidth() - 110, y);

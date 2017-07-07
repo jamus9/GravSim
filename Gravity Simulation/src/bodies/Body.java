@@ -3,11 +3,15 @@ package bodies;
 import javafx.scene.shape.Circle;
 import utils.Vec2D;
 
+/**
+ * An interface for all bodies in the simulation
+ * 
+ * @author Jan Muskalla
+ *
+ */
 public interface Body {
 
 	public void updateObjects();
-
-	public Body clone();
 
 	public void setPos(Vec2D pos);
 
@@ -20,15 +24,17 @@ public interface Body {
 	public void setVel(double x, double y);
 
 	public Vec2D getVel();
-	
-	public void resetAcc();
-	
-	public void addAcc(Vec2D vec);
-	
+
 	public Vec2D getAcc();
 
+	public void addAcc(Vec2D vec);
+
+	public void resetAcc();
+
 	public Circle getCircle();
-	
+
+	public Body clone();
+
 	public void delete();
 
 }

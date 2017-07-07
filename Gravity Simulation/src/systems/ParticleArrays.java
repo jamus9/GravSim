@@ -13,7 +13,7 @@ import utils.Vec2D;
  * @author Jan Muskalla
  *
  */
-public class Particles {
+public class ParticleArrays {
 
 	/**
 	 * returns a vertical line of a number of particles with a given position,

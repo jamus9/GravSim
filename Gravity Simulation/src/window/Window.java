@@ -43,6 +43,7 @@ public class Window extends Application {
 	/** flags for trails label and vectors */
 	private boolean trails, labels, vectors;
 
+	/** minimum size for all planet circles */
 	private double minSize;
 
 	/** coordinates for zoom and translation */
@@ -56,6 +57,7 @@ public class Window extends Application {
 	/** the selected planet */
 	private Planet selectedPlanet;
 
+	/** for following a planet */
 	private boolean follow;
 
 	/** the next planet that will be added */
@@ -110,8 +112,9 @@ public class Window extends Application {
 
 		// scene and root
 		Group root = new Group();
-		// light blue 3 tints down
-		scene = new Scene(root, 1244, 700, Color.BLACK);// Color.rgb(213, 235, 242));
+		// light blue 3 tints down: Color.rgb(213, 235, 242)
+		// dark blue: Color.rgb(13, 21, 45)
+		scene = new Scene(root, 1244, 700, Color.rgb(13, 21, 45));
 		setSceneEvents(scene);
 
 		// stage
@@ -124,7 +127,7 @@ public class Window extends Application {
 		bodyPane = new Pane();
 
 		infoPane = new InfoPane();
-		infoPane.setOrbitMode(orbitMode);
+//		infoPane.setOrbitMode(orbitMode);
 
 		menuBar = new CustomMenuBar(primaryStage);
 		menuBar.updateCMIs();
@@ -546,7 +549,7 @@ public class Window extends Application {
 
 	public void changeOrbitMode() {
 		orbitMode = !orbitMode;
-		infoPane.setOrbitMode(orbitMode);
+//		infoPane.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
 	}
 
