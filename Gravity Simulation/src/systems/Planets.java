@@ -66,12 +66,12 @@ public class Planets {
 
 	private static final Planet mercury = new Planet(mercuryMass, mercuryRad, Color.rgb(212, 201, 156), "Mercury");
 
-	private static final Planet venus = new Planet(venusMass, venusRad, Color.BEIGE, "Venus");
+	private static final Planet venus = new Planet(venusMass, venusRad, Color.rgb(205,165,69), "Venus");
 
-	private static final Planet earth = new Planet(earthMass, earthRad, Color.rgb(79, 76, 176), "Earth");
+	private static final Planet earth = new Planet(earthMass, earthRad, Color.rgb(114,111,191), "Earth");
 	private static final Planet moon = new Planet(moonMass, moonRad, Color.GRAY, "Moon");
 
-	private static final Planet mars = new Planet(marsMass, marsRad, Color.RED, "Mars");
+	private static final Planet mars = new Planet(marsMass, marsRad, Color.rgb(199,86,38), "Mars");
 	private static final Planet phobos = new Planet(1.072e16, 22.5e3, Color.GRAY, "Phobos");
 	private static final Planet deimos = new Planet(1.8e15, 13e3, Color.GRAY, "Deimos");
 

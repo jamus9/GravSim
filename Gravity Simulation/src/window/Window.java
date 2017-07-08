@@ -42,9 +42,6 @@ public class Window extends Application {
 	/** flags for trails label and vectors */
 	private boolean trails, labels, vectors;
 
-	/** minimum size for all planet circles */
-	private double minSize;
-
 	/** coordinates for zoom and translation */
 	private double zoom;
 	private double dx, dy, tempdx, tempdy;
@@ -83,6 +80,8 @@ public class Window extends Application {
 	/** the menu bar */
 	private CustomMenuBar menuBar;
 
+	private Timeline timeline;
+
 	/**
 	 * creates a new window with and initialized local variables
 	 */
@@ -90,8 +89,6 @@ public class Window extends Application {
 		trails = true;
 		labels = true;
 		vectors = false;
-
-		minSize = 2;
 
 		follow = false;
 
@@ -152,12 +149,13 @@ public class Window extends Application {
 		zoom = 1;
 		dx = dy = tempdx = tempdy = 0;
 
-		trailPane.getChildren().clear();
 		deselectPlanet();
 		follow = false;
 
 		// clear the pane and add the new bodies
 		bodyPane.getChildren().clear();
+		trailPane.getChildren().clear();
+
 		for (Particle particle : sim.getParticles())
 			addBodyToWindow(particle);
 		for (Planet planet : sim.getPlanets())
@@ -183,7 +181,7 @@ public class Window extends Application {
 	 * adjusts the view.
 	 */
 	private void runTimeLine() {
-		Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
+		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
 				// transform trails if window size has changed
@@ -516,8 +514,9 @@ public class Window extends Application {
 	 */
 	public void changeLabelsVisibility() {
 		labels = !labels;
-		for (Planet p : Main.sim.getPlanets())
-			p.setLabelVisibility(labels);
+		for (Planet p : Main.sim.getPlanets()) {
+			p.getLabel().setVisible(labels);
+		}
 		menuBar.updateCMIs();
 	}
 
@@ -527,8 +526,10 @@ public class Window extends Application {
 	 */
 	public void changeVectorsVisibility() {
 		vectors = !vectors;
-		for (Planet p : Main.sim.getPlanets())
-			p.setVectorLinesVisibility(vectors);
+		for (Planet p : Main.sim.getPlanets()) {
+			p.getVelocityLine().setVisible(vectors);
+			p.getAccelerationLine().setVisible(vectors);
+		}
 		menuBar.updateCMIs();
 	}
 
@@ -627,15 +628,28 @@ public class Window extends Application {
 		return infoPane.isVisible();
 	}
 
-	public double getMinSize() {
-		return minSize;
-	}
-
 	public void updateColors() {
 		scene.setFill(ViewSettings.background);
 		infoPane.updateTextColor(ViewSettings.textColor);
+
 		for (Planet p : Main.sim.getPlanets()) {
-			p.setLabelColor(ViewSettings.textColor);
+			p.getLabel().setTextFill(ViewSettings.textColor);
+			// for (Line l : p.getTrailLineList()) {
+			// l.setStroke(ViewSettings.trailColor);
+			// }
+		}
+
+		for (Particle p : Main.sim.getParticles()) {
+			p.getCircle().setFill(ViewSettings.bodyColor);
+		}
+
+		// system
+		for (Planet p : Main.sim.getSystem().getPlanetArray()) {
+			p.getLabel().setTextFill(ViewSettings.textColor);
+		}
+
+		for (Particle p : Main.sim.getSystem().getParticleArray()) {
+			p.getCircle().setFill(ViewSettings.bodyColor);
 		}
 	}
 

@@ -26,8 +26,8 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts the first simulation with the default system and opens the
-	 * main window.
+	 * Starts the first simulation with the default system and opens the main
+	 * window.
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -50,8 +50,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts a new simulation with the current system in a default
-	 * window.
+	 * Starts a new simulation with the current system in a default window.
 	 */
 	public static void restart() {
 		sim.stop();

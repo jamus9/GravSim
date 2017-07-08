@@ -22,14 +22,16 @@ public class Systems {
 	/**
 	 * an empty system
 	 */
-	public static final System empty = new System("Empty", new ArrayList<Planet>(), 5e-7, 0.5);
+	public static System empty() {
+		return new System("Empty", new ArrayList<Planet>(), 5e-7, 1);
+	}
 
 	/**
 	 * The Solar System with the sun, 9 planets and the main asteroid belt
 	 */
 	public static System solarSystem() {
 		String name = "Solar System";
-		double scale = 7e-10;
+		double scale = 2e-9;
 		double time = 100;
 		// int sps = default;
 
@@ -304,7 +306,7 @@ public class Systems {
 			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, Planets.moonSma * 0.1, Planets.moonSma));
 			randomMoon.setVel(Utils.getOrbitalVelocityCircular(earth, randomMoon));
 			randomMoon.setColor(Utils.getRandomColor());
-			randomMoon.setName(Integer.toString(i));
+			// randomMoon.setName(Integer.toString(i));
 
 			planets.add(randomMoon);
 		}
@@ -328,7 +330,7 @@ public class Systems {
 			p.setPos(x, y);
 			p.setVel(Utils.plusMinus() * Math.random() * 5000, Utils.plusMinus() * Math.random() * 5000);
 			p.setColor(Utils.getRandomColor());
-			p.setName("P" + Integer.toString(i));
+			// p.setName(Integer.toString(i));
 
 			planets.add(p);
 		}

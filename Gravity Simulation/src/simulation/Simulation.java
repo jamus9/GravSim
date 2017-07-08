@@ -28,7 +28,7 @@ public class Simulation {
 
 	/** the current system with start conditions */
 	private final System system;
-	
+
 	private final String name;
 
 	/** scale of the simulation */
@@ -55,24 +55,26 @@ public class Simulation {
 	 * 
 	 * @param system
 	 */
-	public Simulation(System constellation) {
+	public Simulation(System system) {
 		spsCounter = 0;
 		secondsCounter = 0;
 
-		this.system = constellation.clone();
-		name = constellation.getName();
-		time = constellation.getTime();
-		scale = constellation.getScale();
-		sps = constellation.getSps();
+		// save a copy for later restarts
+		this.system = system.clone();
+
+		name = system.getName();
+		time = system.getTime();
+		scale = system.getScale();
+		sps = system.getSps();
 
 		// copy the planets of the new system in the local array and save the
-		// first position for trails
-		planets = constellation.getPlanetArray();
+		// first position for the trails
+		planets = system.getPlanetArray();
 		for (Planet p : planets)
 			p.savePosition();
 
 		// copy the particles of the new system in the local array
-		particles = constellation.getParticleArray();
+		particles = system.getParticleArray();
 
 		timeline = new Timeline();
 	}
@@ -213,9 +215,9 @@ public class Simulation {
 	 * @param body
 	 */
 	private void removeBody(Body body) {
-		if (body.getClass() == Planet.class)
+		if (body instanceof Planet)
 			planets.remove(body);
-		if (body.getClass() == Particle.class)
+		if (body instanceof Particle)
 			particles.remove(body);
 		body.delete();
 	}
@@ -290,7 +292,7 @@ public class Simulation {
 		return secondsCounter;
 	}
 
-	System getSystem() {
+	public System getSystem() {
 		return system;
 	}
 

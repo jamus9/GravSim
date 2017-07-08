@@ -17,15 +17,21 @@ import window.ViewSettings;
 import window.Window;
 
 /**
- * Implements a planet with position and velocity, radius, mass and a name. Each
+ * Implements a planet with position, velocity, radius, mass and a name. Each
  * planet has a circle, velocity line and label that are drawn in the main
- * window. The orbitLineList contains the orbit that gets drawn and the list
- * orbitPoints saves the real coordinates of the orbit for later transformation.
+ * window. The trailLineList contains the trail that gets drawn and the list
+ * trailPointsList saves the real coordinates of the trail for later
+ * transformation.
  * 
  * @author Jan Muskalla
  * 
  */
 public class Planet implements Body {
+
+	/** settings */
+	private static double trailWidth = 1;
+	private static int trailSeconds = 20;
+	public static double minSize = 1.5;
 
 	/** planet properties */
 	private Vec2D pos, vel, acc;
@@ -45,10 +51,10 @@ public class Planet implements Body {
 	/**
 	 * Creates a new Planet with position, velocity, mass, radius, color and name.
 	 * 
-	 * @param xp
-	 * @param yp
-	 * @param xv
-	 * @param yv
+	 * @param posX
+	 * @param posY
+	 * @param velX
+	 * @param velY
 	 * @param mass
 	 * @param radius
 	 * @param color
@@ -78,17 +84,18 @@ public class Planet implements Body {
 	/**
 	 * Creates an anonymous Planet with position, velocity and mass (with density).
 	 * 
-	 * @param xp
-	 * @param yp
-	 * @param xv
-	 * @param yv
-	 * @param radius
+	 * @param posX
+	 * @param posY
+	 * @param velX
+	 * @param velY
+	 * @param mass
+	 * @param density
 	 */
 	public Planet(double posX, double posY, double velX, double velY, double mass, double density) {
 		this.pos = new Vec2D(posX, posY);
 		this.vel = new Vec2D(velX, velY);
 		setMass(mass, density);
-		initializeObjects(Color.WHITE, "");
+		initializeObjects(ViewSettings.bodyColor, "");
 	}
 
 	/**
@@ -100,8 +107,6 @@ public class Planet implements Body {
 	private void initializeObjects(Color color, String name) {
 		label = new Label(name);
 		label.setTextFill(ViewSettings.textColor);
-		label.setScaleX(0.8);
-		label.setScaleY(0.8);
 
 		circle = new Circle();
 		circle.setFill(color);
@@ -133,8 +138,8 @@ public class Planet implements Body {
 		// update circle
 		circle.setCenterX(tp.getX());
 		circle.setCenterY(tp.getY());
-		if (circleRadius < win.getMinSize())
-			circle.setRadius(win.getMinSize());
+		if (circleRadius < minSize)
+			circle.setRadius(minSize);
 		else
 			circle.setRadius(circleRadius);
 
@@ -170,18 +175,19 @@ public class Planet implements Body {
 			if (tp.sub(tplast).norm() > 3) {
 
 				// delete last if it is invisible
-				if (!trailLineList.isEmpty() && trailLineList.getFirst().getOpacity() == 0) {
+				if (!trailLineList.isEmpty() && trailLineList.getFirst().getOpacity() == 0.0) {
 					Line line = trailLineList.getFirst();
-					((Pane) line.getParent()).getChildren().remove(line);
+					((Pane) line.getParent()).getChildren().remove(line); // Null Pointer?
 					trailLineList.removeFirst();
 					trailPointsList.removeFirst();
 				}
 
 				// the new line
 				Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
-				line.setStroke(ViewSettings.trailColor);
+				line.setStroke(circle.getFill());
+				line.setStrokeWidth(trailWidth);
 
-				FadeTransition ft = new FadeTransition(Duration.seconds(30), line);
+				FadeTransition ft = new FadeTransition(Duration.seconds(trailSeconds), line);
 				ft.setFromValue(1.0);
 				ft.setToValue(0.0);
 				ft.play();
@@ -195,7 +201,9 @@ public class Planet implements Body {
 		}
 	}
 
-	/** Translate all Lines in orbitLineList with help of orbitPoints. */
+	/**
+	 * Translate all Lines in orbitLineList with help of orbitPoints.
+	 */
 	public void translateTrail() {
 		Vec2D newStart, newEnd;
 		Line line;
@@ -215,13 +223,21 @@ public class Planet implements Body {
 		}
 	}
 
-	/** Deletes all orbit data. */
+	/**
+	 * Deletes all orbit data.
+	 */
 	public void deleteTrail() {
 		for (Line line : trailLineList) {
 			((Pane) line.getParent()).getChildren().remove(line);
 		}
 		trailLineList.clear();
 		trailPointsList.clear();
+	}
+
+	public void delete() {
+		deleteTrail();
+		((Pane) circle.getParent()).getChildren().remove(circle);
+		((Pane) label.getParent()).getChildren().remove(label);
 	}
 
 	/** Return a copy of this planet. */
@@ -340,36 +356,12 @@ public class Planet implements Body {
 		return trailLineList;
 	}
 
-	public void setLabelVisibility(boolean b) {
-		label.setVisible(b);
-	}
-
-	public void setVectorLinesVisibility(boolean b) {
-		velocityLine.setVisible(b);
-		accelerationLine.setVisible(b);
-	}
-
-	public void delete() {
-		deleteTrail();
-		((Pane) circle.getParent()).getChildren().remove(circle);
-		((Pane) label.getParent()).getChildren().remove(label);
-	}
-
-	public void setZero() {
-		pos = new Vec2D();
-		vel = new Vec2D();
-	}
-
 	public void setOrbitalVel(Planet parent) {
 		setVel(Utils.getOrbitalVelocityCircular(parent, this));
 	}
 
 	public void setOrbitalVel(Planet parent, double sma) {
 		setVel(Utils.getOrbitalVelocityElliptical(parent, this, sma));
-	}
-	
-	public void setLabelColor(Color color) {
-		label.setTextFill(color);
 	}
 
 }

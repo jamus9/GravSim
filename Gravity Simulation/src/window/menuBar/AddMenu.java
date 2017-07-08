@@ -20,6 +20,7 @@ public class AddMenu extends Menu {
 
 	public AddMenu() {
 		super("Add");
+		
 		newMenu(Planets.getPhobos());
 		newMenu(Planets.getMoon());
 		newMenu(Planets.getMercury());
@@ -31,8 +32,10 @@ public class AddMenu extends Menu {
 		newMenu(Planets.getSaturn());
 		newMenu(Planets.getUranus());
 		newMenu(Planets.getNeptune());
-		newMenu(Planets.getSagittariusA());
+		newMenu(Planets.getSun());
 		newMenu(Planets.getBetelgeuse());
+		newMenu(Planets.getSagittariusA());
+		
 	}
 	
 	private void newMenu(Planet p) {
