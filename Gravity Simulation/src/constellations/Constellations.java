@@ -1,9 +1,9 @@
-package systems;
+package constellations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import bodies.System;
+import bodies.Constellation;
 import bodies.Particle;
 import bodies.Planet;
 import javafx.scene.paint.Color;
@@ -12,24 +12,24 @@ import utils.Utils;
 import utils.Vec2D;
 
 /**
- * A class that creates systems for the simulation.
+ * A class that creates Constellations for the simulation.
  * 
  * @author Jan Muskalla
  * 
  */
-public class Systems {
+public class Constellations {
 
 	/**
 	 * an empty system
 	 */
-	public static System empty() {
-		return new System("Empty", new ArrayList<Planet>(), 5e-7, 1);
+	public static Constellation empty() {
+		return new Constellation("Empty", new ArrayList<Planet>(), 5e-7, 1);
 	}
 
 	/**
 	 * The Solar System with the sun, 9 planets and the main asteroid belt
 	 */
-	public static System solarSystem() {
+	public static Constellation solarSystem() {
 		String name = "Solar System";
 		double scale = 2e-9;
 		double time = 100;
@@ -93,13 +93,13 @@ public class Systems {
 		double rMax = Planets.AU * 3.3;
 		ArrayList<Particle> particles = ParticleArrays.getRing(sun, 100, rMin, rMax);
 
-		return new System(name, planets, particles, scale, time);
+		return new Constellation(name, planets, particles, scale, time);
 	}
 
 	/**
 	 * The Earth Moon System
 	 */
-	public static System earthSystem() {
+	public static Constellation earthSystem() {
 		Planet earth = Planets.getEarth();
 		Planet moon = Planets.getMoon();
 
@@ -112,13 +112,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth, moon));
 
-		return new System("Earth System", planets, 0.8e-6, 20);
+		return new Constellation("Earth System", planets, 0.8e-6, 20);
 	}
 
 	/**
 	 * The Mars system with the two moons Phobos and Deimos
 	 */
-	public static System marsSystem() {
+	public static Constellation marsSystem() {
 		Planet mars = Planets.getMars();
 		Planet phobos = Planets.getPhobos();
 		Planet deimos = Planets.getDeimos();
@@ -133,13 +133,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(mars, phobos, deimos));
 
-		return new System("Mars System", planets, 1.2e-5, 0.5);
+		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
 	}
 
 	/**
 	 * The Jupiter system with the four Galilean moons
 	 */
-	public static System jupiterSystem() {
+	public static Constellation jupiterSystem() {
 		double ioDis = 421.7e6;
 		double europaDis = 670.9e6;
 		double ganymadeDis = 1070.4e6;
@@ -169,13 +169,13 @@ public class Systems {
 		double rMax = 122e6;
 		ArrayList<Particle> particles = ParticleArrays.getRing(jupiter, 100, rMin, rMax);
 
-		return new System("Jupiter System", planets, particles, 1.7e-7, 1);
+		return new Constellation("Jupiter System", planets, particles, 1.7e-7, 1);
 	}
 
 	/**
 	 * Saturn system
 	 */
-	public static System saturnSystem() {
+	public static Constellation saturnSystem() {
 		String name = "Saturn System";
 		double scale = 6e-7;
 		double time = 3;
@@ -222,13 +222,13 @@ public class Systems {
 		double rMax = 200e6;
 		ArrayList<Particle> particles = ParticleArrays.getRing(saturn, ringParticle, rMin, rMax);
 
-		return new System(name, planets, particles, scale, time, sps);
+		return new Constellation(name, planets, particles, scale, time, sps);
 	}
 
 	/**
 	 * A fly-by of Jupiter by two asteroids
 	 */
-	public static System jupiterFlyby() {
+	public static Constellation jupiterFlyby() {
 		Planet ast1 = new Planet(-133708e3 * 17, -133708e3 * 4, 10000, 0, 100, 1, Color.GRAY, "Asteroid");
 		Planet ast2 = new Planet(-133708e3 * 17, -133708e3 * 8, 10000, 0, 100, 1, Color.GRAY, "Asteroid");
 
@@ -236,13 +236,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(ast1, ast2, jupiter));
 
-		return new System("Jupiter flyby", planets, 3e-7, 3);
+		return new Constellation("Jupiter flyby", planets, 3e-7, 3);
 	}
 
 	/**
 	 * 8 planets in a symmetrical constellation
 	 */
-	public static System sym8() {
+	public static Constellation sym8() {
 		int dis = 3000;
 		double vel = 0.0135;
 		double mass = 5e9;
@@ -260,13 +260,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(p1, p2, p3, p4, p5, p6, p7, p8));
 
-		return new System("Symmetrical 8", planets, 0.05, 10);
+		return new Constellation("Symmetrical 8", planets, 0.05, 10);
 	}
 
 	/**
 	 * Earth on collision curse with two mars
 	 */
-	public static System earthMarsCollision() {
+	public static Constellation earthMarsCollision() {
 		double distance = Planets.getMars().getRadius() * 100;
 		double vel = 1000;
 
@@ -285,13 +285,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(mars, mars2, earth));
 
-		return new System("Earth-Mars Collisions", planets, 8e-7, 5);
+		return new Constellation("Earth-Mars Collisions", planets, 8e-7, 5);
 	}
 
 	/**
 	 * A number of random moons in orbit around the earth
 	 */
-	public static System randomMoons() {
+	public static Constellation randomMoons() {
 		int number = 60;
 		int sps = 2000;
 
@@ -311,13 +311,13 @@ public class Systems {
 			planets.add(randomMoon);
 		}
 
-		return new System("Random moons", planets, 8e-7, 4, sps);
+		return new Constellation("Random moons", planets, 1e-6, 4, sps);
 	}
 
 	/**
 	 * Random planets
 	 */
-	public static System randomPlanets() {
+	public static Constellation randomPlanets() {
 		int number = 60;
 		ArrayList<Planet> planets = new ArrayList<Planet>();
 
@@ -335,13 +335,13 @@ public class Systems {
 			planets.add(p);
 		}
 
-		return new System("Random planets", planets, 7e-7, 1, 2000);
+		return new Constellation("Random planets", planets, 7e-7, 1, 2000);
 	}
 
 	/**
 	 * Saturn with rings encounters Uranus
 	 */
-	public static System saturnUranusEncounter() {
+	public static Constellation saturnUranusEncounter() {
 		int sps = 2000;
 		Planet saturn = Planets.getSaturn();
 		Planet uranus = Planets.getUranus();
@@ -355,13 +355,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(saturn, uranus));
 
-		return new System("Saturn Uranus encounter", planets, particles, 0.7e-6, 4, sps);
+		return new Constellation("Saturn Uranus encounter", planets, particles, 0.7e-6, 4, sps);
 	}
 
 	/**
 	 * Earth with a line of particles
 	 */
-	public static System getParLine() {
+	public static Constellation getParLine() {
 		Planet earth = Planets.getEarth();
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth));
@@ -369,13 +369,13 @@ public class Systems {
 		ArrayList<Particle> particles = ParticleArrays.getVerticalLine(new Vec2D(-Planets.moonSma / 2.0, 0),
 				new Vec2D(1000, 0), Planets.moonSma * 2, 1000);
 
-		return new System("Particle line", planets, particles, 0.7e-6, 20);
+		return new Constellation("Particle line", planets, particles, 0.7e-6, 20);
 	}
 
 	/**
 	 * A binary Star System with two jupiter sized planets
 	 */
-	public static System binaryStar() {
+	public static Constellation binaryStar() {
 		Planet sun1 = Planets.getSun();
 		sun1.setName("A");
 
@@ -404,13 +404,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(sun1, sun2, p1, p2));
 
-		return new System("Binary star", planets, 1e-8, 10);
+		return new Constellation("Binary star", planets, 1e-8, 10);
 	}
 
 	/**
 	 * Two Saturn with rings in orbit around each other
 	 */
-	public static System binaryWithRings() {
+	public static Constellation binaryWithRings() {
 		int sps = 2000;
 
 		Planet p1 = Planets.getSaturn();
@@ -432,13 +432,13 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(p1, p2));
 
-		return new System("Binary with rings", planets, particlesAll, 5e-7, 10, sps);
+		return new Constellation("Binary with rings", planets, particlesAll, 5e-7, 10, sps);
 	}
 
 	/**
 	 * Earth flying through 2500 particles
 	 */
-	public static System flyThroughParticleField() {
+	public static Constellation flyThroughParticleField() {
 		int sps = 1000;
 
 		Planet earth = Planets.getEarth();
@@ -450,16 +450,16 @@ public class Systems {
 		ArrayList<Particle> particles = ParticleArrays.getField(Planets.moonSma * 2, Planets.moonSma * 2,
 				new Vec2D(-Planets.moonSma, 0));
 
-		return new System("Earth flying through particles", planets, particles, 5e-7, 50, sps);
+		return new Constellation("Earth flying through particles", planets, particles, 5e-7, 50, sps);
 	}
 
 	/**
 	 * Earth in the center of 2500 particles
 	 */
-	public static System particleField() {
+	public static Constellation particleField() {
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(Planets.getEarth()));
 		ArrayList<Particle> particles = ParticleArrays.getField(Planets.moonSma, Planets.moonSma, new Vec2D());
-		return new System("Earth in particle field", planets, particles, 1.5e-6, 5, 1000);
+		return new Constellation("Earth in particle field", planets, particles, 1.5e-6, 5, 1000);
 	}
 
 }

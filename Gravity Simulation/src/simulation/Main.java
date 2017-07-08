@@ -1,9 +1,9 @@
 package simulation;
 
-import bodies.System;
+import bodies.Constellation;
+import constellations.Constellations;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import systems.Systems;
 import window.Window;
 
 /**
@@ -31,7 +31,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(Systems.solarSystem());
+		sim = new Simulation(Constellations.solarSystem());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();
@@ -42,7 +42,7 @@ public class Main extends Application {
 	 * 
 	 * @param newConstellation
 	 */
-	public static void restart(System newConstellation) {
+	public static void restart(Constellation newConstellation) {
 		sim.stop();
 		sim = new Simulation(newConstellation);
 		sim.run();
@@ -54,7 +54,7 @@ public class Main extends Application {
 	 */
 	public static void restart() {
 		sim.stop();
-		sim = new Simulation(sim.getSystem());
+		sim = new Simulation(sim.getConstellation());
 		sim.run();
 		win.resetAndLoad(sim);
 	}

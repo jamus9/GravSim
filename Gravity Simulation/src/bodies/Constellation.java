@@ -3,12 +3,12 @@ package bodies;
 import java.util.ArrayList;
 
 /**
- * Implements a System with an array of planets, a scale, time and name.
+ * Implements a Constellation with an array of planets, a scale, time and name.
  * 
  * @author Jan Muskalla
  * 
  */
-public class System {
+public class Constellation {
 
 	private ArrayList<Planet> planetArray;
 	private ArrayList<Particle> particleArray;
@@ -29,7 +29,7 @@ public class System {
 	 * @param scale
 	 * @param time
 	 */
-	public System(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
+	public Constellation(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
 			double time, int sps) {
 		this.name = name;
 		this.planetArray = planetArray;
@@ -49,7 +49,7 @@ public class System {
 	 * @param scale
 	 * @param time
 	 */
-	public System(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
+	public Constellation(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
 			double time) {
 		this(name, planetArray, particleArray, scale, time, defaultSps);
 	}
@@ -62,7 +62,7 @@ public class System {
 	 * @param scale
 	 * @param time
 	 */
-	public System(String name, ArrayList<Planet> planetArray, double scale, double time, int sps) {
+	public Constellation(String name, ArrayList<Planet> planetArray, double scale, double time, int sps) {
 		this(name, planetArray, new ArrayList<Particle>(), scale, time, sps);
 	}
 
@@ -74,7 +74,7 @@ public class System {
 	 * @param scale
 	 * @param time
 	 */
-	public System(String name, ArrayList<Planet> planetArray, double scale, double time) {
+	public Constellation(String name, ArrayList<Planet> planetArray, double scale, double time) {
 		this(name, planetArray, new ArrayList<Particle>(), scale, time, defaultSps);
 	}
 
@@ -118,7 +118,7 @@ public class System {
 		return sps;
 	}
 
-	public System clone() {
+	public Constellation clone() {
 		ArrayList<Planet> planetArrayNew = new ArrayList<>();
 		for (Planet p : planetArray)
 			planetArrayNew.add(p.clone());
@@ -127,7 +127,7 @@ public class System {
 		for (Particle p : particleArray)
 			particleArrayNew.add(p.clone());
 
-		return new System(this.name, planetArrayNew, particleArrayNew, this.scale, this.time, this.sps);
+		return new Constellation(this.name, planetArrayNew, particleArrayNew, this.scale, this.time, this.sps);
 	}
 
 }

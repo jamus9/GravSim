@@ -1,4 +1,4 @@
-package systems;
+package constellations;
 
 import java.util.ArrayList;
 

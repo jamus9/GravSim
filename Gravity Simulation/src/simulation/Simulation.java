@@ -2,7 +2,7 @@ package simulation;
 
 import java.util.ArrayList;
 import bodies.Body;
-import bodies.System;
+import bodies.Constellation;
 import bodies.Particle;
 import bodies.Planet;
 import javafx.animation.Animation;
@@ -27,7 +27,7 @@ public class Simulation {
 	private static double sps;
 
 	/** the current system with start conditions */
-	private final System system;
+	private final Constellation constellation;
 
 	private final String name;
 
@@ -55,12 +55,12 @@ public class Simulation {
 	 * 
 	 * @param system
 	 */
-	public Simulation(System system) {
+	public Simulation(Constellation system) {
 		spsCounter = 0;
 		secondsCounter = 0;
 
 		// save a copy for later restarts
-		this.system = system.clone();
+		this.constellation = system.clone();
 
 		name = system.getName();
 		time = system.getTime();
@@ -277,7 +277,7 @@ public class Simulation {
 	}
 
 	public void resetTime() {
-		time = system.getTime();
+		time = constellation.getTime();
 	}
 
 	public int getSpsCounter() {
@@ -292,8 +292,8 @@ public class Simulation {
 		return secondsCounter;
 	}
 
-	public System getSystem() {
-		return system;
+	public Constellation getConstellation() {
+		return constellation;
 	}
 
 	public ArrayList<Planet> getPlanets() {

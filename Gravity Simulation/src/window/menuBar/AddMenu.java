@@ -1,11 +1,11 @@
 package window.menuBar;
 
 import bodies.Planet;
+import constellations.Planets;
 import javafx.scene.control.Menu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
 import simulation.Main;
-import systems.Planets;
 
 /**
  * The menu to add new planets to the scene

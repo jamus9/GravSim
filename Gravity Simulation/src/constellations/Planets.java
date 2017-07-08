@@ -1,4 +1,4 @@
-package systems;
+package constellations;
 
 import bodies.Planet;
 import javafx.scene.paint.Color;

@@ -3,6 +3,7 @@ package window;
 import bodies.Body;
 import bodies.Particle;
 import bodies.Planet;
+import constellations.Planets;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -24,7 +25,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
 import simulation.Simulation;
-import systems.Planets;
 import utils.Utils;
 import utils.Vec2D;
 import window.menuBar.CustomMenuBar;
@@ -114,7 +114,7 @@ public class Window extends Application {
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-		primaryStage.setMaximized(true);
+//		primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
@@ -644,11 +644,11 @@ public class Window extends Application {
 		}
 
 		// system
-		for (Planet p : Main.sim.getSystem().getPlanetArray()) {
+		for (Planet p : Main.sim.getConstellation().getPlanetArray()) {
 			p.getLabel().setTextFill(ViewSettings.textColor);
 		}
 
-		for (Particle p : Main.sim.getSystem().getParticleArray()) {
+		for (Particle p : Main.sim.getConstellation().getParticleArray()) {
 			p.getCircle().setFill(ViewSettings.bodyColor);
 		}
 	}

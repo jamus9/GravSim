@@ -29,9 +29,10 @@ import window.Window;
 public class Planet implements Body {
 
 	/** settings */
-	private static double trailWidth = 1;
+	public static double minSize = 2.5;
+	private static double trailWidth = 2;
 	private static int trailSeconds = 20;
-	public static double minSize = 1.5;
+	private static int trailLength = 4;
 
 	/** planet properties */
 	private Vec2D pos, vel, acc;
@@ -171,13 +172,13 @@ public class Planet implements Body {
 		if (win.isTrails()) {
 			Vec2D tplast = win.transform(trailPointsList.getLast());
 
-			// only draw new line if planet moved 3 pixel
-			if (tp.sub(tplast).norm() > 3) {
+			// only draw new line if planet moved more than trailLength
+			if (tp.sub(tplast).norm() > trailLength) {
 
-				// delete last if it is invisible
+				// delete first line if it is invisible
 				if (!trailLineList.isEmpty() && trailLineList.getFirst().getOpacity() == 0.0) {
 					Line line = trailLineList.getFirst();
-					((Pane) line.getParent()).getChildren().remove(line); // Null Pointer?
+					((Pane) line.getParent()).getChildren().remove(line);
 					trailLineList.removeFirst();
 					trailPointsList.removeFirst();
 				}
@@ -192,6 +193,7 @@ public class Planet implements Body {
 				ft.setToValue(0.0);
 				ft.play();
 
+				// add the line to the list and the window
 				trailLineList.add(line);
 				win.addTrail(line);
 

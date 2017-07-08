@@ -14,6 +14,8 @@ import utils.Vec2D;
  *
  */
 public class Particle implements Body {
+	
+	private static double radius = 1;
 
 	/** planet properties */
 	private Vec2D pos, vel, acc;
@@ -33,7 +35,7 @@ public class Particle implements Body {
 		this.pos = new Vec2D(posX, posY);
 		this.vel = new Vec2D(velX, velY);
 		this.acc = new Vec2D();
-		circle = new Circle(0.6);
+		circle = new Circle(radius);
 		circle.setFill(Color.WHITE);
 	}
 
