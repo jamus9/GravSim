@@ -80,8 +80,6 @@ public class Window extends Application {
 	/** the menu bar */
 	private CustomMenuBar menuBar;
 
-	private Timeline timeline;
-
 	/**
 	 * creates a new window with and initialized local variables
 	 */
@@ -114,7 +112,7 @@ public class Window extends Application {
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-//		primaryStage.setMaximized(true);
+		// primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
@@ -142,51 +140,16 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Sets the view to default values, clears trails and bodies and loads all new
-	 * bodies from the simulation
-	 */
-	public void resetAndLoad(Simulation sim) {
-		zoom = 1;
-		dx = dy = tempdx = tempdy = 0;
-
-		deselectPlanet();
-		follow = false;
-
-		// clear the pane and add the new bodies
-		bodyPane.getChildren().clear();
-		trailPane.getChildren().clear();
-
-		for (Particle particle : sim.getParticles())
-			addBodyToWindow(particle);
-		for (Planet planet : sim.getPlanets())
-			addBodyToWindow(planet);
-	}
-
-	/**
-	 * adds all objects of a body to the bodyPane
-	 * 
-	 * @param body
-	 */
-	private void addBodyToWindow(Body body) {
-		bodyPane.getChildren().add(body.getCircle());
-
-		if (body.getClass() == Planet.class) {
-			Planet p = (Planet) body;
-			bodyPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getLabel());
-		}
-	}
-
-	/**
 	 * The main window time line. 60 times per second updates all drawn objects and
 	 * adjusts the view.
 	 */
 	private void runTimeLine() {
-		timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
+		Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.0 / 60), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 
 				// transform trails if window size has changed
 				if (winWasChanged) {
-					updateTrails();
+					translateTrails();
 					infoPane.relocateTimeButtons();
 					winWasChanged = false;
 				}
@@ -196,13 +159,13 @@ public class Window extends Application {
 					Vec2D pos = selectedPlanet.getPos().mult(Main.sim.getScale());
 					dx = -pos.getX();
 					dy = pos.getY();
-					updateTrails();
+					translateTrails();
 				}
 
 				// update all drawn objects
-				for (Planet planet : Main.sim.getPlanets())
+				for (Planet planet : Main.sim.getPlanetList())
 					planet.updateObjects();
-				for (Particle particle : Main.sim.getParticles())
+				for (Particle particle : Main.sim.getParticleList())
 					particle.updateObjects();
 
 				// update info
@@ -274,7 +237,7 @@ public class Window extends Application {
 					zoom *= 1.1; // zoom in
 				else
 					zoom /= 1.1; // zoom out
-				updateTrails();
+				translateTrails();
 				event.consume();
 			}
 		});
@@ -312,7 +275,7 @@ public class Window extends Application {
 				if (event.isPrimaryButtonDown()) {
 					tempdx = (event.getX() - mouseX) / zoom;
 					tempdy = (event.getY() - mouseY) / zoom;
-					updateTrails();
+					translateTrails();
 				}
 			}
 		});
@@ -332,6 +295,41 @@ public class Window extends Application {
 				mousePos.set(event.getX(), event.getY());
 			}
 		});
+	}
+
+	/**
+	 * Sets the view to default values, clears trails and bodies and loads all new
+	 * bodies from the simulation
+	 */
+	public void resetAndLoad(Simulation sim) {
+		zoom = 1;
+		dx = dy = tempdx = tempdy = 0;
+
+		deselectPlanet();
+		follow = false;
+
+		// clear the pane and add the new bodies
+		bodyPane.getChildren().clear();
+		trailPane.getChildren().clear();
+
+		for (Particle particle : sim.getParticleList())
+			addBodyToWindow(particle);
+		for (Planet planet : sim.getPlanetList())
+			addBodyToWindow(planet);
+	}
+
+	/**
+	 * adds all objects of a body to the bodyPane
+	 * 
+	 * @param body
+	 */
+	private void addBodyToWindow(Body body) {
+		bodyPane.getChildren().add(body.getCircle());
+
+		if (body.getClass() == Planet.class) {
+			Planet p = (Planet) body;
+			bodyPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getLabel());
+		}
 	}
 
 	/**
@@ -366,7 +364,7 @@ public class Window extends Application {
 				else
 					dy /= 1.1;
 
-				updateTrails();
+				translateTrails();
 
 				if (zoom == 1 && dx == 0 && dy == 0)
 					timeline.stop();
@@ -408,7 +406,7 @@ public class Window extends Application {
 					dx = posx * (1 - pancounter) + -pos.getX() * pancounter;
 					dy = posy * (1 - pancounter) + pos.getY() * pancounter;
 					pancounter += 0.05;
-					updateTrails();
+					translateTrails();
 				}
 			}
 		});
@@ -427,7 +425,7 @@ public class Window extends Application {
 		Circle circle;
 		Vec2D mouse, center;
 
-		for (Planet planet : Main.sim.getPlanets()) {
+		for (Planet planet : Main.sim.getPlanetList()) {
 			circle = planet.getCircle();
 			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2D(mouseX, mouseY);
@@ -446,10 +444,10 @@ public class Window extends Application {
 		newPlanet.setPos(transfromBack(mousePos));
 
 		// velocity
-		if (!orbitMode || Main.sim.getPlanets().size() == 0) {
+		if (!orbitMode || Main.sim.getPlanetList().size() == 0) {
 			newPlanet.setVel(0, 0);
 		} else {
-			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanets().toArray(new Planet[] {}));
+			Planet biggest = Utils.getBiggestInView(Main.win, Main.sim.getPlanetList().toArray(new Planet[] {}));
 			newPlanet.setVel(Utils.getOrbitalVelocityCircular(biggest, newPlanet));
 		}
 
@@ -459,11 +457,11 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Translates all Orbits to the new right position if the orbits are visible.
+	 * Translates all Trails to the new position if the trails are visible.
 	 */
-	private void updateTrails() {
+	private void translateTrails() {
 		if (trails)
-			for (Planet planet : Main.sim.getPlanets())
+			for (Planet planet : Main.sim.getPlanetList())
 				planet.translateTrail();
 	}
 
@@ -488,21 +486,17 @@ public class Window extends Application {
 	}
 
 	/**
-	 * Changes the visibility of the orbit for all planets and updates the check
+	 * Changes the visibility of the trails for all planets and updates the check
 	 * menu item.
-	 * 
-	 * If the orbits are turned off, delete the orbit for all planets and clear the
-	 * orbit group. If the orbits are turned on, set the first position of the orbit
-	 * for all planets.
 	 */
 	public void changeTrailsVisibility() {
 		if (trails) {
 			trails = false;
-			for (Planet p : Main.sim.getPlanets())
+			for (Planet p : Main.sim.getPlanetList())
 				p.deleteTrail();
 		} else {
 			trails = true;
-			for (Planet p : Main.sim.getPlanets())
+			for (Planet p : Main.sim.getPlanetList())
 				p.savePosition();
 		}
 		menuBar.updateCMIs();
@@ -514,7 +508,7 @@ public class Window extends Application {
 	 */
 	public void changeLabelsVisibility() {
 		labels = !labels;
-		for (Planet p : Main.sim.getPlanets()) {
+		for (Planet p : Main.sim.getPlanetList()) {
 			p.getLabel().setVisible(labels);
 		}
 		menuBar.updateCMIs();
@@ -526,7 +520,7 @@ public class Window extends Application {
 	 */
 	public void changeVectorsVisibility() {
 		vectors = !vectors;
-		for (Planet p : Main.sim.getPlanets()) {
+		for (Planet p : Main.sim.getPlanetList()) {
 			p.getVelocityLine().setVisible(vectors);
 			p.getAccelerationLine().setVisible(vectors);
 		}
@@ -542,13 +536,18 @@ public class Window extends Application {
 		menuBar.updateCMIs();
 	}
 
+	/**
+	 * turns the orbitMode on or off
+	 */
 	public void changeOrbitMode() {
 		orbitMode = !orbitMode;
 		// infoPane.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
 	}
 
-	/** opens the help window */
+	/**
+	 * opens the help window
+	 */
 	public void openHelpWindow() {
 		HelpWindow helpWin = new HelpWindow();
 		try {
@@ -632,23 +631,20 @@ public class Window extends Application {
 		scene.setFill(ViewSettings.background);
 		infoPane.updateTextColor(ViewSettings.textColor);
 
-		for (Planet p : Main.sim.getPlanets()) {
+		for (Planet p : Main.sim.getPlanetList()) {
 			p.getLabel().setTextFill(ViewSettings.textColor);
-			// for (Line l : p.getTrailLineList()) {
-			// l.setStroke(ViewSettings.trailColor);
-			// }
 		}
 
-		for (Particle p : Main.sim.getParticles()) {
+		for (Particle p : Main.sim.getParticleList()) {
 			p.getCircle().setFill(ViewSettings.bodyColor);
 		}
 
 		// system
-		for (Planet p : Main.sim.getConstellation().getPlanetArray()) {
+		for (Planet p : Main.sim.getConstellation().getPlanetList()) {
 			p.getLabel().setTextFill(ViewSettings.textColor);
 		}
 
-		for (Particle p : Main.sim.getConstellation().getParticleArray()) {
+		for (Particle p : Main.sim.getConstellation().getParticleList()) {
 			p.getCircle().setFill(ViewSettings.bodyColor);
 		}
 	}

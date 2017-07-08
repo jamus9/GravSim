@@ -10,14 +10,14 @@ import java.util.ArrayList;
  */
 public class Constellation {
 
-	private ArrayList<Planet> planetArray;
-	private ArrayList<Particle> particleArray;
+	private static final int defaultSps = 6000;
+
+	private ArrayList<Planet> planetList;
+	private ArrayList<Particle> particleList;
 	private double scale;
 	private double time;
 	private String name;
 	private int sps;
-
-	private static final int defaultSps = 6000;
 
 	/**
 	 * Creates a new constellation with name, planets, particles, scale and time
@@ -32,8 +32,8 @@ public class Constellation {
 	public Constellation(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
 			double time, int sps) {
 		this.name = name;
-		this.planetArray = planetArray;
-		this.particleArray = particleArray;
+		this.planetList = planetArray;
+		this.particleList = particleArray;
 		this.scale = scale;
 		this.time = time;
 		this.sps = sps;
@@ -79,31 +79,31 @@ public class Constellation {
 	}
 
 	public int numberOfPlanets() {
-		return planetArray.size();
+		return planetList.size();
 	}
 
 	public int numberOfParticles() {
-		return particleArray.size();
+		return particleList.size();
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public ArrayList<Planet> getPlanetArray() {
-		return planetArray;
+	public ArrayList<Planet> getPlanetList() {
+		return planetList;
+	}
+
+	public ArrayList<Particle> getParticleList() {
+		return particleList;
 	}
 
 	public Planet getPlanet(int i) {
-		return planetArray.get(i);
-	}
-
-	public ArrayList<Particle> getParticleArray() {
-		return particleArray;
+		return planetList.get(i);
 	}
 
 	public Particle getParticle(int i) {
-		return particleArray.get(i);
+		return particleList.get(i);
 	}
 
 	public double getScale() {
@@ -120,11 +120,11 @@ public class Constellation {
 
 	public Constellation clone() {
 		ArrayList<Planet> planetArrayNew = new ArrayList<>();
-		for (Planet p : planetArray)
+		for (Planet p : planetList)
 			planetArrayNew.add(p.clone());
 
 		ArrayList<Particle> particleArrayNew = new ArrayList<>();
-		for (Particle p : particleArray)
+		for (Particle p : particleList)
 			particleArrayNew.add(p.clone());
 
 		return new Constellation(this.name, planetArrayNew, particleArrayNew, this.scale, this.time, this.sps);

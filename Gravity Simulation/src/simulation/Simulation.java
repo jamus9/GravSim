@@ -23,25 +23,17 @@ import utils.Vec2D;
  */
 public class Simulation {
 
-	/** simulations per second */
-	private static double sps;
-
-	/** the current system with start conditions */
+	/** a copy of the Constellation for this simulation */
 	private final Constellation constellation;
-
-	private final String name;
-
-	/** scale of the simulation */
-	private final double scale;
 
 	/** time step per simulation */
 	private double time;
 
 	/** all planets of the current simulation are saved here */
-	private ArrayList<Planet> planets;
+	private ArrayList<Planet> planetList;
 
 	/** all particles of the current simulation */
-	private ArrayList<Particle> particles;
+	private ArrayList<Particle> particleList;
 
 	/** the time line in which all calculations happen */
 	public Timeline timeline;
@@ -53,28 +45,26 @@ public class Simulation {
 	/**
 	 * Creates a new simulation with a given system.
 	 * 
-	 * @param system
+	 * @param constellation
 	 */
-	public Simulation(Constellation system) {
+	public Simulation(Constellation constellation) {
 		spsCounter = 0;
 		secondsCounter = 0;
 
 		// save a copy for later restarts
-		this.constellation = system.clone();
-
-		name = system.getName();
-		time = system.getTime();
-		scale = system.getScale();
-		sps = system.getSps();
+		this.constellation = constellation.clone();
+		
+		// the variable time step per simulation
+		time = constellation.getTime();
 
 		// copy the planets of the new system in the local array and save the
 		// first position for the trails
-		planets = system.getPlanetArray();
-		for (Planet p : planets)
+		planetList = constellation.getPlanetList();
+		for (Planet p : planetList)
 			p.savePosition();
 
 		// copy the particles of the new system in the local array
-		particles = system.getParticleArray();
+		particleList = constellation.getParticleList();
 
 		timeline = new Timeline();
 	}
@@ -83,10 +73,12 @@ public class Simulation {
 	 * Moves the planets SPS times per second and checks for collisions.
 	 */
 	public void run() {
-		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / sps), new EventHandler<ActionEvent>() {
+		KeyFrame kf = new KeyFrame(Duration.seconds(1.0 / getSps()), new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
+
 				moveBodies();
 				checkForCollisions();
+
 				spsCounter++;
 				secondsCounter += time;
 			}
@@ -104,18 +96,18 @@ public class Simulation {
 	private void moveBodies() {
 
 		// add all acceleration vectors in one time step
-		for (Planet p1 : planets)
-			for (Planet p2 : planets)
+		for (Planet p1 : planetList)
+			for (Planet p2 : planetList)
 				if (p1 != p2)
 					p1.addAcc(getAccVec(p1, p2));
 
 		// update all planets
-		for (Planet planet : planets)
+		for (Planet planet : planetList)
 			updateBodyProps(planet);
 
 		// add all acceleration vectors in one time step
-		for (Particle particle : particles) {
-			for (Planet planet : planets)
+		for (Particle particle : particleList) {
+			for (Planet planet : planetList)
 				particle.addAcc(getAccVec(particle, planet));
 
 			// update all particles
@@ -159,17 +151,19 @@ public class Simulation {
 		body.resetAcc();
 	}
 
-	/** Checks all bodies for collisions and removes all collided ones */
+	/**
+	 * Checks all bodies for collisions and removes all collided ones
+	 */
 	private void checkForCollisions() {
 		ArrayList<Body> toRemove = new ArrayList<Body>();
 
 		// planets (collide with each other)
 		Planet p1, p2, bigP, smallP;
-		for (int i = 0; i < planets.size(); i++) {
-			p1 = planets.get(i);
+		for (int i = 0; i < planetList.size(); i++) {
+			p1 = planetList.get(i);
 
-			for (int j = i + 1; j < planets.size(); j++) {
-				p2 = planets.get(j);
+			for (int j = i + 1; j < planetList.size(); j++) {
+				p2 = planetList.get(j);
 
 				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius()) {
 					bigP = Utils.getBiggest(p1, p2);
@@ -180,13 +174,20 @@ public class Simulation {
 			}
 
 			// particles (don't collide with each other)
-			for (Particle particle : particles)
-				if (particle.getPos().sub(p1.getPos()).norm() < p1.getRadius())
+			for (Particle particle : particleList) {
+				if (particle.getPos().sub(p1.getPos()).norm() < p1.getRadius()) {
 					toRemove.add(particle);
+				}
+			}
 		}
 
-		for (Body body : toRemove)
-			removeBody(body);
+		for (Body body : toRemove) {
+			if (body instanceof Planet)
+				planetList.remove(body);
+			else if (body instanceof Particle)
+				particleList.remove(body);
+			body.delete();
+		}
 	}
 
 	/**
@@ -207,19 +208,6 @@ public class Simulation {
 		Planet sp = Main.win.getSelectedPlanet();
 		if (sp != null && sp.equals(smallP))
 			Main.win.selectPlanet(bigP);
-	}
-
-	/**
-	 * deletes a body from the array and window
-	 * 
-	 * @param body
-	 */
-	private void removeBody(Body body) {
-		if (body instanceof Planet)
-			planets.remove(body);
-		if (body instanceof Particle)
-			particles.remove(body);
-		body.delete();
 	}
 
 	/**
@@ -248,15 +236,19 @@ public class Simulation {
 	 */
 	public void addNewPlanet(Planet planet) {
 		planet.savePosition();
-		planets.add(planet);
+		planetList.add(planet);
 	}
 
-	/** stops the simulation */
+	/**
+	 * stops the simulation
+	 */
 	public void stop() {
 		timeline.stop();
 	}
 
-	/** pauses the simulation */
+	/**
+	 * pauses the simulation
+	 */
 	public void setPause(boolean b) {
 		if (b)
 			timeline.pause();
@@ -296,27 +288,27 @@ public class Simulation {
 		return constellation;
 	}
 
-	public ArrayList<Planet> getPlanets() {
-		return planets;
+	public ArrayList<Planet> getPlanetList() {
+		return planetList;
 	}
 
-	public ArrayList<Particle> getParticles() {
-		return particles;
+	public ArrayList<Particle> getParticleList() {
+		return particleList;
 	}
 
 	public double getScale() {
-		return scale;
+		return constellation.getScale();
 	}
 
 	public int getNumberOfObjects() {
-		return planets.size() + particles.size();
+		return planetList.size() + particleList.size();
 	}
 
-	public static double getSps() {
-		return sps;
+	public double getSps() {
+		return constellation.getSps();
 	}
 
 	public String getName() {
-		return name;
+		return constellation.getName();
 	}
 }

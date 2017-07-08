@@ -6,7 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import simulation.Main;
-import simulation.Simulation;
 import utils.Utils;
 
 /**
@@ -96,7 +95,7 @@ public class InfoPane extends Pane {
 
 		// general information
 		String infoText = Main.sim.getName() + "\nObjects: " + Main.sim.getNumberOfObjects() + "\nTime: x"
-				+ ((int) (Main.sim.getTime() * Simulation.getSps()));
+				+ ((int) (Main.sim.getTime() * Main.sim.getSps()));
 
 		// info about selected planet
 		Planet selPl = Main.win.getSelectedPlanet();

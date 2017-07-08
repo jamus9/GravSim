@@ -306,7 +306,7 @@ public class Constellations {
 			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, Planets.moonSma * 0.1, Planets.moonSma));
 			randomMoon.setVel(Utils.getOrbitalVelocityCircular(earth, randomMoon));
 			randomMoon.setColor(Utils.getRandomColor());
-			// randomMoon.setName(Integer.toString(i));
+			randomMoon.setName(Integer.toString(i));
 
 			planets.add(randomMoon);
 		}
@@ -330,7 +330,7 @@ public class Constellations {
 			p.setPos(x, y);
 			p.setVel(Utils.plusMinus() * Math.random() * 5000, Utils.plusMinus() * Math.random() * 5000);
 			p.setColor(Utils.getRandomColor());
-			// p.setName(Integer.toString(i));
+			p.setName(Integer.toString(i));
 
 			planets.add(p);
 		}

@@ -26,7 +26,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts the first simulation with the default system and opens the main
+	 * Starts the first simulation with the default Constellation and opens the main
 	 * window.
 	 */
 	@Override
@@ -38,7 +38,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts a new simulation with a given system in a default window.
+	 * Starts a new simulation with a given Constellation in a default window.
 	 * 
 	 * @param newConstellation
 	 */
@@ -50,7 +50,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Starts a new simulation with the current system in a default window.
+	 * Starts a new simulation with the current Constellation in a default window.
 	 */
 	public static void restart() {
 		sim.stop();
