@@ -13,10 +13,7 @@ import window.ViewSettings;
 
 /**
  * Implements a planet with position, velocity, radius, mass and a name. Each
- * planet has a circle, velocity line and label that are drawn in the main
- * window. The trailLineList contains the trail that gets drawn and the list
- * trailPointsList saves the real coordinates of the trail for later
- * transformation.
+ * planet has a circle, label and trail that are drawn in the main window.
  * 
  * @author Jan Muskalla
  * 
@@ -83,7 +80,7 @@ public class Planet implements Body {
 	}
 
 	/**
-	 * Initializes the circle, vectors, label and trail.
+	 * Initializes the circle, label and trail (and acc).
 	 * 
 	 * @param color
 	 * @param name
@@ -91,24 +88,18 @@ public class Planet implements Body {
 	private void initializeObjects(Color color, String name) {
 		label = new Label(name);
 		label.setTextFill(ViewSettings.textColor);
-
-		circle = new Circle();
-		circle.setFill(color);
-
+		circle = new Circle(1, color);
 		trail = new Trail(this);
-
 		acc = new Vec2d();
 	}
 
 	/**
-	 * Updates the position and radius of the circle, the vector line, the label and
-	 * the trail of this planet.
+	 * Updates the position and radius of the circle, the label and the trail of
+	 * this planet.
 	 */
 	@Override
 	public void updateObjects() {
-
 		Vec2d tp = Main.win.transform(pos);
-
 		double circleRadius = Main.sim.getScale() * Main.win.getZoom() * radius;
 
 		// update circle

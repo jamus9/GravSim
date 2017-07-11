@@ -1,6 +1,7 @@
 package utils;
 
 /**
+ * An orbit for a body with semi-major axis, periapsis and argument of periapsis.
  * 
  * @author Jan Muskalla
  *
@@ -8,26 +9,26 @@ package utils;
 public class Orbit {
 
 	private double sma;
-	
+
 	private double periapsis;
-	
-	private double argumentOfPeriapsis;
+
+	private double argOfPeriapsis;
 
 	public Orbit(double sma, double periapsis, double argumentOfPeriapsis) {
 		this.sma = sma;
 		this.periapsis = periapsis;
-		this.argumentOfPeriapsis = argumentOfPeriapsis;
+		this.argOfPeriapsis = argumentOfPeriapsis;
 	}
 
 	public Orbit(double periapsis, double apoapsis) {
 		this.sma = (periapsis + apoapsis) / 2.0;
 		this.periapsis = periapsis;
-		this.argumentOfPeriapsis = 0;
+		this.argOfPeriapsis = 0;
 	}
-	
+
 	public Orbit(double sma) {
 		this.sma = this.periapsis = sma;
-		argumentOfPeriapsis = 0;
+		argOfPeriapsis = 0;
 	}
 
 	public double getSma() {
@@ -43,11 +44,11 @@ public class Orbit {
 	}
 
 	public double getArgumentOfPeriapsis() {
-		return argumentOfPeriapsis;
+		return argOfPeriapsis;
 	}
 
 	public void setArgumentOfPeriapsis(double argumentOfPeriapsis) {
-		this.argumentOfPeriapsis = argumentOfPeriapsis;
+		this.argOfPeriapsis = argumentOfPeriapsis;
 	}
 
 }

@@ -1,11 +1,11 @@
 package window.menuBar;
 
 import bodies.Planet;
-import constellations.PlanetData;
 import javafx.scene.control.Menu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
 import simulation.Main;
+import systems.PlanetData;
 
 /**
  * The menu to add new planets to the scene
@@ -22,7 +22,15 @@ public class AddMenu extends Menu {
 		super("Add");
 		
 		newMenu(PlanetData.getPhobos());
-		newMenu(PlanetData.getMoon());
+		
+//		newMenu(PlanetData.getMoon());
+		Planet moon = PlanetData.getMoon();
+		RadioMenuItem temp = new RadioMenuItem(moon.getName());
+		temp.setOnAction(actionEvent -> Main.win.setNextAddedPlanet(moon));
+		toggleGroup.getToggles().add(temp);
+		this.getItems().add(temp);
+		temp.setSelected(true);
+		
 		newMenu(PlanetData.getMercury());
 		newMenu(PlanetData.getVenus());
 		newMenu(PlanetData.getEarth());

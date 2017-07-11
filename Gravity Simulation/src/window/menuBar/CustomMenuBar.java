@@ -22,8 +22,8 @@ public class CustomMenuBar extends MenuBar {
 	private CheckMenuItem trailsCMI = new CheckMenuItem("Trails");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Labels");
 	
-	private MenuItem darkThemeCMI = new MenuItem("Dark Theme");
-	private MenuItem lightThemeCMI = new MenuItem("Light Theme");
+	private CheckMenuItem darkThemeCMI = new CheckMenuItem("Dark Theme");
+	private CheckMenuItem lightThemeCMI = new CheckMenuItem("Light Theme");
 	
 	/** menu items in settings menu */
 	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
@@ -67,6 +67,7 @@ public class CustomMenuBar extends MenuBar {
 		labelsCMI.setOnAction(actionEvent -> Main.win.changeLabelsVisibility());
 		infoCMI.setOnAction(actionEvent -> Main.win.changeInfoVisibility());
 		darkThemeCMI.setOnAction(actionEvent -> ViewSettings.setDarkTheme());
+		darkThemeCMI.setSelected(ViewSettings.darkTheme);
 		lightThemeCMI.setOnAction(actionEvent -> ViewSettings.setLightTheme());
 
 		Menu viewMenu = new Menu("View");
@@ -88,6 +89,8 @@ public class CustomMenuBar extends MenuBar {
 		labelsCMI.setSelected(Main.win.isLabels());
 		infoCMI.setSelected(Main.win.isInfoVisible());
 		orbitModeCMI.setSelected(Main.win.isOrbitMode());
+		darkThemeCMI.setSelected(ViewSettings.darkTheme);
+		lightThemeCMI.setSelected(!ViewSettings.darkTheme);
 	}
 
 }

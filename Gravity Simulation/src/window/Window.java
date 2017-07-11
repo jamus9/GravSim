@@ -3,7 +3,6 @@ package window;
 import bodies.Body;
 import bodies.Particle;
 import bodies.Planet;
-import constellations.PlanetData;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import simulation.Main;
 import simulation.Simulation;
+import systems.PlanetData;
 import utils.Utils;
 import utils.Vec2d;
 import window.menuBar.CustomMenuBar;
@@ -608,25 +608,9 @@ public class Window extends Application {
 	}
 
 	public void updateColors() {
+		menuBar.updateCMIs();
 		scene.setFill(ViewSettings.background);
 		infoPane.updateTextColor(ViewSettings.textColor);
-
-		for (Planet p : Main.sim.getPlanetList()) {
-			p.getLabel().setTextFill(ViewSettings.textColor);
-		}
-
-		for (Particle p : Main.sim.getParticleList()) {
-			p.getCircle().setFill(ViewSettings.bodyColor);
-		}
-
-		// system
-		for (Planet p : Main.sim.getConstellation().getPlanetList()) {
-			p.getLabel().setTextFill(ViewSettings.textColor);
-		}
-
-		for (Particle p : Main.sim.getConstellation().getParticleList()) {
-			p.getCircle().setFill(ViewSettings.bodyColor);
-		}
 	}
 
 }

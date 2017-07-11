@@ -1,7 +1,6 @@
-package constellations;
+package systems;
 
 import java.util.ArrayList;
-
 import bodies.Particle;
 import bodies.Planet;
 import utils.Utils;

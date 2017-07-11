@@ -1,4 +1,4 @@
-package constellations;
+package systems;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import utils.Vec2d;
  * @author Jan Muskalla
  * 
  */
-public class Constellations {
+public class Systems {
 
 	/**
 	 * an empty system
@@ -292,7 +292,7 @@ public class Constellations {
 			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, PlanetData.moonSma * 0.1, PlanetData.moonSma));
 			randomMoon.setOrbitalVel(earth);
 			randomMoon.setColor(Utils.getRandomColor());
-//			randomMoon.setName(Integer.toString(i));
+			// randomMoon.setName(Integer.toString(i));
 
 			planets.add(randomMoon);
 		}
@@ -316,7 +316,7 @@ public class Constellations {
 			p.setPos(x, y);
 			p.setVel(Utils.plusMinus() * Math.random() * 5000, Utils.plusMinus() * Math.random() * 5000);
 			p.setColor(Utils.getRandomColor());
-//			p.setName(Integer.toString(i));
+			// p.setName(Integer.toString(i));
 
 			planets.add(p);
 		}
@@ -463,27 +463,3 @@ public class Constellations {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,9 +1,9 @@
 package simulation;
 
 import bodies.Constellation;
-import constellations.Constellations;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import systems.Systems;
 import window.Window;
 
 /**
@@ -31,7 +31,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		sim = new Simulation(Constellations.earthSystem());
+		sim = new Simulation(Systems.earthSystem());
 		win = new Window();
 		win.start(primaryStage);
 		sim.run();

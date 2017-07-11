@@ -49,24 +49,29 @@ public class Trail {
 		Vec2d tplast = Main.win.transform(coordList.getLast());
 
 		// only draw new line if planet moved more than trailLength
-		if (tp.sub(tplast).norm() > 3) {
+		if (tp.sub(tplast).norm() > ViewSettings.trailLength) {
 
 			// the new line
-			Line line = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
-			line.setStroke(parent.getColor());
-			line.setStrokeWidth(ViewSettings.trailWidth);
+			Line newLine = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
+			newLine.setStroke(parent.getColor());
+			newLine.setStrokeWidth(ViewSettings.trailWidth);
 
-			FadeTransition ft = new FadeTransition(Duration.seconds(ViewSettings.trailSeconds), line);
+			FadeTransition ft = new FadeTransition(Duration.seconds(ViewSettings.trailSeconds), newLine);
 			ft.setFromValue(1.0);
 			ft.setToValue(0.0);
 			ft.play();
 
 			// add the line to the list and the window
-			lineList.add(line);
-			Main.win.addTrail(line);
+			lineList.add(newLine);
+			Main.win.addTrail(newLine);
 
 			// delete first line if it is invisible
-			deleteInvisibleLine();
+			if (lineList.getFirst().getOpacity() == 0.0) {
+				Line oldLine = lineList.getFirst();
+				((Pane) oldLine.getParent()).getChildren().remove(oldLine);
+				lineList.removeFirst();
+				coordList.removeFirst();
+			}
 
 			// save position for the next line start
 			savePosition();
@@ -74,16 +79,10 @@ public class Trail {
 	}
 
 	/**
-	 * deletes the first line in the list from the list and the window, if it is
-	 * invisible
+	 * Saves the current position of the planet in coordList.
 	 */
-	private void deleteInvisibleLine() {
-		if (lineList.getFirst().getOpacity() == 0.0) {
-			Line line = lineList.getFirst();
-			((Pane) line.getParent()).getChildren().remove(line);
-			lineList.removeFirst();
-			coordList.removeFirst();
-		}
+	public void savePosition() {
+		coordList.add(new Vec2d(parent.getPos()));
 	}
 
 	/**
@@ -96,8 +95,7 @@ public class Trail {
 		for (int i = 0; i < lineList.size(); i++) {
 			line = lineList.get(i);
 
-			// get the original position of the trail and use the current
-			// transform
+			// get the coordinates and use the current transform
 			newStart = Main.win.transform(coordList.get(i));
 			newEnd = Main.win.transform(coordList.get(i + 1));
 
@@ -109,19 +107,11 @@ public class Trail {
 	}
 
 	/**
-	 * saves the current position of the planet in coordList
-	 */
-	public void savePosition() {
-		coordList.add(new Vec2d(parent.getPos()));
-	}
-
-	/**
 	 * Deletes all orbit data.
 	 */
 	public void delete() {
-		for (Line line : lineList) {
+		for (Line line : lineList)
 			((Pane) line.getParent()).getChildren().remove(line);
-		}
 		lineList.clear();
 		coordList.clear();
 	}
