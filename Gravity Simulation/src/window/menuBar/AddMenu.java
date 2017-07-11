@@ -1,7 +1,7 @@
 package window.menuBar;
 
 import bodies.Planet;
-import constellations.Planets;
+import constellations.PlanetData;
 import javafx.scene.control.Menu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
@@ -21,20 +21,20 @@ public class AddMenu extends Menu {
 	public AddMenu() {
 		super("Add");
 		
-		newMenu(Planets.getPhobos());
-		newMenu(Planets.getMoon());
-		newMenu(Planets.getMercury());
-		newMenu(Planets.getVenus());
-		newMenu(Planets.getEarth());
-		newMenu(Planets.getVenus());
-		newMenu(Planets.getMars());
-		newMenu(Planets.getJupiter());
-		newMenu(Planets.getSaturn());
-		newMenu(Planets.getUranus());
-		newMenu(Planets.getNeptune());
-		newMenu(Planets.getSun());
-		newMenu(Planets.getBetelgeuse());
-		newMenu(Planets.getSagittariusA());
+		newMenu(PlanetData.getPhobos());
+		newMenu(PlanetData.getMoon());
+		newMenu(PlanetData.getMercury());
+		newMenu(PlanetData.getVenus());
+		newMenu(PlanetData.getEarth());
+		newMenu(PlanetData.getVenus());
+		newMenu(PlanetData.getMars());
+		newMenu(PlanetData.getJupiter());
+		newMenu(PlanetData.getSaturn());
+		newMenu(PlanetData.getUranus());
+		newMenu(PlanetData.getNeptune());
+		newMenu(PlanetData.getSun());
+		newMenu(PlanetData.getBetelgeuse());
+		newMenu(PlanetData.getSagittariusA());
 		
 	}
 	

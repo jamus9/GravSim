@@ -3,17 +3,25 @@ package window;
 import javafx.scene.paint.Color;
 import simulation.Main;
 
+/**
+ * Settings for the appearance of the application
+ * 
+ * @author Jan Muskalla
+ *
+ */
 public class ViewSettings {
 
+	/** colors */
 	public static Color background = Color.rgb(13, 21, 45);
-
 	public static Color textColor = Color.WHITE;
-
 	public static Color planetSelectionColor = Color.WHITE;
-	
 	public static Color bodyColor = Color.WHITE;
 
-	public static double minSize = 2;
+	/** sizes */
+	public static double minBodySize = 1;
+	public static double trailWidth = 1.5;
+	public static int trailSeconds = 30;
+	public static int trailLength = 3;
 
 	public static void setDarkTheme() {
 		background = Color.rgb(13, 21, 45);

@@ -3,7 +3,7 @@ package window;
 import bodies.Body;
 import bodies.Particle;
 import bodies.Planet;
-import constellations.Planets;
+import constellations.PlanetData;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -26,7 +26,7 @@ import javafx.util.Duration;
 import simulation.Main;
 import simulation.Simulation;
 import utils.Utils;
-import utils.Vec2D;
+import utils.Vec2d;
 import window.menuBar.CustomMenuBar;
 
 /**
@@ -40,7 +40,7 @@ import window.menuBar.CustomMenuBar;
 public class Window extends Application {
 
 	/** flags for trails label and vectors */
-	private boolean trails, labels, vectors;
+	private boolean trails, labels;
 
 	/** coordinates for zoom and translation */
 	private double zoom;
@@ -48,7 +48,7 @@ public class Window extends Application {
 	private double mouseX, mouseY;
 
 	/** the current mouse position for adding planets */
-	Vec2D mousePos;
+	Vec2d mousePos;
 
 	/** the selected planet */
 	private Planet selectedPlanet;
@@ -86,14 +86,13 @@ public class Window extends Application {
 	public Window() {
 		trails = true;
 		labels = true;
-		vectors = false;
 
 		follow = false;
 
-		nextAddedPlanet = Planets.getMoon();
+		nextAddedPlanet = PlanetData.getMoon();
 		orbitMode = true;
 
-		mousePos = new Vec2D();
+		mousePos = new Vec2d();
 		winWasChanged = true;
 	}
 
@@ -156,7 +155,7 @@ public class Window extends Application {
 
 				// follow a planet
 				if (follow) {
-					Vec2D pos = selectedPlanet.getPos().mult(Main.sim.getScale());
+					Vec2d pos = selectedPlanet.getPos().mult(Main.sim.getScale());
 					dx = -pos.getX();
 					dy = pos.getY();
 					translateTrails();
@@ -203,8 +202,6 @@ public class Window extends Application {
 					changeTrailsVisibility();
 				if (key == KeyCode.L)
 					changeLabelsVisibility();
-				if (key == KeyCode.V)
-					changeVectorsVisibility();
 				if (key == KeyCode.I)
 					changeInfoVisibility();
 
@@ -328,7 +325,7 @@ public class Window extends Application {
 
 		if (body.getClass() == Planet.class) {
 			Planet p = (Planet) body;
-			bodyPane.getChildren().addAll(p.getVelocityLine(), p.getAccelerationLine(), p.getLabel());
+			bodyPane.getChildren().addAll(p.getLabel());
 		}
 	}
 
@@ -400,7 +397,7 @@ public class Window extends Application {
 				if (selectedPlanet == null) {
 					timeline.stop();
 				} else {
-					Vec2D pos = selectedPlanet.getPos().mult(Main.sim.getScale());
+					Vec2d pos = selectedPlanet.getPos().mult(Main.sim.getScale());
 
 					// pancounter from 0 -> 1
 					dx = posx * (1 - pancounter) + -pos.getX() * pancounter;
@@ -423,12 +420,12 @@ public class Window extends Application {
 	 */
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
 		Circle circle;
-		Vec2D mouse, center;
+		Vec2d mouse, center;
 
 		for (Planet planet : Main.sim.getPlanetList()) {
 			circle = planet.getCircle();
-			center = new Vec2D(circle.getCenterX(), circle.getCenterY());
-			mouse = new Vec2D(mouseX, mouseY);
+			center = new Vec2d(circle.getCenterX(), circle.getCenterY());
+			mouse = new Vec2d(mouseX, mouseY);
 
 			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
 				selectPlanet(planet);
@@ -462,7 +459,8 @@ public class Window extends Application {
 	private void translateTrails() {
 		if (trails)
 			for (Planet planet : Main.sim.getPlanetList())
-				planet.translateTrail();
+				planet.getTrail().translate();
+//				planet.translateTrail();
 	}
 
 	/**
@@ -493,11 +491,11 @@ public class Window extends Application {
 		if (trails) {
 			trails = false;
 			for (Planet p : Main.sim.getPlanetList())
-				p.deleteTrail();
+				p.getTrail().delete();
 		} else {
 			trails = true;
 			for (Planet p : Main.sim.getPlanetList())
-				p.savePosition();
+				p.getTrail().savePosition();
 		}
 		menuBar.updateCMIs();
 	}
@@ -510,19 +508,6 @@ public class Window extends Application {
 		labels = !labels;
 		for (Planet p : Main.sim.getPlanetList()) {
 			p.getLabel().setVisible(labels);
-		}
-		menuBar.updateCMIs();
-	}
-
-	/**
-	 * Changes the visibility of the velocity vector for all planets and updates the
-	 * check menu item.
-	 */
-	public void changeVectorsVisibility() {
-		vectors = !vectors;
-		for (Planet p : Main.sim.getPlanetList()) {
-			p.getVelocityLine().setVisible(vectors);
-			p.getAccelerationLine().setVisible(vectors);
 		}
 		menuBar.updateCMIs();
 	}
@@ -541,7 +526,6 @@ public class Window extends Application {
 	 */
 	public void changeOrbitMode() {
 		orbitMode = !orbitMode;
-		// infoPane.setOrbitMode(orbitMode);
 		menuBar.updateCMIs();
 	}
 
@@ -563,10 +547,10 @@ public class Window extends Application {
 	 * @param vector
 	 * @return the transformed vector
 	 */
-	public Vec2D transfromBack(Vec2D vector) {
+	public Vec2d transfromBack(Vec2d vector) {
 		double x = ((vector.getX() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
 		double y = -((vector.getY() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
-		return new Vec2D(x, y);
+		return new Vec2d(x, y);
 	}
 
 	/**
@@ -575,10 +559,10 @@ public class Window extends Application {
 	 * @param vector
 	 * @return the transformed vector
 	 */
-	public Vec2D transform(Vec2D vector) {
+	public Vec2d transform(Vec2d vector) {
 		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getWidth() / 2.0;
 		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getHeight() / 2.0;
-		return new Vec2D(x, y);
+		return new Vec2d(x, y);
 	}
 
 	/** returns the width of the window */
@@ -605,10 +589,6 @@ public class Window extends Application {
 
 	public boolean isLabels() {
 		return labels;
-	}
-
-	public boolean isVectors() {
-		return vectors;
 	}
 
 	public void addTrail(Line line) {

@@ -12,7 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
 import utils.Utils;
-import utils.Vec2D;
+import utils.Vec2d;
 
 /**
  * Simulates the movement of the planets and handles the current planets and
@@ -61,7 +61,8 @@ public class Simulation {
 		// first position for the trails
 		planetList = constellation.getPlanetList();
 		for (Planet p : planetList)
-			p.savePosition();
+			p.getTrail().savePosition();
+//			p.savePosition();
 
 		// copy the particles of the new system in the local array
 		particleList = constellation.getParticleList();
@@ -122,10 +123,10 @@ public class Simulation {
 	 * @param planet
 	 * @return the acceleration vector
 	 */
-	private Vec2D getAccVec(Body body, Planet planet) {
+	private Vec2d getAccVec(Body body, Planet planet) {
 
 		// direction of the acceleration vector
-		Vec2D r = (planet.getPos()).sub(body.getPos());
+		Vec2d r = (planet.getPos()).sub(body.getPos());
 
 		// r * G * m / |r|^3
 		return r.mult(Utils.GRAV_CONST * planet.getMass() / Math.pow(r.norm(), 3));
@@ -138,8 +139,8 @@ public class Simulation {
 	 * @param body
 	 */
 	private void updateBodyProps(Body body) {
-		Vec2D v = body.getVel();
-		Vec2D a = body.getAcc();
+		Vec2d v = body.getVel();
+		Vec2d a = body.getAcc();
 
 		// v + a*t
 		body.setVel(v.add(a.mult(time)));
@@ -218,14 +219,14 @@ public class Simulation {
 	 * @param p2
 	 * @return the new velocity
 	 */
-	private static Vec2D getCollisionVel(Planet p1, Planet p2) {
+	private static Vec2d getCollisionVel(Planet p1, Planet p2) {
 		double m1 = p1.getMass();
 		double m2 = p2.getMass();
-		Vec2D v1 = p1.getVel();
-		Vec2D v2 = p2.getVel();
+		Vec2d v1 = p1.getVel();
+		Vec2d v2 = p2.getVel();
 		double x = (m1 * v1.getX() + m2 * v2.getX()) / (m1 + m2);
 		double y = (m1 * v1.getY() + m2 * v2.getY()) / (m1 + m2);
-		return new Vec2D(x, y);
+		return new Vec2d(x, y);
 	}
 
 	/**
@@ -235,7 +236,8 @@ public class Simulation {
 	 *            the new planet
 	 */
 	public void addNewPlanet(Planet planet) {
-		planet.savePosition();
+		planet.getTrail().savePosition();
+//		planet.savePosition();
 		planetList.add(planet);
 	}
 

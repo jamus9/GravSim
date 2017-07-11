@@ -17,14 +17,15 @@ import window.ViewSettings;
  */
 public class CustomMenuBar extends MenuBar {
 
-	/** CheckMenuItems in settings menu */
+	/** menu items in view menu */
 	private CheckMenuItem infoCMI = new CheckMenuItem("Information");
 	private CheckMenuItem trailsCMI = new CheckMenuItem("Trails");
 	private CheckMenuItem labelsCMI = new CheckMenuItem("Labels");
-	private CheckMenuItem vectorsCMI = new CheckMenuItem("Vectors");
+	
 	private MenuItem darkThemeCMI = new MenuItem("Dark Theme");
 	private MenuItem lightThemeCMI = new MenuItem("Light Theme");
 	
+	/** menu items in settings menu */
 	private CheckMenuItem orbitModeCMI = new CheckMenuItem("Orbit Mode");
 
 	/**
@@ -65,12 +66,11 @@ public class CustomMenuBar extends MenuBar {
 		trailsCMI.setOnAction(actionEvent -> Main.win.changeTrailsVisibility());
 		labelsCMI.setOnAction(actionEvent -> Main.win.changeLabelsVisibility());
 		infoCMI.setOnAction(actionEvent -> Main.win.changeInfoVisibility());
-		vectorsCMI.setOnAction(actionEvent -> Main.win.changeVectorsVisibility());
 		darkThemeCMI.setOnAction(actionEvent -> ViewSettings.setDarkTheme());
 		lightThemeCMI.setOnAction(actionEvent -> ViewSettings.setLightTheme());
 
 		Menu viewMenu = new Menu("View");
-		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, vectorsCMI, darkThemeCMI, lightThemeCMI);
+		viewMenu.getItems().addAll(trailsCMI, labelsCMI, infoCMI, darkThemeCMI, lightThemeCMI);
 
 		// open and add menu
 		OpenMenu openMenu = new OpenMenu();
@@ -86,7 +86,6 @@ public class CustomMenuBar extends MenuBar {
 	public void updateCMIs() {
 		trailsCMI.setSelected(Main.win.isTrails());
 		labelsCMI.setSelected(Main.win.isLabels());
-		vectorsCMI.setSelected(Main.win.isVectors());
 		infoCMI.setSelected(Main.win.isInfoVisible());
 		orbitModeCMI.setSelected(Main.win.isOrbitMode());
 	}

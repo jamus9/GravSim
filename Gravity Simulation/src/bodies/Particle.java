@@ -4,7 +4,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import simulation.Main;
-import utils.Vec2D;
+import utils.Vec2d;
+import window.ViewSettings;
 
 /**
  * A particle has no mass, radius, name or trail, so it does not influence other
@@ -14,11 +15,9 @@ import utils.Vec2D;
  *
  */
 public class Particle implements Body {
-	
-	private static double radius = 1;
 
 	/** planet properties */
-	private Vec2D pos, vel, acc;
+	private Vec2d pos, vel, acc;
 
 	/** drawn objects */
 	private Circle circle;
@@ -32,10 +31,10 @@ public class Particle implements Body {
 	 * @param velY
 	 */
 	public Particle(double posX, double posY, double velX, double velY) {
-		this.pos = new Vec2D(posX, posY);
-		this.vel = new Vec2D(velX, velY);
-		this.acc = new Vec2D();
-		circle = new Circle(radius);
+		this.pos = new Vec2d(posX, posY);
+		this.vel = new Vec2d(velX, velY);
+		this.acc = new Vec2d();
+		circle = new Circle(ViewSettings.minBodySize);
 		circle.setFill(Color.WHITE);
 	}
 
@@ -47,7 +46,7 @@ public class Particle implements Body {
 	/** updates the circle position */
 	@Override
 	public void updateObjects() {
-		Vec2D tp = Main.win.transform(pos);
+		Vec2d tp = Main.win.transform(pos);
 		circle.setCenterX(tp.getX());
 		circle.setCenterY(tp.getY());
 	}
@@ -58,47 +57,47 @@ public class Particle implements Body {
 	}
 
 	@Override
-	public void setPos(Vec2D pos) {
+	public void setPos(Vec2d pos) {
 		this.pos = pos;
 	}
 
 	@Override
 	public void setPos(double x, double y) {
-		this.pos = new Vec2D(x, y);
+		this.pos = new Vec2d(x, y);
 	}
 
 	@Override
-	public Vec2D getPos() {
+	public Vec2d getPos() {
 		return pos;
 	}
 
 	@Override
-	public void setVel(Vec2D vel) {
+	public void setVel(Vec2d vel) {
 		this.vel = vel;
 	}
 
 	@Override
 	public void setVel(double x, double y) {
-		vel = new Vec2D(x, y);
+		vel = new Vec2d(x, y);
 	}
 
 	@Override
-	public Vec2D getVel() {
+	public Vec2d getVel() {
 		return vel;
 	}
 
 	@Override
 	public void resetAcc() {
-		acc = new Vec2D();
+		acc = new Vec2d();
 	}
 
 	@Override
-	public Vec2D getAcc() {
+	public Vec2d getAcc() {
 		return acc;
 	}
 
 	@Override
-	public void addAcc(Vec2D v) {
+	public void addAcc(Vec2d v) {
 		acc = acc.add(v);
 	}
 

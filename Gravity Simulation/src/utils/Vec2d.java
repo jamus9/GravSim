@@ -6,25 +6,25 @@ package utils;
  * @author Jan Muskalla
  *
  */
-public class Vec2D {
+public class Vec2d {
 
 	private double x, y;
 
-	public Vec2D(double x, double y) {
+	public Vec2d(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	public Vec2D(Vec2D v) {
+	public Vec2d(Vec2d v) {
 		this.x = v.x;
 		this.y = v.y;
 	}
 	
-	public Vec2D(PolarVec2D pv) {
-		this(pv.toVec2D());
+	public Vec2d(PolarVec2d pv) {
+		this(pv.toVec2d());
 	}
 
-	public Vec2D() {
+	public Vec2d() {
 		this(0, 0);
 	}
 	
@@ -41,23 +41,23 @@ public class Vec2D {
 		return y;
 	}
 
-	public Vec2D add(Vec2D v) {
-		return new Vec2D(x + v.x, y + v.y);
+	public Vec2d add(Vec2d v) {
+		return new Vec2d(x + v.x, y + v.y);
 	}
 
-	public Vec2D sub(Vec2D v) {
-		return new Vec2D(x - v.x, y - v.y);
+	public Vec2d sub(Vec2d v) {
+		return new Vec2d(x - v.x, y - v.y);
 	}
 
-	public Vec2D mult(double a) {
-		return new Vec2D(a * x, a * y);
+	public Vec2d mult(double a) {
+		return new Vec2d(a * x, a * y);
 	}
 
 	public double norm() {
 		return Math.sqrt(x * x + y * y);
 	}
 	
-	public Vec2D getDir() {
+	public Vec2d getDir() {
 		return this.mult(1.0 / this.norm());
 	}
 	

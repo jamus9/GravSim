@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -20,7 +19,7 @@ public class HelpWindow extends Application {
 		primaryStage.setTitle("Help");
 
 		Group root = new Group();
-		Scene scene = new Scene(root, 250, 350, Color.WHITE);
+		Scene scene = new Scene(root, 240, 310, ViewSettings.background);
 
 		Label helpLabel = new Label();
 		helpLabel.relocate(10, 10);
@@ -32,7 +31,7 @@ public class HelpWindow extends Application {
 				+ "Decelerate time	,\n"
 				+ "Reset time		-\n"
 				+ "Vectors			V\n"
-				+ "Orbits			T\n"
+				+ "Trails			T\n"
 				+ "Labels			L\n"
 				+ "Information		I\n"
 				+ "Select planet		Left mouse button\n"
@@ -42,6 +41,8 @@ public class HelpWindow extends Application {
 				+ "Drag view		Left mouse button\n"
 				+ "Zoom			Mouse scroll\n"
 				+ "Exit				Esc");
+		
+		helpLabel.setTextFill(ViewSettings.textColor);
 		
 		root.getChildren().add(helpLabel);
 		
