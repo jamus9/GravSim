@@ -3,7 +3,6 @@ package utils;
 import java.util.LinkedList;
 
 import bodies.Body;
-import bodies.Particle;
 import bodies.Planet;
 import javafx.scene.paint.Color;
 import window.Window;
@@ -124,13 +123,13 @@ public class Utils {
 	 * @return the orbital velocity as a vector
 	 */
 	public static Vec2d getOrbitalVelocityElliptical(Planet parent, Body body, double sma) {
-	
+
 		// connection vector
 		Vec2d r = parent.getPos().sub(body.getPos());
-	
+
 		// normal vector to r
 		Vec2d velDirection = new Vec2d(r.getY(), -r.getX());
-	
+
 		// norm and multiply with orbital speed
 		return velDirection.getDir().mult(orbSpeedElliptical(parent, r.norm(), sma)).add(parent.getVel());
 	}
@@ -170,37 +169,9 @@ public class Utils {
 	public static double momComp(double ownMass, double otherMass, double otherSpeed) {
 		return -otherMass * otherSpeed / ownMass;
 	}
-	
+
 	public static Vec2d momComp(Planet p1, Planet p2) {
 		return p2.getVel().mult(p2.getMass()).mult(-1.0 / p1.getMass());
-	}
-
-	/**
-	 * Gives the past seconds in a nice time format.
-	 * 
-	 * @return the past time as a String
-	 */
-	public static String getTimeString(double seconds) {
-		int secs = (int) seconds;
-		int mins, hours, days, years;
-
-		years = secs / 31536000;
-		secs -= years * 31536000;
-		days = secs / 86400;
-		secs -= days * 86400;
-		hours = secs / 3600;
-		secs -= hours * 3600;
-		mins = secs / 60;
-		secs -= mins * 60;
-
-		if (years > 0)
-			return String.format("Y: %1$d D: %2$d", years, days);
-		else if (days > 0)
-			return String.format("Y: %1$d D: %2$d H: %3$d", years, days, hours);
-		else if (hours > 0)
-			return String.format("Y: %1$d D: %2$d H: %3$d M: %4$d", years, days, hours, mins);
-		else
-			return String.format("Y: %1$d D: %2$d H: %3$d M: %4$d S: %5$d", years, days, hours, mins, secs);
 	}
 
 	/**
@@ -232,30 +203,31 @@ public class Utils {
 	 * @return a color
 	 */
 	public static Color getRandomColor() {
-		return Color.color(Math.random(), Math.random(), Math.random());
+		return Color.color(Math.random()*0.8+0.2, Math.random()*0.8+0.2, Math.random()*0.8+0.2);
 	}
 
-	/**
-	 * concatenates two particle arrays
-	 * 
-	 * @param array1
-	 * @param array2
-	 * @return the new array
-	 */
-	public static Particle[] concatParticles(Particle array1[], Particle array2[]) {
-		int l1 = array1.length;
-		int l2 = array2.length;
-		Particle concat[] = new Particle[l1 + l2];
-
-		// copy the first array in the first half
-		for (int i = 0; i < l1; i++)
-			concat[i] = array1[i];
-
-		// copy the second array in the second half
-		for (int i = 0; i < l2; i++)
-			concat[l1 + i] = array2[i];
-
-		return concat;
-	}
+	// /**
+	// * concatenates two particle arrays
+	// *
+	// * @param array1
+	// * @param array2
+	// * @return the new array
+	// */
+	// public static Particle[] concatParticles(Particle array1[], Particle
+	// array2[]) {
+	// int l1 = array1.length;
+	// int l2 = array2.length;
+	// Particle concat[] = new Particle[l1 + l2];
+	//
+	// // copy the first array in the first half
+	// for (int i = 0; i < l1; i++)
+	// concat[i] = array1[i];
+	//
+	// // copy the second array in the second half
+	// for (int i = 0; i < l2; i++)
+	// concat[l1 + i] = array2[i];
+	//
+	// return concat;
+	// }
 
 }

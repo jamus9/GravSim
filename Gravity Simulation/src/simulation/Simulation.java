@@ -53,7 +53,7 @@ public class Simulation {
 
 		// save a copy for later restarts
 		this.constellation = constellation.clone();
-		
+
 		// the variable time step per simulation
 		time = constellation.getTime();
 
@@ -62,7 +62,7 @@ public class Simulation {
 		planetList = constellation.getPlanetList();
 		for (Planet p : planetList)
 			p.getTrail().savePosition();
-//			p.savePosition();
+		// p.savePosition();
 
 		// copy the particles of the new system in the local array
 		particleList = constellation.getParticleList();
@@ -123,7 +123,7 @@ public class Simulation {
 	 * @param planet
 	 * @return the acceleration vector
 	 */
-	private Vec2d getAccVec(Body body, Planet planet) {
+	private static Vec2d getAccVec(Body body, Planet planet) {
 
 		// direction of the acceleration vector
 		Vec2d r = (planet.getPos()).sub(body.getPos());
@@ -169,7 +169,16 @@ public class Simulation {
 				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius()) {
 					bigP = Utils.getBiggest(p1, p2);
 					smallP = Utils.getSmallest(p1, p2);
-					collidePlanets(bigP, smallP);
+
+					// velocity, mass and radius of the new planet
+					bigP.setVel(getCollisionVel(bigP, smallP));
+					bigP.setMass(bigP.getMass() + smallP.getMass(), bigP.getDensity());
+
+					// check for selected planets
+					Planet sp = Main.win.getSelectedPlanet();
+					if (sp != null && sp.equals(smallP))
+						Main.win.selectPlanet(bigP);
+
 					toRemove.add(smallP);
 				}
 			}
@@ -182,6 +191,7 @@ public class Simulation {
 			}
 		}
 
+		// remove all collided smaller planets and particles
 		for (Body body : toRemove) {
 			if (body instanceof Planet)
 				planetList.remove(body);
@@ -189,26 +199,6 @@ public class Simulation {
 				particleList.remove(body);
 			body.delete();
 		}
-	}
-
-	/**
-	 * Collides two planets and changes the bigger one after the collision.
-	 * 
-	 * @param bigP
-	 *            the bigger planet
-	 * @param smallP
-	 *            the smaller planet
-	 */
-	private void collidePlanets(Planet bigP, Planet smallP) {
-
-		// velocity, mass and radius of the new planet
-		bigP.setVel(getCollisionVel(bigP, smallP));
-		bigP.setMass(bigP.getMass() + smallP.getMass(), bigP.getDensity());
-
-		// check selected planet
-		Planet sp = Main.win.getSelectedPlanet();
-		if (sp != null && sp.equals(smallP))
-			Main.win.selectPlanet(bigP);
 	}
 
 	/**
@@ -237,7 +227,6 @@ public class Simulation {
 	 */
 	public void addNewPlanet(Planet planet) {
 		planet.getTrail().savePosition();
-//		planet.savePosition();
 		planetList.add(planet);
 	}
 

@@ -48,7 +48,7 @@ public class Window extends Application {
 	private double mouseX, mouseY;
 
 	/** the current mouse position for adding planets */
-	Vec2d mousePos;
+	private Vec2d mousePos;
 
 	/** the selected planet */
 	private Planet selectedPlanet;
@@ -111,12 +111,13 @@ public class Window extends Application {
 		// stage
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-		// primaryStage.setMaximized(true);
+		primaryStage.setMaximized(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
 		bodyPane = new Pane();
 		infoPane = new InfoPane();
+//		infoPane.setVisible(false);
 		menuBar = new CustomMenuBar(primaryStage);
 		menuBar.updateCMIs();
 		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar);
@@ -189,9 +190,11 @@ public class Window extends Application {
 			public void handle(KeyEvent event) {
 				KeyCode key = event.getCode();
 
-				// restart and exit
+				// restart, help and exit
 				if (key == KeyCode.R)
 					Main.restart();
+				if (key == KeyCode.H)
+					openHelpWindow();
 				if (key == KeyCode.ESCAPE)
 					Platform.exit();
 
@@ -220,10 +223,6 @@ public class Window extends Application {
 					addNextPlanet();
 				if (key == KeyCode.M)
 					changeOrbitMode();
-
-				// help window
-				if (key == KeyCode.H)
-					openHelpWindow();
 			}
 		});
 
@@ -352,7 +351,7 @@ public class Window extends Application {
 				}
 
 				// reset translation
-				if (Math.abs(dx) < 1.0)
+				if (Math.abs(dx) < 1)
 					dx = 0;
 				else
 					dx /= 1.1;
@@ -397,12 +396,12 @@ public class Window extends Application {
 				if (selectedPlanet == null) {
 					timeline.stop();
 				} else {
-					Vec2d pos = selectedPlanet.getPos().mult(Main.sim.getScale());
+					Vec2d scaledPos = selectedPlanet.getPos().mult(Main.sim.getScale());
 
 					// pancounter from 0 -> 1
-					dx = posx * (1 - pancounter) + -pos.getX() * pancounter;
-					dy = posy * (1 - pancounter) + pos.getY() * pancounter;
-					pancounter += 0.05;
+					dx = posx * (1 - pancounter) + -scaledPos.getX() * pancounter;
+					dy = posy * (1 - pancounter) + scaledPos.getY() * pancounter;
+					pancounter += 0.1;
 					translateTrails();
 				}
 			}
@@ -422,18 +421,20 @@ public class Window extends Application {
 		Circle circle;
 		Vec2d mouse, center;
 
-		for (Planet planet : Main.sim.getPlanetList()) {
-			circle = planet.getCircle();
+		for (Planet p : Main.sim.getPlanetList()) {
+			circle = p.getCircle();
 			center = new Vec2d(circle.getCenterX(), circle.getCenterY());
 			mouse = new Vec2d(mouseX, mouseY);
 
 			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
-				selectPlanet(planet);
+				selectPlanet(p);
 			}
 		}
 	}
 
-	/** adds a planet to the simulation */
+	/**
+	 * adds the selected planet to the simulation
+	 */
 	private void addNextPlanet() {
 		Planet newPlanet = nextAddedPlanet.clone();
 
@@ -458,9 +459,41 @@ public class Window extends Application {
 	 */
 	private void translateTrails() {
 		if (trails)
-			for (Planet planet : Main.sim.getPlanetList())
-				planet.getTrail().translate();
-//				planet.translateTrail();
+			for (Planet p : Main.sim.getPlanetList())
+				p.getTrail().translate();
+	}
+
+	/**
+	 * adds a trail line to the trail pane
+	 * 
+	 * @param line
+	 */
+	public void addTrail(Line line) {
+		trailPane.getChildren().add(line);
+	}
+
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param vector
+	 * @return the transformed vector
+	 */
+	public Vec2d transform(Vec2d vector) {
+		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getWidth() / 2.0;
+		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getHeight() / 2.0;
+		return new Vec2d(x, y);
+	}
+
+	/**
+	 * Transforms a vector from planet coordinates to screen coordinates.
+	 * 
+	 * @param vector
+	 * @return the transformed vector
+	 */
+	public Vec2d transfromBack(Vec2d vector) {
+		double x = ((vector.getX() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
+		double y = -((vector.getY() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
+		return new Vec2d(x, y);
 	}
 
 	/**
@@ -475,12 +508,36 @@ public class Window extends Application {
 		panToBody();
 	}
 
-	/** Deselects the selected planet and updates the info label. */
+	/**
+	 * Deselects the selected planet and updates the info label.
+	 */
 	public void deselectPlanet() {
 		follow = false;
 		if (selectedPlanet != null)
 			selectedPlanet.deselect();
 		selectedPlanet = null;
+	}
+
+	/**
+	 * opens the help window
+	 */
+	public void openHelpWindow() {
+		HelpWindow helpWin = new HelpWindow();
+		try {
+			helpWin.start(new Stage());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Updates the colors of the background and text after a theme change. Also
+	 * updates the check menu items in the menu bar.
+	 */
+	public void updateColors() {
+		scene.setFill(ViewSettings.background);
+		infoPane.updateTextColor(ViewSettings.textColor);
+		menuBar.updateCMIs();
 	}
 
 	/**
@@ -529,60 +586,6 @@ public class Window extends Application {
 		menuBar.updateCMIs();
 	}
 
-	/**
-	 * opens the help window
-	 */
-	public void openHelpWindow() {
-		HelpWindow helpWin = new HelpWindow();
-		try {
-			helpWin.start(new Stage());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Transforms a vector from planet coordinates to screen coordinates.
-	 * 
-	 * @param vector
-	 * @return the transformed vector
-	 */
-	public Vec2d transfromBack(Vec2d vector) {
-		double x = ((vector.getX() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
-		double y = -((vector.getY() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
-		return new Vec2d(x, y);
-	}
-
-	/**
-	 * Transforms a vector from planet coordinates to screen coordinates.
-	 * 
-	 * @param vector
-	 * @return the transformed vector
-	 */
-	public Vec2d transform(Vec2d vector) {
-		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getWidth() / 2.0;
-		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getHeight() / 2.0;
-		return new Vec2d(x, y);
-	}
-
-	/** returns the width of the window */
-	public double getWidth() {
-		return scene.getWidth();
-	}
-
-	/** returns the height of the window */
-	public double getHeight() {
-		return scene.getHeight();
-	}
-
-	public double getZoom() {
-		return zoom;
-	}
-
-	public Planet getSelectedPlanet() {
-		return selectedPlanet;
-	}
-
 	public boolean isTrails() {
 		return trails;
 	}
@@ -591,26 +594,32 @@ public class Window extends Application {
 		return labels;
 	}
 
-	public void addTrail(Line line) {
-		trailPane.getChildren().add(line);
-	}
-
-	public void setNextAddedPlanet(Planet p) {
-		this.nextAddedPlanet = p;
+	public boolean isInfoVisible() {
+		return infoPane.isVisible();
 	}
 
 	public boolean isOrbitMode() {
 		return orbitMode;
 	}
 
-	public boolean isInfoVisible() {
-		return infoPane.isVisible();
+	public void setNextAddedPlanet(Planet p) {
+		this.nextAddedPlanet = p;
 	}
 
-	public void updateColors() {
-		menuBar.updateCMIs();
-		scene.setFill(ViewSettings.background);
-		infoPane.updateTextColor(ViewSettings.textColor);
+	public Planet getSelectedPlanet() {
+		return selectedPlanet;
+	}
+
+	public double getZoom() {
+		return zoom;
+	}
+
+	public double getWidth() {
+		return scene.getWidth();
+	}
+
+	public double getHeight() {
+		return scene.getHeight();
 	}
 
 }

@@ -6,7 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import simulation.Main;
-import utils.Utils;
 
 /**
  * Implements the information group for the main window.
@@ -90,7 +89,7 @@ public class InfoPane extends Pane {
 			spsLabel.setText("Steps/Sec: " + spsFinal);
 
 			// past simulation time
-			pastTimeLabel.setText(Utils.getTimeString(Main.sim.getSecondsCounter()));
+			pastTimeLabel.setText(getTimeString(Main.sim.getSecondsCounter()));
 		}
 
 		// general information
@@ -125,6 +124,34 @@ public class InfoPane extends Pane {
 		spsLabel.setTextFill(c);
 		pastTimeLabel.setTextFill(c);
 		infoLabel.setTextFill(c);
+	}
+	
+	/**
+	 * Gives the past seconds in a nice time format.
+	 * 
+	 * @return the past time as a String
+	 */
+	public static String getTimeString(double seconds) {
+		int secs = (int) seconds;
+		int mins, hours, days, years;
+
+		years = secs / 31536000;
+		secs -= years * 31536000;
+		days = secs / 86400;
+		secs -= days * 86400;
+		hours = secs / 3600;
+		secs -= hours * 3600;
+		mins = secs / 60;
+		secs -= mins * 60;
+
+		if (years > 0)
+			return String.format("Y: %1$d D: %2$d", years, days);
+		else if (days > 0)
+			return String.format("Y: %1$d D: %2$d H: %3$d", years, days, hours);
+		else if (hours > 0)
+			return String.format("Y: %1$d D: %2$d H: %3$d M: %4$d", years, days, hours, mins);
+		else
+			return String.format("Y: %1$d D: %2$d H: %3$d M: %4$d S: %5$d", years, days, hours, mins, secs);
 	}
 
 }
