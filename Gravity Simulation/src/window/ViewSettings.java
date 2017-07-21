@@ -20,6 +20,8 @@ public class ViewSettings {
 	public static Color textColor = Color.WHITE;
 	public static Color planetSelectionColor = Color.WHITE;
 	public static Color bodyColor = Color.WHITE;
+	
+	public static double uiOpacity = 0.7;
 
 	/** sizes */
 	public static double minBodySize = 1;

@@ -22,7 +22,7 @@ public class Systems {
 	 * an empty system
 	 */
 	public static Constellation empty() {
-		return new Constellation("Empty", new ArrayList<Planet>(), 5e-7, 1);
+		return new Constellation("Empty", new ArrayList<Planet>(), 0.8e-6, 1);
 	}
 
 	/**
@@ -30,9 +30,9 @@ public class Systems {
 	 */
 	public static Constellation solarSystem() {
 		String name = "Solar System";
-		double scale = 2e-9;
+		double scale = 1.3e-9;
 		double time = 100;
-		// int sps = default;
+		int asteroids = 50;
 
 		Planet sun = PlanetData.getSun();
 		Planet mercury = PlanetData.getMercury();
@@ -55,12 +55,11 @@ public class Systems {
 		uranus.setOrbit(sun, PlanetData.uranusOrbit);
 		neptun.setOrbit(sun, PlanetData.neptuneOrbit);
 
-		// all planets
 		ArrayList<Planet> planets = new ArrayList<Planet>(
 				Arrays.asList(sun, mercury, venus, earth, mars, ceres, jupiter, saturn, uranus, neptun));
 
 		// asteroid belt between mars and Jupiter
-		ArrayList<Particle> particles = ParticleArrays.getRing(sun, 100, PlanetData.AU * 2.3, PlanetData.AU * 3.3);
+		ArrayList<Particle> particles = ParticleArrays.getRing(sun, asteroids, PlanetData.AU * 2.3, PlanetData.AU * 3.3);
 
 		return new Constellation(name, planets, particles, scale, time);
 	}
@@ -70,9 +69,8 @@ public class Systems {
 	 */
 	public static Constellation outerSolarSystem() {
 		String name = "Solar System";
-		double scale = 6e-11;
+		double scale = 1e-10;
 		double time = 8000;
-		// int sps = default;
 
 		Planet sun = PlanetData.getSun();
 		Planet jupiter = PlanetData.getJupiter();
@@ -104,7 +102,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth, moon));
 
-		return new Constellation("Earth System", planets, 0.8e-6, 20);
+		return new Constellation("Earth System", planets, 1.3e-6, 20);
 	}
 
 	/**
@@ -123,7 +121,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(mars, phobos, deimos));
 
-		return new Constellation("Mars System", planets, 1.2e-5, 0.5);
+		return new Constellation("Mars System", planets, 2e-5, 0.5);
 	}
 
 	/**
@@ -155,9 +153,9 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(jupiter, io, europa, ganymede, callisto));
 
-		ArrayList<Particle> particles = ParticleArrays.getRing(jupiter, 100, 92e6, 122e6);
+//		ArrayList<Particle> particles = ParticleArrays.getRing(jupiter, 100, 92e6, 122e6);
 
-		return new Constellation("Jupiter System", planets, particles, 1.7e-7, 1);
+		return new Constellation("Jupiter System", planets, 4.8e-7, 3);
 	}
 
 	/**
@@ -165,7 +163,7 @@ public class Systems {
 	 */
 	public static Constellation saturnSystem() {
 		String name = "Saturn System";
-		double scale = 6e-7;
+		double scale = 7.2e-7;
 		double time = 3;
 		int sps = 2000;
 		int ringParticle = 500;
@@ -222,7 +220,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(ast1, ast2, jupiter));
 
-		return new Constellation("Jupiter flyby", planets, 3e-7, 3);
+		return new Constellation("Jupiter flyby", planets, 4.4e-7, 3);
 	}
 
 	/**
@@ -246,7 +244,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(p1, p2, p3, p4, p5, p6, p7, p8));
 
-		return new Constellation("Symmetrical 8", planets, 0.05, 10);
+		return new Constellation("Symmetrical 8", planets, 0.073, 10);
 	}
 
 	/**
@@ -271,7 +269,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(mars, mars2, earth));
 
-		return new Constellation("Earth-Mars Collisions", planets, 8e-7, 5);
+		return new Constellation("Earth-Mars Collisions", planets, 1.7e-6, 5);
 	}
 
 	/**
@@ -292,12 +290,11 @@ public class Systems {
 			randomMoon.setPos(Utils.getRandomOrbitPosition(earth, PlanetData.moonSma * 0.1, PlanetData.moonSma));
 			randomMoon.setOrbitalVel(earth);
 			randomMoon.setColor(Utils.getRandomColor());
-			// randomMoon.setName(Integer.toString(i));
 
 			planets.add(randomMoon);
 		}
 
-		return new Constellation("Random moons", planets, 1e-6, 4, sps);
+		return new Constellation("Random moons", planets, 2e-6, 4, sps);
 	}
 
 	/**
@@ -309,19 +306,19 @@ public class Systems {
 
 		for (int i = 0; i < number; i++) {
 			Planet p = PlanetData.getRandomPlanet();
-
-			double x = Utils.plusMinus() * Math.random() * 5e7 * 12;
-			double y = Utils.plusMinus() * Math.random() * 5e7 * 7;
+			
+			double s = 6e7;
+			double x = Utils.plusMinus() * Math.random() * s * 12;
+			double y = Utils.plusMinus() * Math.random() * s * 7;
 
 			p.setPos(x, y);
 			p.setVel(Utils.plusMinus() * Math.random() * 5000, Utils.plusMinus() * Math.random() * 5000);
 			p.setColor(Utils.getRandomColor());
-			// p.setName(Integer.toString(i));
 
 			planets.add(p);
 		}
 
-		return new Constellation("Random planets", planets, 7e-7, 1, 2000);
+		return new Constellation("Random planets", planets, 1.2e-6, 1, 2000);
 	}
 
 	/**
@@ -390,7 +387,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(sun1, sun2, p1, p2));
 
-		return new Constellation("Binary star", planets, 1e-8, 10);
+		return new Constellation("Binary star", planets, 1.6e-8, 10);
 	}
 
 	/**
@@ -418,7 +415,7 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(p1, p2));
 
-		return new Constellation("Binary with rings", planets, particlesAll, 5e-7, 10, sps);
+		return new Constellation("Binary with rings", planets, particlesAll, 7.3e-7, 10, sps);
 	}
 
 	/**
@@ -445,19 +442,29 @@ public class Systems {
 	public static Constellation particleField() {
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(PlanetData.getEarth()));
 		ArrayList<Particle> particles = ParticleArrays.getField(PlanetData.moonSma, PlanetData.moonSma, new Vec2d());
-		return new Constellation("Earth in particle field", planets, particles, 1.5e-6, 5, 1000);
+		return new Constellation("Earth in particle field", planets, particles, 2.65e-6, 5, 1000);
 	}
 
-	public static Constellation test() {
-
+	public static Constellation iss() {
 		Planet earth = PlanetData.getEarth();
 		Planet iss = new Planet(100e3, 500, Color.WHITE, "ISS");
 		Planet gso = new Planet(100, 5, Color.WHITE, "GSO");
+		Planet hubble = new Planet(100, 5, Color.WHITE, "Hubble");
+		Planet gps  = new Planet(100, 5, Color.WHITE, "GPS");
+		Planet moon = PlanetData.getMoon();
+
+		moon.setOrbit(earth, PlanetData.moonOrbit);
+		earth.setVel(Utils.momComp(earth, moon));
 
 		iss.setOrbit(earth, new Orbit(earth.getRadius() + 400e3));
 		gso.setOrbit(earth, new Orbit(42157e3));
+		Orbit ho = new Orbit(earth.getRadius() + 545e3);
+		ho.setArgumentOfPeriapsis(180);
+		hubble.setOrbit(earth, ho);
+		gps.setOrbit(earth, new Orbit(20200e3));
+		
 
-		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth, iss, gso));
+		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth, iss, gso, moon, hubble, gps));
 
 		return new Constellation("Test System", planets, 20e-6, 0.05);
 	}

@@ -88,6 +88,8 @@ public class Planet implements Body {
 	private void initializeObjects(Color color, String name) {
 		label = new Label(name);
 		label.setTextFill(ViewSettings.textColor);
+		label.setScaleX(0.9);
+		label.setScaleY(0.9);
 		circle = new Circle(1, color);
 		trail = new Trail(this);
 		acc = new Vec2d();

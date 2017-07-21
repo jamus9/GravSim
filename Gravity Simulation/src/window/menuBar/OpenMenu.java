@@ -25,6 +25,10 @@ public class OpenMenu extends Menu {
 		MenuItem solarSystem = new MenuItem("Solar System");
 		solarSystem.setOnAction(actionEvent -> Main.restart(Systems.solarSystem()));
 		subMenuReal.getItems().add(solarSystem);
+		
+		MenuItem outerSolarSystem = new MenuItem("Outer Solar System");
+		outerSolarSystem.setOnAction(actionEvent -> Main.restart(Systems.outerSolarSystem()));
+		subMenuReal.getItems().add(outerSolarSystem);
 
 		MenuItem earthSystem = new MenuItem("Earth System");
 		earthSystem.setOnAction(actionEvent -> Main.restart(Systems.earthSystem()));
@@ -94,7 +98,10 @@ public class OpenMenu extends Menu {
 		MenuItem empty = new MenuItem("Empty");
 		empty.setOnAction(actionEvent -> Main.restart(Systems.empty()));
 		this.getItems().add(empty);
-
+		
+		MenuItem iss = new MenuItem("ISS Orbit");
+		iss.setOnAction(actionEvent -> Main.restart(Systems.iss()));
+		this.getItems().add(iss);
 	}
 
 }

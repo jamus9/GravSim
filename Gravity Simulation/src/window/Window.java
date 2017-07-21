@@ -13,11 +13,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
@@ -67,6 +70,7 @@ public class Window extends Application {
 
 	/** the scene of the window */
 	private Scene scene;
+	private Stage primaryStage;
 
 	/** pane for all trails */
 	private Pane trailPane;
@@ -79,6 +83,10 @@ public class Window extends Application {
 
 	/** the menu bar */
 	private CustomMenuBar menuBar;
+
+	private Button deccButton, pauseButton, accButton;
+
+	private Label pauseLabel;
 
 	/**
 	 * creates a new window with and initialized local variables
@@ -99,9 +107,9 @@ public class Window extends Application {
 	/**
 	 * Starts the window for the simulation.
 	 * 
-	 * @param primaryStage
+	 * @param stage
 	 */
-	public void start(Stage primaryStage) {
+	public void start(Stage stage) {
 
 		// scene and root
 		Group root = new Group();
@@ -109,18 +117,51 @@ public class Window extends Application {
 		setSceneEvents(scene);
 
 		// stage
+		this.primaryStage = stage;
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Gravity Simulation");
-		primaryStage.setMaximized(true);
+		primaryStage.setFullScreenExitHint("");
+		// primaryStage.setMaximized(true);
+		primaryStage.setFullScreen(true);
 
 		// add panes and menu to root
 		trailPane = new Pane();
 		bodyPane = new Pane();
 		infoPane = new InfoPane();
-//		infoPane.setVisible(false);
 		menuBar = new CustomMenuBar(primaryStage);
-		menuBar.updateCMIs();
-		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar);
+
+		{
+			int x = 285;
+			int y = -1;
+			deccButton = new Button("<<");
+			deccButton.setOnAction(actionEvent -> Main.sim.multTime(0.5));
+			deccButton.setOpacity(ViewSettings.uiOpacity);
+			deccButton.setTranslateX(x);
+			deccButton.setTranslateY(y);
+
+			pauseButton = new Button("||");
+			pauseButton.setOnAction(actionEvent -> togglePause());
+			pauseButton.setOpacity(ViewSettings.uiOpacity);
+			pauseButton.setTranslateX(x + 35);
+			pauseButton.setTranslateY(y);
+			pauseButton.setPrefWidth(25);
+
+			accButton = new Button(">>");
+			accButton.setOnAction(actionEvent -> Main.sim.multTime(2));
+			accButton.setOpacity(ViewSettings.uiOpacity);
+			accButton.setTranslateX(x + 63);
+			accButton.setTranslateY(y);
+
+			pauseLabel = new Label("Pause");
+			pauseLabel.setTextFill(Color.RED);
+			pauseLabel.setStyle("-fx-font-size: 20");
+			pauseLabel.setVisible(false);
+			pauseLabel.setTranslateX(x + 100);
+			pauseLabel.setTranslateY(-3);
+		}
+
+		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar, deccButton, pauseButton, accButton,
+				pauseLabel);
 
 		// initialize all values to default and load the planet objects
 		resetAndLoad(Main.sim);
@@ -150,7 +191,6 @@ public class Window extends Application {
 				// transform trails if window size has changed
 				if (winWasChanged) {
 					translateTrails();
-					infoPane.relocateTimeButtons();
 					winWasChanged = false;
 				}
 
@@ -202,11 +242,13 @@ public class Window extends Application {
 				if (key == KeyCode.E)
 					resetView();
 				if (key == KeyCode.T)
-					changeTrailsVisibility();
+					toggleTrails();
 				if (key == KeyCode.L)
-					changeLabelsVisibility();
+					toggleLabels();
 				if (key == KeyCode.I)
-					changeInfoVisibility();
+					toggleInfo();
+				if (key == KeyCode.F)
+					toggleFullscreen();
 
 				// time controls
 				if (key == KeyCode.PERIOD)
@@ -216,14 +258,22 @@ public class Window extends Application {
 				if (key == KeyCode.MINUS)
 					Main.sim.resetTime();
 				if (key == KeyCode.P || key == KeyCode.SPACE)
-					Main.sim.setPause(!Main.sim.isPaused());
+					togglePause();
 
-				// adding planets
+				// planets
 				if (key == KeyCode.A)
 					addNextPlanet();
-				if (key == KeyCode.M)
-					changeOrbitMode();
+				if (key == KeyCode.DELETE && selectedPlanet != null) {
+					Main.sim.getPlanetList().remove(selectedPlanet);
+					selectedPlanet.delete();
+					deselectPlanet();
+				}
+				if (key == KeyCode.O)
+					toggleOrbitMode();
+				if (key == KeyCode.Q)
+					printInfo();
 			}
+
 		});
 
 		// zoom with the mouse wheel
@@ -304,6 +354,8 @@ public class Window extends Application {
 		deselectPlanet();
 		follow = false;
 
+		pauseLabel.setVisible(false);
+
 		// clear the pane and add the new bodies
 		bodyPane.getChildren().clear();
 		trailPane.getChildren().clear();
@@ -321,11 +373,8 @@ public class Window extends Application {
 	 */
 	private void addBodyToWindow(Body body) {
 		bodyPane.getChildren().add(body.getCircle());
-
-		if (body.getClass() == Planet.class) {
-			Planet p = (Planet) body;
-			bodyPane.getChildren().addAll(p.getLabel());
-		}
+		if (body.getClass() == Planet.class)
+			bodyPane.getChildren().add(((Planet) body).getLabel());
 	}
 
 	/**
@@ -544,15 +593,17 @@ public class Window extends Application {
 	 * Changes the visibility of the trails for all planets and updates the check
 	 * menu item.
 	 */
-	public void changeTrailsVisibility() {
+	public void toggleTrails() {
 		if (trails) {
-			trails = false;
 			for (Planet p : Main.sim.getPlanetList())
 				p.getTrail().delete();
+			trails = false;
 		} else {
-			trails = true;
+			for (Planet p : Main.sim.getPlanetList())
+				p.getTrail().delete();
 			for (Planet p : Main.sim.getPlanetList())
 				p.getTrail().savePosition();
+			trails = true;
 		}
 		menuBar.updateCMIs();
 	}
@@ -561,7 +612,7 @@ public class Window extends Application {
 	 * Changes the visibility of the label for all planets and updates the check
 	 * menu item.
 	 */
-	public void changeLabelsVisibility() {
+	public void toggleLabels() {
 		labels = !labels;
 		for (Planet p : Main.sim.getPlanetList()) {
 			p.getLabel().setVisible(labels);
@@ -573,17 +624,38 @@ public class Window extends Application {
 	 * Changes the visibility of the information group and updates the check menu
 	 * item.
 	 */
-	public void changeInfoVisibility() {
+	public void toggleInfo() {
 		infoPane.setVisible(!infoPane.isVisible());
 		menuBar.updateCMIs();
+	}
+
+	public void toggleFullscreen() {
+		primaryStage.setFullScreen(!primaryStage.isFullScreen());
+		menuBar.updateCMIs();
+	}
+
+	private void togglePause() {
+		boolean np = !Main.sim.isPaused();
+		Main.sim.setPause(np);
+		pauseLabel.setVisible(np);
+		if (np)
+			pauseButton.setText(">");
+		else
+			pauseButton.setText("||");
 	}
 
 	/**
 	 * turns the orbitMode on or off
 	 */
-	public void changeOrbitMode() {
+	public void toggleOrbitMode() {
 		orbitMode = !orbitMode;
 		menuBar.updateCMIs();
+	}
+
+	private void printInfo() {
+		System.out.println("System: " + Main.sim.getConstellation().getName());
+		System.out.println("Scale: " + zoom * Main.sim.getScale());
+		System.out.println("Time: " + Main.sim.getTime());
 	}
 
 	public boolean isTrails() {
@@ -596,6 +668,10 @@ public class Window extends Application {
 
 	public boolean isInfoVisible() {
 		return infoPane.isVisible();
+	}
+
+	public boolean isFullscreen() {
+		return primaryStage.isFullScreen();
 	}
 
 	public boolean isOrbitMode() {

@@ -19,27 +19,28 @@ public class HelpWindow extends Application {
 		primaryStage.setTitle("Help");
 
 		Group root = new Group();
-		Scene scene = new Scene(root, 240, 310, ViewSettings.background);
+		Scene scene = new Scene(root, 260, 330, ViewSettings.background);
 
 		Label helpLabel = new Label();
 		helpLabel.relocate(10, 10);
 		helpLabel.setText(
 				  "Restart			R\n"
-				+ "Reset view		E\n"
+				+ "Reset View		E\n"
 				+ "Pause			Space or P\n"
-				+ "Accelerate time	.\n"
-				+ "Decelerate time	,\n"
-				+ "Reset time		-\n"
-				+ "Vectors			V\n"
+				+ "Accelerate Time	.\n"
+				+ "Decelerate Time	,\n"
+				+ "Reset Time		-\n"
 				+ "Trails			T\n"
 				+ "Labels			L\n"
 				+ "Information		I\n"
-				+ "Select planet		Left mouse button\n"
-				+ "Add new planet	Right mouse button\n"
-				+ "Orbit mode		M\n"
-				+ "Reset view		Middle mouse button\n"
-				+ "Drag view		Left mouse button\n"
-				+ "Zoom			Mouse scroll\n"
+				+ "Orbit Mode		O\n"
+				+ "Select Planet		Left Mouse Button\n"
+				+ "Add new Planet	Right Mouse Button or A\n"
+				+ "Delete Planet		Delete\n"
+				+ "Reset View		Middle Mouse Button\n"
+				+ "Drag View		Left Mouse Button\n"
+				+ "Zoom			Mouse Scroll\n"
+				+ "Fullscreen		F\n"
 				+ "Exit				Esc");
 		
 		helpLabel.setTextFill(ViewSettings.textColor);

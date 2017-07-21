@@ -22,24 +22,24 @@ public class AddMenu extends Menu {
 		super("Add");
 		
 		newMenu(PlanetData.getPhobos());
+		newMenu(PlanetData.getEnceladus());
 		
-//		newMenu(PlanetData.getMoon());
 		Planet moon = PlanetData.getMoon();
-		RadioMenuItem temp = new RadioMenuItem(moon.getName());
-		temp.setOnAction(actionEvent -> Main.win.setNextAddedPlanet(moon));
-		toggleGroup.getToggles().add(temp);
-		this.getItems().add(temp);
-		temp.setSelected(true);
+		RadioMenuItem moonItem = new RadioMenuItem(moon.getName());
+		moonItem.setOnAction(actionEvent -> Main.win.setNextAddedPlanet(moon));
+		toggleGroup.getToggles().add(moonItem);
+		this.getItems().add(moonItem);
+		moonItem.setSelected(true);
 		
 		newMenu(PlanetData.getMercury());
 		newMenu(PlanetData.getVenus());
 		newMenu(PlanetData.getEarth());
-		newMenu(PlanetData.getVenus());
 		newMenu(PlanetData.getMars());
 		newMenu(PlanetData.getJupiter());
 		newMenu(PlanetData.getSaturn());
 		newMenu(PlanetData.getUranus());
 		newMenu(PlanetData.getNeptune());
+		
 		newMenu(PlanetData.getSun());
 		newMenu(PlanetData.getBetelgeuse());
 		newMenu(PlanetData.getSagittariusA());

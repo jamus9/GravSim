@@ -62,7 +62,6 @@ public class Simulation {
 		planetList = constellation.getPlanetList();
 		for (Planet p : planetList)
 			p.getTrail().savePosition();
-		// p.savePosition();
 
 		// copy the particles of the new system in the local array
 		particleList = constellation.getParticleList();
