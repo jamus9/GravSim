@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import simulation.Main;
 import utils.Vec2d;
+import utils.Vec;
 import window.ViewSettings;
 
 /**
@@ -17,7 +18,7 @@ import window.ViewSettings;
 public class Particle implements Body {
 
 	/** planet properties */
-	private Vec2d pos, vel, acc;
+	private Vec pos, vel, acc;
 
 	/** drawn objects */
 	private Circle circle;
@@ -31,9 +32,9 @@ public class Particle implements Body {
 	 * @param velY
 	 */
 	public Particle(double posX, double posY, double velX, double velY) {
-		this.pos = new Vec2d(posX, posY);
-		this.vel = new Vec2d(velX, velY);
-		this.acc = new Vec2d();
+		this.pos = new Vec(posX, posY);
+		this.vel = new Vec(velX, velY);
+		this.acc = new Vec();
 		circle = new Circle(ViewSettings.minBodySize);
 		circle.setFill(Color.WHITE);
 	}
@@ -46,7 +47,7 @@ public class Particle implements Body {
 	/** updates the circle position */
 	@Override
 	public void updateObjects() {
-		Vec2d tp = Main.win.transform(pos);
+		Vec tp = Main.win.transform(pos);
 		circle.setCenterX(tp.getX());
 		circle.setCenterY(tp.getY());
 	}
@@ -58,46 +59,46 @@ public class Particle implements Body {
 
 	@Override
 	public void setPos(Vec2d pos) {
-		this.pos = pos;
+		this.pos.set(pos.getX(), pos.getY());
 	}
 
 	@Override
 	public void setPos(double x, double y) {
-		this.pos = new Vec2d(x, y);
+		this.pos = new Vec(x, y);
 	}
 
 	@Override
-	public Vec2d getPos() {
+	public Vec getPos() {
 		return pos;
 	}
 
 	@Override
-	public void setVel(Vec2d vel) {
+	public void setVel(Vec vel) {
 		this.vel = vel;
 	}
 
 	@Override
 	public void setVel(double x, double y) {
-		vel = new Vec2d(x, y);
+		vel = new Vec(x, y);
 	}
 
 	@Override
-	public Vec2d getVel() {
+	public Vec getVel() {
 		return vel;
 	}
 
 	@Override
 	public void resetAcc() {
-		acc = new Vec2d();
+		acc = new Vec();
 	}
 
 	@Override
-	public Vec2d getAcc() {
+	public Vec getAcc() {
 		return acc;
 	}
 
 	@Override
-	public void addAcc(Vec2d v) {
+	public void addAcc(Vec v) {
 		acc = acc.add(v);
 	}
 

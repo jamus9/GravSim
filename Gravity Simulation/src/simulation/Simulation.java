@@ -12,7 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
 import utils.Utils;
-import utils.Vec2d;
+import utils.Vec;
 
 /**
  * Simulates the movement of the planets and handles the current planets and
@@ -122,13 +122,13 @@ public class Simulation {
 	 * @param planet
 	 * @return the acceleration vector
 	 */
-	private static Vec2d getAccVec(Body body, Planet planet) {
+	private static Vec getAccVec(Body body, Planet planet) {
 
 		// direction of the acceleration vector
-		Vec2d r = (planet.getPos()).sub(body.getPos());
+		Vec r = (planet.getPos()).sub(body.getPos());
 
 		// r * G * m / |r|^3
-		return r.mult(Utils.GRAV_CONST * planet.getMass() / Math.pow(r.norm(), 3));
+		return r.mult(Utils.GRAV_CONST * planet.getMass() / Math.pow(r.getRadius(), 3));
 	}
 
 	/**
@@ -138,8 +138,8 @@ public class Simulation {
 	 * @param body
 	 */
 	private void updateBodyProps(Body body) {
-		Vec2d v = body.getVel();
-		Vec2d a = body.getAcc();
+		Vec v = body.getVel();
+		Vec a = body.getAcc();
 
 		// v + a*t
 		body.setVel(v.add(a.mult(time)));
@@ -165,7 +165,7 @@ public class Simulation {
 			for (int j = i + 1; j < planetList.size(); j++) {
 				p2 = planetList.get(j);
 
-				if (p1.getPos().sub(p2.getPos()).norm() < p1.getRadius() + p2.getRadius()) {
+				if (p1.getPos().sub(p2.getPos()).getRadius() < p1.getRadius() + p2.getRadius()) {
 					bigP = Utils.getBiggest(p1, p2);
 					smallP = Utils.getSmallest(p1, p2);
 
@@ -184,7 +184,7 @@ public class Simulation {
 
 			// particles (don't collide with each other)
 			for (Particle particle : particleList) {
-				if (particle.getPos().sub(p1.getPos()).norm() < p1.getRadius()) {
+				if (particle.getPos().sub(p1.getPos()).getRadius() < p1.getRadius()) {
 					toRemove.add(particle);
 				}
 			}
@@ -208,14 +208,14 @@ public class Simulation {
 	 * @param p2
 	 * @return the new velocity
 	 */
-	private static Vec2d getCollisionVel(Planet p1, Planet p2) {
+	private static Vec getCollisionVel(Planet p1, Planet p2) {
 		double m1 = p1.getMass();
 		double m2 = p2.getMass();
-		Vec2d v1 = p1.getVel();
-		Vec2d v2 = p2.getVel();
+		Vec v1 = p1.getVel();
+		Vec v2 = p2.getVel();
 		double x = (m1 * v1.getX() + m2 * v2.getX()) / (m1 + m2);
 		double y = (m1 * v1.getY() + m2 * v2.getY()) / (m1 + m2);
-		return new Vec2d(x, y);
+		return new Vec(x, y);
 	}
 
 	/**
@@ -294,7 +294,7 @@ public class Simulation {
 		return planetList.size() + particleList.size();
 	}
 
-	public double getSps() {
+	public int getSps() {
 		return constellation.getSps();
 	}
 

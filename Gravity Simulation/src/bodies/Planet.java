@@ -6,9 +6,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import simulation.Main;
 import utils.Orbit;
-import utils.PolarVec2d;
+import utils.PolarVec;
 import utils.Utils;
 import utils.Vec2d;
+import utils.Vec;
 import window.ViewSettings;
 
 /**
@@ -21,7 +22,7 @@ import window.ViewSettings;
 public class Planet implements Body {
 
 	/** planet properties */
-	private Vec2d pos, vel, acc;
+	private Vec pos, vel, acc;
 	private double radius, mass;
 
 	/** drawn objects */
@@ -43,8 +44,8 @@ public class Planet implements Body {
 	 */
 	public Planet(double posX, double posY, double velX, double velY, double mass, double radius, Color color,
 			String name) {
-		this.pos = new Vec2d(posX, posY);
-		this.vel = new Vec2d(velX, velY);
+		this.pos = new Vec(posX, posY);
+		this.vel = new Vec(velX, velY);
 		this.mass = mass;
 		this.radius = radius;
 		initializeObjects(color, name);
@@ -73,8 +74,8 @@ public class Planet implements Body {
 	 * @param density
 	 */
 	public Planet(double posX, double posY, double velX, double velY, double mass, double density) {
-		this.pos = new Vec2d(posX, posY);
-		this.vel = new Vec2d(velX, velY);
+		this.pos = new Vec(posX, posY);
+		this.vel = new Vec(velX, velY);
 		setMass(mass, density);
 		initializeObjects(ViewSettings.bodyColor, "");
 	}
@@ -92,7 +93,7 @@ public class Planet implements Body {
 		label.setScaleY(0.9);
 		circle = new Circle(1, color);
 		trail = new Trail(this);
-		acc = new Vec2d();
+		acc = new Vec();
 	}
 
 	/**
@@ -101,7 +102,7 @@ public class Planet implements Body {
 	 */
 	@Override
 	public void updateObjects() {
-		Vec2d tp = Main.win.transform(pos);
+		Vec tp = Main.win.transform(pos);
 		double circleRadius = Main.sim.getScale() * Main.win.getZoom() * radius;
 
 		// update circle
@@ -113,8 +114,10 @@ public class Planet implements Body {
 			circle.setRadius(circleRadius);
 
 		// update label
-		if (Main.win.isLabels())
-			label.relocate(tp.getX() + circleRadius + 5, tp.getY());
+		if (Main.win.isLabels()) {
+			double d = (circleRadius / 1.41421) + 2;
+			label.relocate(tp.getX() + d, tp.getY() + d);
+		}
 
 		// update trail
 		if (Main.win.isTrails())
@@ -146,44 +149,44 @@ public class Planet implements Body {
 		circle.setStroke(null);
 	}
 
-	public Vec2d getPos() {
+	public Vec getPos() {
 		return pos;
 	}
 
 	public void setPos(Vec2d pos) {
-		this.pos = pos;
+		this.pos.set(pos.getX(), pos.getY());
 	}
 
-	public void setPos(PolarVec2d pos) {
-		this.pos = pos.toVec2d();
-	}
+	// public void setPos(PolarVec2d pos) {
+	// this.pos = pos.toVec2d();
+	// }
 
 	public void setPos(double x, double y) {
-		pos = new Vec2d(x, y);
+		pos = new Vec(x, y);
 	}
 
-	public Vec2d getVel() {
+	public Vec getVel() {
 		return vel;
 	}
 
-	public void setVel(Vec2d vel) {
+	public void setVel(Vec vel) {
 		this.vel = vel;
 	}
 
 	public void setVel(double x, double y) {
-		vel = new Vec2d(x, y);
+		vel = new Vec(x, y);
 	}
 
-	public Vec2d getAcc() {
+	public Vec getAcc() {
 		return acc;
 	}
 
-	public void addAcc(Vec2d v) {
+	public void addAcc(Vec v) {
 		acc = acc.add(v);
 	}
 
 	public void resetAcc() {
-		acc = new Vec2d();
+		acc = new Vec();
 	}
 
 	public double getMass() {
@@ -241,7 +244,7 @@ public class Planet implements Body {
 	}
 
 	public void setOrbit(Planet parent, Orbit orb) {
-		setPos(new PolarVec2d(orb.getPeriapsis(), orb.getArgumentOfPeriapsis()));
+		setPos(new PolarVec(orb.getPeriapsis(), orb.getArgOfPeriapsis()));
 		setVel(Utils.getOrbitalVelocityElliptical(parent, this, orb.getSma()));
 	}
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import bodies.Particle;
 import bodies.Planet;
 import utils.Utils;
-import utils.Vec2d;
+import utils.Vec;
 
 /**
  * Creates different arrays of particles.
@@ -24,7 +24,7 @@ public class ParticleArrays {
 	 * @param number
 	 * @return
 	 */
-	public static ArrayList<Particle> getVerticalLine(Vec2d pos, Vec2d vel, double lenght, int number) {
+	public static ArrayList<Particle> getVerticalLine(Vec pos, Vec vel, double lenght, int number) {
 		ArrayList<Particle> particles = new ArrayList<Particle>();
 
 		Particle particle;
@@ -72,7 +72,7 @@ public class ParticleArrays {
 	 * @param y
 	 * @return
 	 */
-	public static ArrayList<Particle> getField(double x, double y, Vec2d center) {
+	public static ArrayList<Particle> getField(double x, double y, Vec center) {
 		int n = 50;
 		double cx = center.getX();
 		double cy = center.getY();

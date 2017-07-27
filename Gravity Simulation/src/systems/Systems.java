@@ -8,7 +8,7 @@ import bodies.Planet;
 import javafx.scene.paint.Color;
 import utils.Orbit;
 import utils.Utils;
-import utils.Vec2d;
+import utils.Vec;
 
 /**
  * A class that creates Constellations for the simulation.
@@ -349,8 +349,8 @@ public class Systems {
 
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth));
 
-		ArrayList<Particle> particles = ParticleArrays.getVerticalLine(new Vec2d(-PlanetData.moonSma / 2.0, 0),
-				new Vec2d(1000, 0), PlanetData.moonSma * 2, 1000);
+		ArrayList<Particle> particles = ParticleArrays.getVerticalLine(new Vec(-PlanetData.moonSma / 2.0, 0),
+				new Vec(1000, 0), PlanetData.moonSma * 2, 1000);
 
 		return new Constellation("Particle line", planets, particles, 0.7e-6, 20);
 	}
@@ -431,7 +431,7 @@ public class Systems {
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(earth));
 
 		ArrayList<Particle> particles = ParticleArrays.getField(PlanetData.moonSma * 2, PlanetData.moonSma * 2,
-				new Vec2d(-PlanetData.moonSma, 0));
+				new Vec(-PlanetData.moonSma, 0));
 
 		return new Constellation("Earth flying through particles", planets, particles, 5e-7, 50, sps);
 	}
@@ -441,7 +441,7 @@ public class Systems {
 	 */
 	public static Constellation particleField() {
 		ArrayList<Planet> planets = new ArrayList<Planet>(Arrays.asList(PlanetData.getEarth()));
-		ArrayList<Particle> particles = ParticleArrays.getField(PlanetData.moonSma, PlanetData.moonSma, new Vec2d());
+		ArrayList<Particle> particles = ParticleArrays.getField(PlanetData.moonSma, PlanetData.moonSma, new Vec());
 		return new Constellation("Earth in particle field", planets, particles, 2.65e-6, 5, 1000);
 	}
 
@@ -459,7 +459,7 @@ public class Systems {
 		iss.setOrbit(earth, new Orbit(earth.getRadius() + 400e3));
 		gso.setOrbit(earth, new Orbit(42157e3));
 		Orbit ho = new Orbit(earth.getRadius() + 545e3);
-		ho.setArgumentOfPeriapsis(180);
+		ho.setArgOfPeriapsis(180);
 		hubble.setOrbit(earth, ho);
 		gps.setOrbit(earth, new Orbit(20200e3));
 		

@@ -6,7 +6,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
 import simulation.Main;
-import utils.Vec2d;
+import utils.Vec;
 import window.ViewSettings;
 
 /**
@@ -26,7 +26,7 @@ public class Trail {
 	private LinkedList<Line> lineList;
 
 	/** the real coordinates of the trail */
-	private LinkedList<Vec2d> coordList;
+	private LinkedList<Vec> coordList;
 
 	/**
 	 * creates a new trail
@@ -36,7 +36,7 @@ public class Trail {
 	public Trail(Planet parent) {
 		this.parent = parent;
 		lineList = new LinkedList<Line>();
-		coordList = new LinkedList<Vec2d>();
+		coordList = new LinkedList<Vec>();
 	}
 
 	/**
@@ -45,11 +45,11 @@ public class Trail {
 	 * @param pos
 	 */
 	public void addLine() {
-		Vec2d tp = Main.win.transform(parent.getPos());
-		Vec2d tplast = Main.win.transform(coordList.getLast());
+		Vec tp = Main.win.transform(parent.getPos());
+		Vec tplast = Main.win.transform(coordList.getLast());
 
 		// only draw new line if planet moved more than trailLength
-		if (tp.sub(tplast).norm() > ViewSettings.trailLength) {
+		if (tp.sub(tplast).getRadius() > ViewSettings.trailLength) {
 
 			// the new line
 			Line newLine = new Line(tplast.getX(), tplast.getY(), tp.getX(), tp.getY());
@@ -82,14 +82,14 @@ public class Trail {
 	 * Saves the current position of the planet in coordList.
 	 */
 	public void savePosition() {
-		coordList.add(new Vec2d(parent.getPos()));
+		coordList.add(new Vec(parent.getPos()));
 	}
 
 	/**
 	 * Translate all Lines in lineList with help of orbitPoints.
 	 */
 	public void translate() {
-		Vec2d newStart, newEnd;
+		Vec newStart, newEnd;
 		Line line;
 
 		for (int i = 0; i < lineList.size(); i++) {

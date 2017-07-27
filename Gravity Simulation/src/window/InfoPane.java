@@ -23,8 +23,6 @@ public class InfoPane extends Pane {
 	 * Creates an information group.
 	 */
 	public InfoPane() {
-		super();
-
 		int y = 16;
 
 		spsLabel = new Label();
@@ -88,7 +86,7 @@ public class InfoPane extends Pane {
 				String mass = "Mass: " + selPl.getMass() + " kg\n";
 				String rad = "Radius: " + Math.round(selPl.getRadius() / 1000.0) + " km\n";
 				String dens = "Density: " + (int) selPl.getDensity() + " kg/m^3\n";
-				String vel = "Velocity: " + (int) selPl.getVel().norm() + " m/s" + "\n";
+				String vel = "Velocity: " + (int) selPl.getVel().getRadius() + " m/s" + "\n";
 				infoText += "\n\n" + name + rad + mass + dens + vel;
 			}
 

@@ -1,8 +1,6 @@
 package window;
 
-import bodies.Body;
-import bodies.Particle;
-import bodies.Planet;
+import java.util.ArrayList;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,11 +23,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import simulation.Main;
-import simulation.Simulation;
+import simulation.*;
 import systems.PlanetData;
 import utils.Utils;
-import utils.Vec2d;
+import utils.Vec;
+import bodies.Constellation;
+import bodies.Particle;
+import bodies.Planet;
 import window.menuBar.CustomMenuBar;
 
 /**
@@ -42,65 +42,55 @@ import window.menuBar.CustomMenuBar;
  */
 public class Window extends Application {
 
-	/** flags for trails label and vectors */
+	/** the scene of the window */
+	private Scene scene;
+	private Stage primaryStage;
+	private Group root;
+
+	/** panes for circles, trails, labels and Info */
+	private Pane bodyPane, trailPane, labelPane;
+	private InfoPane infoPane;
+
+	/** the menu */
+	private CustomMenuBar menuBar;
+	private Button deccButton, pauseButton, accButton;
+	private Label pauseLabel;
+
+	/** flags for trails, labels */
 	private boolean trails, labels;
 
 	/** coordinates for zoom and translation */
-	private double zoom;
-	private double dx, dy, tempdx, tempdy;
+	private double zoom, dx, dy, tempdx, tempdy;
 	private double mouseX, mouseY;
 
 	/** the current mouse position for adding planets */
-	private Vec2d mousePos;
+	private Vec mousePos;
 
-	/** the selected planet */
+	/** the selected planet and a flag for following it*/
 	private Planet selectedPlanet;
-
-	/** for following a planet */
 	private boolean follow;
 
-	/** the next planet that will be added */
+	/** the next planet that will be added and the mode */
 	private Planet nextAddedPlanet;
-
-	/** in orbit mode all planets get placed in orbits */
 	private boolean orbitMode;
 
 	/** true if window size was changed */
 	private boolean winWasChanged;
 
-	/** the scene of the window */
-	private Scene scene;
-	private Stage primaryStage;
-
-	/** pane for all trails */
-	private Pane trailPane;
-
-	/** pane for all circles, vectors and labels */
-	private Pane bodyPane;
-
-	/** pane for all information */
-	private InfoPane infoPane;
-
-	/** the menu bar */
-	private CustomMenuBar menuBar;
-
-	private Button deccButton, pauseButton, accButton;
-
-	private Label pauseLabel;
+	private Constellation save;
 
 	/**
-	 * creates a new window with and initialized local variables
+	 * Creates a new window with initialized local variables.
 	 */
 	public Window() {
 		trails = true;
 		labels = true;
-
 		follow = false;
 
 		nextAddedPlanet = PlanetData.getMoon();
 		orbitMode = true;
 
-		mousePos = new Vec2d();
+		mousePos = new Vec();
 		winWasChanged = true;
 	}
 
@@ -112,7 +102,7 @@ public class Window extends Application {
 	public void start(Stage stage) {
 
 		// scene and root
-		Group root = new Group();
+		root = new Group();
 		scene = new Scene(root, 1244, 700, ViewSettings.background);
 		setSceneEvents(scene);
 
@@ -127,6 +117,7 @@ public class Window extends Application {
 		// add panes and menu to root
 		trailPane = new Pane();
 		bodyPane = new Pane();
+		labelPane = new Pane();
 		infoPane = new InfoPane();
 		menuBar = new CustomMenuBar(primaryStage);
 
@@ -160,7 +151,7 @@ public class Window extends Application {
 			pauseLabel.setTranslateY(-3);
 		}
 
-		root.getChildren().addAll(trailPane, bodyPane, infoPane, menuBar, deccButton, pauseButton, accButton,
+		root.getChildren().addAll(trailPane, bodyPane, labelPane, infoPane, menuBar, deccButton, pauseButton, accButton,
 				pauseLabel);
 
 		// initialize all values to default and load the planet objects
@@ -196,7 +187,7 @@ public class Window extends Application {
 
 				// follow a planet
 				if (follow) {
-					Vec2d pos = selectedPlanet.getPos().mult(Main.sim.getScale());
+					Vec pos = selectedPlanet.getPos().mult(Main.sim.getScale());
 					dx = -pos.getX();
 					dy = pos.getY();
 					translateTrails();
@@ -270,8 +261,18 @@ public class Window extends Application {
 				}
 				if (key == KeyCode.O)
 					toggleOrbitMode();
-				if (key == KeyCode.Q)
-					printInfo();
+
+				// testing
+//				if (key == KeyCode.Q)
+//					printInfo();
+//				if (key == KeyCode.W) {
+//					if (save == null)
+//						enterCompareMode();
+//					else {
+//						Main.restart(save, true);
+//						// save = null;
+//					}
+//				}
 			}
 
 		});
@@ -358,23 +359,16 @@ public class Window extends Application {
 
 		// clear the pane and add the new bodies
 		bodyPane.getChildren().clear();
+		labelPane.getChildren().clear();
 		trailPane.getChildren().clear();
 
 		for (Particle particle : sim.getParticleList())
-			addBodyToWindow(particle);
-		for (Planet planet : sim.getPlanetList())
-			addBodyToWindow(planet);
-	}
+			bodyPane.getChildren().add(particle.getCircle());
 
-	/**
-	 * adds all objects of a body to the bodyPane
-	 * 
-	 * @param body
-	 */
-	private void addBodyToWindow(Body body) {
-		bodyPane.getChildren().add(body.getCircle());
-		if (body.getClass() == Planet.class)
-			bodyPane.getChildren().add(((Planet) body).getLabel());
+		for (Planet planet : sim.getPlanetList())
+			bodyPane.getChildren().add(planet.getCircle());
+		for (Planet planet : sim.getPlanetList())
+			labelPane.getChildren().add(planet.getLabel());
 	}
 
 	/**
@@ -445,12 +439,12 @@ public class Window extends Application {
 				if (selectedPlanet == null) {
 					timeline.stop();
 				} else {
-					Vec2d scaledPos = selectedPlanet.getPos().mult(Main.sim.getScale());
+					Vec scaledPos = selectedPlanet.getPos().mult(Main.sim.getScale());
 
 					// pancounter from 0 -> 1
 					dx = posx * (1 - pancounter) + -scaledPos.getX() * pancounter;
 					dy = posy * (1 - pancounter) + scaledPos.getY() * pancounter;
-					pancounter += 0.1;
+					pancounter += 0.08;
 					translateTrails();
 				}
 			}
@@ -468,14 +462,14 @@ public class Window extends Application {
 	 */
 	private void checkForSelectedPlanet(double mouseX, double mouseY) {
 		Circle circle;
-		Vec2d mouse, center;
+		Vec mouse, center;
 
 		for (Planet p : Main.sim.getPlanetList()) {
 			circle = p.getCircle();
-			center = new Vec2d(circle.getCenterX(), circle.getCenterY());
-			mouse = new Vec2d(mouseX, mouseY);
+			center = new Vec(circle.getCenterX(), circle.getCenterY());
+			mouse = new Vec(mouseX, mouseY);
 
-			if (mouse.sub(center).norm() < circle.getRadius() + 5) {
+			if (mouse.sub(center).getRadius() < circle.getRadius() + 10) {
 				selectPlanet(p);
 			}
 		}
@@ -500,7 +494,52 @@ public class Window extends Application {
 
 		// add the planet
 		Main.sim.addNewPlanet(newPlanet);
-		addBodyToWindow(newPlanet);
+
+		bodyPane.getChildren().add(newPlanet.getCircle());
+		labelPane.getChildren().add(newPlanet.getLabel());
+	}
+
+	public void enterCompareMode() {
+		Main.sim.setPause(true);
+
+		save = new Constellation(Main.sim.getName(), Main.sim.getPlanetList(), Main.sim.getParticleList(),
+				Main.sim.getScale(), Main.sim.getTime(), Main.sim.getSps());
+
+		for (Planet p : save.getPlanetList()) {
+			p.getTrail().delete();
+			p.getTrail().savePosition();
+		}
+
+		ArrayList<Planet> planetList = new ArrayList<>();
+		for (Planet p : Main.sim.getPlanetList()) {
+			planetList.add(p.clone());
+		}
+
+		// sort the list
+		// planetList.sort(new Comparator<Planet>() {
+		// public int compare(Planet p1, Planet p2) {
+		// if (p1.getRadius() > p2.getRadius())
+		// return -1;
+		// else
+		// return 1;
+		// }
+		// });
+
+		planetList.get(0).setPos(-planetList.get(0).getRadius(), 0);
+
+		for (int i = 1; i < planetList.size(); i++) {
+			Planet p = planetList.get(i);
+			Planet pp = planetList.get(i - 1);
+			p.setPos(pp.getPos().getX() + pp.getRadius() + p.getRadius(), 0);
+		}
+
+		double scale = 400 / Utils.getBiggest(planetList).getRadius();
+
+		Main.restart(new Constellation(save.getName(), planetList, scale, 0), false);
+	}
+
+	public void resetSaved() {
+		save = null;
 	}
 
 	/**
@@ -527,10 +566,10 @@ public class Window extends Application {
 	 * @param vector
 	 * @return the transformed vector
 	 */
-	public Vec2d transform(Vec2d vector) {
+	public Vec transform(Vec vector) {
 		double x = zoom * (Main.sim.getScale() * vector.getX() + dx + tempdx) + getWidth() / 2.0;
 		double y = zoom * (Main.sim.getScale() * -vector.getY() + dy + tempdy) + getHeight() / 2.0;
-		return new Vec2d(x, y);
+		return new Vec(x, y);
 	}
 
 	/**
@@ -539,10 +578,10 @@ public class Window extends Application {
 	 * @param vector
 	 * @return the transformed vector
 	 */
-	public Vec2d transfromBack(Vec2d vector) {
+	public Vec transfromBack(Vec vector) {
 		double x = ((vector.getX() - getWidth() / 2) / zoom - dx - tempdx) / Main.sim.getScale();
 		double y = -((vector.getY() - getHeight() / 2) / zoom - dy - tempdy) / Main.sim.getScale();
-		return new Vec2d(x, y);
+		return new Vec(x, y);
 	}
 
 	/**

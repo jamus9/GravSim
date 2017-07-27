@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import bodies.Body;
@@ -32,6 +33,10 @@ public class Utils {
 				biggest = p;
 		return biggest;
 	}
+	
+	public static Planet getBiggest(ArrayList<Planet> planets) {
+		return getBiggest(planets.toArray(new Planet[planets.size()]));
+	}
 
 	/**
 	 * returns the least massive planet from a collection of planets
@@ -62,15 +67,15 @@ public class Utils {
 	public static Planet getBiggestInView(Window win, Planet... planets) {
 		LinkedList<Planet> planetsInView = new LinkedList<Planet>();
 
-		Vec2d topLeft = win.transfromBack(new Vec2d(0, 0));
-		Vec2d bottomRight = win.transfromBack(new Vec2d(win.getWidth(), win.getHeight()));
+		Vec topLeft = win.transfromBack(new Vec(0, 0));
+		Vec bottomRight = win.transfromBack(new Vec(win.getWidth(), win.getHeight()));
 
 		double x1 = topLeft.getX();
 		double x2 = bottomRight.getX();
 		double y1 = topLeft.getY();
 		double y2 = bottomRight.getY();
 
-		Vec2d pos;
+		Vec pos;
 
 		for (Planet planet : planets) {
 			pos = planet.getPos();
@@ -89,11 +94,11 @@ public class Utils {
 	 * @param rMax
 	 * @return the random position vector
 	 */
-	public static Vec2d getRandomOrbitPosition(Planet parent, double rMin, double rMax) {
+	public static Vec getRandomOrbitPosition(Planet parent, double rMin, double rMax) {
 		double angle = getRandomInInervall(0, 360);
 		double radius = getRandomInInervall(rMin, rMax);
 
-		return (new Vec2d(new PolarVec2d(radius, angle))).add(parent.getPos());
+		return (new Vec(new PolarVec(radius, angle))).add(parent.getPos());
 	}
 
 	/**
@@ -103,16 +108,16 @@ public class Utils {
 	 * @param position
 	 * @return the orbital velocity as a vector
 	 */
-	public static Vec2d getOrbitalVelocityCircular(Planet parent, Body body) {
+	public static Vec getOrbitalVelocityCircular(Planet parent, Body body) {
 
 		// connection vector
-		Vec2d r = parent.getPos().sub(body.getPos());
+		Vec r = parent.getPos().sub(body.getPos());
 
 		// normal vector to r
-		Vec2d velDirection = new Vec2d(r.getY(), -r.getX());
+		Vec velDirection = new Vec(r.getY(), -r.getX());
 
 		// norm and multiply with orbital speed
-		return velDirection.getDir().mult(orbSpeedCircular(parent, r.norm())).add(parent.getVel());
+		return velDirection.normalize().mult(orbSpeedCircular(parent, r.getRadius())).add(parent.getVel());
 	}
 
 	/**
@@ -122,16 +127,16 @@ public class Utils {
 	 * @param position
 	 * @return the orbital velocity as a vector
 	 */
-	public static Vec2d getOrbitalVelocityElliptical(Planet parent, Body body, double sma) {
+	public static Vec getOrbitalVelocityElliptical(Planet parent, Body body, double sma) {
 
 		// connection vector
-		Vec2d r = parent.getPos().sub(body.getPos());
+		Vec r = parent.getPos().sub(body.getPos());
 
 		// normal vector to r
-		Vec2d velDirection = new Vec2d(r.getY(), -r.getX());
+		Vec velDirection = new Vec(r.getY(), -r.getX());
 
 		// norm and multiply with orbital speed
-		return velDirection.getDir().mult(orbSpeedElliptical(parent, r.norm(), sma)).add(parent.getVel());
+		return velDirection.normalize().mult(orbSpeedElliptical(parent, r.getRadius(), sma)).add(parent.getVel());
 	}
 
 	/**
@@ -170,7 +175,7 @@ public class Utils {
 		return -otherMass * otherSpeed / ownMass;
 	}
 
-	public static Vec2d momComp(Planet p1, Planet p2) {
+	public static Vec momComp(Planet p1, Planet p2) {
 		return p2.getVel().mult(p2.getMass()).mult(-1.0 / p1.getMass());
 	}
 

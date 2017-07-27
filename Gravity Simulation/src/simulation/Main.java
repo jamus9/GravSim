@@ -42,21 +42,24 @@ public class Main extends Application {
 	 * 
 	 * @param newConstellation
 	 */
-	public static void restart(Constellation newConstellation) {
+	public static void restart(Constellation newConstellation, boolean resetSave) {
 		sim.stop();
 		sim = new Simulation(newConstellation);
 		sim.run();
 		win.resetAndLoad(sim);
+		if (resetSave)
+			win.resetSaved();
+	}
+
+	public static void restart(Constellation newConstellation) {
+		restart(newConstellation, true);
 	}
 
 	/**
 	 * Starts a new simulation with the current Constellation in a default window.
 	 */
 	public static void restart() {
-		sim.stop();
-		sim = new Simulation(sim.getConstellation());
-		sim.run();
-		win.resetAndLoad(sim);
+		restart(sim.getConstellation());
 	}
 
 }

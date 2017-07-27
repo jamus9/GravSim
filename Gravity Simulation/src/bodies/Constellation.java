@@ -20,23 +20,28 @@ public class Constellation {
 	private int sps;
 
 	/**
-	 * Creates a new constellation with name, planets, particles, scale and time
-	 * scale
+	 * Creates a new constellation with name, planets, scale and time scale
 	 * 
 	 * @param name
 	 * @param planetArray
-	 * @param particleArray
 	 * @param scale
 	 * @param time
 	 */
-	public Constellation(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
-			double time, int sps) {
-		this.name = name;
-		this.planetList = planetArray;
-		this.particleList = particleArray;
-		this.scale = scale;
-		this.time = time;
-		this.sps = sps;
+	public Constellation(String name, ArrayList<Planet> planetArray, double scale, double time) {
+		this(name, planetArray, new ArrayList<Particle>(), scale, time, defaultSps);
+	}
+
+	/**
+	 * Creates a new constellation with name, planets, scale and time scale and steps per second
+	 * 
+	 * @param name
+	 * @param planetArray
+	 * @param scale
+	 * @param time
+	 * @param sps
+	 */
+	public Constellation(String name, ArrayList<Planet> planetArray, double scale, double time, int sps) {
+		this(name, planetArray, new ArrayList<Particle>(), scale, time, sps);
 	}
 
 	/**
@@ -55,27 +60,23 @@ public class Constellation {
 	}
 
 	/**
-	 * Creates a new constellation with name, planets, scale and time scale
+	 * Creates a new constellation with name, planets, particles, scale and time
+	 * scale
 	 * 
 	 * @param name
 	 * @param planetArray
+	 * @param particleArray
 	 * @param scale
 	 * @param time
 	 */
-	public Constellation(String name, ArrayList<Planet> planetArray, double scale, double time, int sps) {
-		this(name, planetArray, new ArrayList<Particle>(), scale, time, sps);
-	}
-
-	/**
-	 * Creates a new constellation with name, planets, scale and time scale
-	 * 
-	 * @param name
-	 * @param planetArray
-	 * @param scale
-	 * @param time
-	 */
-	public Constellation(String name, ArrayList<Planet> planetArray, double scale, double time) {
-		this(name, planetArray, new ArrayList<Particle>(), scale, time, defaultSps);
+	public Constellation(String name, ArrayList<Planet> planetArray, ArrayList<Particle> particleArray, double scale,
+			double time, int sps) {
+		this.name = name;
+		this.planetList = planetArray;
+		this.particleList = particleArray;
+		this.scale = scale;
+		this.time = time;
+		this.sps = sps;
 	}
 
 	public int numberOfPlanets() {
@@ -114,7 +115,7 @@ public class Constellation {
 		return time;
 	}
 
-	public double getSps() {
+	public int getSps() {
 		return sps;
 	}
 
